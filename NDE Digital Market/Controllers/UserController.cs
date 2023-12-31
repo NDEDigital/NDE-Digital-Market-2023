@@ -268,7 +268,7 @@ GROUP BY CR.MaxUser;";
             }
             else
             {
-                con.Close();
+             
                 return BadRequest(new { message = "Invalid phone number or Password"});
             }
         }
