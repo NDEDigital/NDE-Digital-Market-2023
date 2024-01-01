@@ -54,7 +54,7 @@ namespace NDE_Digital_Market.Controllers
                     {
                         GetOrderInvoiceByMasterIdDto details = new GetOrderInvoiceByMasterIdDto();
                         {
-                            details.OrderMasterId = Convert.ToInt32(reader["OrderMasterId"].ToString());
+                            //details.OrderMasterId = Convert.ToInt32(reader["OrderMasterId"].ToString());
                             details.OrderNo = reader["OrderNo"].ToString();
                             details.OrderDate = Convert.ToDateTime(reader["OrderDate"].ToString());
                             details.Address = reader["Address"].ToString();
@@ -64,12 +64,13 @@ namespace NDE_Digital_Market.Controllers
                             details.TotalPrice = Convert.ToDecimal(reader["TotalPrice"].ToString());
                             details.PhoneNumber = reader["PhoneNumber"].ToString();
                             details.DeliveryCharge = Convert.ToDecimal(reader["DeliveryCharge"].ToString());
-                            details.OrderDetailId = Convert.ToInt32(reader["OrderDetailId"].ToString());
+                            //details.OrderDetailId = Convert.ToInt32(reader["OrderDetailId"].ToString());
                             details.SellerName = reader["SellerName"].ToString();
+                            details.CompanyName = reader["CompanyName"].ToString();
                             details.ProductName = reader["ProductName"].ToString();
                             details.Specification = reader["Specification"].ToString();
                             details.Qty = Convert.ToInt32(reader["Qty"].ToString());
-                            details.UnitId = Convert.ToInt32(reader["UnitId"].ToString());
+                            //details.UnitId = Convert.ToInt32(reader["UnitId"].ToString());
                             details.Unit = reader["Unit"].ToString();
                             details.DiscountAmount = reader.IsDBNull(reader.GetOrdinal("DiscountAmount")) ? (Decimal?)null : (Decimal?)reader.GetDecimal(reader.GetOrdinal("DiscountAmount"));
                             details.Price = Convert.ToDecimal(reader["Price"].ToString());
