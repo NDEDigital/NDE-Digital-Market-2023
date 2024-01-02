@@ -12,9 +12,14 @@
         public int NumberOfItem { get; set; }
         public decimal TotalPrice { get; set; }
 
-        // OrderInvoice list
-        public List<OrderInvoiceDetails> OrderInvoiceDetailList { get; set; } = new List<OrderInvoiceDetails>();
+        public List<OrderInvoiceDetails> OrderInvoiceDetailList { get; set; }
+
+        public GetOrderInvoiceByMasterIdDto()
+        {
+            OrderInvoiceDetailList = new List<OrderInvoiceDetails>();
+        }
     }
+
 
     public class OrderInvoiceDetails
     {

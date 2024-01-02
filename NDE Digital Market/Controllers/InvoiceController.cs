@@ -50,17 +50,15 @@ namespace NDE_Digital_Market.Controllers
             con.Close();
             for (int i = 0; i < reader.Rows.Count; i++)
             {
-                GetOrderInvoiceByMasterIdDto buyerdata = new GetOrderInvoiceByMasterIdDto
-                {
-                    InvoiceNumber = reader.Rows[i]["InvoiceNumber"].ToString(),
-                    OrderDate = Convert.ToDateTime(reader.Rows[i]["OrderDate"].ToString()),
-                    BuyerName = reader.Rows[i]["BuyerName"].ToString(),
-                    Address = reader.Rows[i]["Address"].ToString(),
-                    Phone = reader.Rows[i]["Phone"].ToString(),
-                    PaymentMethod = reader.Rows[i]["PaymentMethod"].ToString(),
-                    NumberOfItem = Convert.ToInt32(reader.Rows[i]["NumberOfItem"].ToString()),
-                    TotalPrice = Convert.ToDecimal(reader.Rows[i]["TotalPrice"].ToString()),
-                };
+                invoice.InvoiceNumber = reader.Rows[i]["InvoiceNumber"].ToString();
+                invoice.OrderDate = Convert.ToDateTime(reader.Rows[i]["OrderDate"].ToString());
+                invoice.BuyerName = reader.Rows[i]["BuyerName"].ToString();
+                invoice.Address = reader.Rows[i]["Address"].ToString();
+                invoice.Phone = reader.Rows[i]["Phone"].ToString();
+                invoice.PaymentMethod = reader.Rows[i]["PaymentMethod"].ToString();
+                invoice.NumberOfItem = Convert.ToInt32(reader.Rows[i]["NumberOfItem"].ToString());
+                invoice.TotalPrice = Convert.ToDecimal(reader.Rows[i]["TotalPrice"].ToString());
+
                 //invoice.OrderInvoiceDetailList.Add(buyerdata);
             }
             for (int i = 0; i < reader1.Rows.Count; i++)
@@ -87,6 +85,7 @@ namespace NDE_Digital_Market.Controllers
             }
             return Ok(new { message = "Buyer Order Invoice got successfully", invoice });
         }
+
 
         //public IActionResult GetInvoiceDataForAdmin(int OrderID)
         //{
@@ -173,18 +172,16 @@ namespace NDE_Digital_Market.Controllers
             con.Close();
             for (int i = 0; i < reader.Rows.Count; i++)
             {
-                SellerInvoice Sellerdata = new SellerInvoice
-                {
 
-                    SSMCode = reader.Rows[i]["SSMCode"].ToString(),
-                    SSMDate = Convert.ToDateTime(reader.Rows[i]["SSMDate"].ToString()),
-                    SelesPerson = reader.Rows[i]["SelesPerson"].ToString(),
-                    Company = reader.Rows[i]["Company"].ToString(),
-                    SelesAddress = reader.Rows[i]["SelesAddress"].ToString(),
-                    Phone = reader.Rows[i]["Phone"].ToString(),
-                    Challan = reader.Rows[i]["Challan"].ToString(),
-                    Remarks = reader.Rows[i]["Remarks"].ToString(),
-                };
+
+                invoice.SSMCode = reader.Rows[i]["SSMCode"].ToString();
+                invoice.SSMDate = Convert.ToDateTime(reader.Rows[i]["SSMDate"].ToString());
+                invoice.SelesPerson = reader.Rows[i]["SelesPerson"].ToString();
+                invoice.Company = reader.Rows[i]["Company"].ToString();
+                invoice.SelesAddress = reader.Rows[i]["SelesAddress"].ToString();
+                invoice.Phone = reader.Rows[i]["Phone"].ToString();
+                invoice.Challan = reader.Rows[i]["Challan"].ToString();
+                invoice.Remarks = reader.Rows[i]["Remarks"].ToString();
             }
 
             for (int i = 0; i < reader1.Rows.Count; i++)
@@ -206,11 +203,11 @@ namespace NDE_Digital_Market.Controllers
                     Address = reader1.Rows[i]["Address"].ToString(),
 
                 };
+                // Add the ProductDetails object to the productDetailsList
                 invoice.SellerInvoiceDetailList.Add(sellerDetails);
             }
             return Ok(new { message = "Sellers Order Invoice got successfully", invoice });
         }
-
 
 
     }
