@@ -14,7 +14,7 @@ namespace NDE_Digital_Market.Model
         public int? RatingValue { get; set; }
 
         public int? BuyerId { get; set; }
-   
+
 
         public int? ProductGroupID { get; set; }
 

@@ -108,16 +108,17 @@ namespace NDE_Digital_Market.Controllers
         //}
 
 
+
         [HttpPost]
         [Route("getReviewRatingsData")]
         public async Task<IActionResult> AddReview([FromForm] ReviewsAndRatings review)
         {
-            string ImagePath = string.Empty; 
+            string ImagePath = string.Empty;
 
             if (review.ImageFile != null)
             {
                 ImagePath = CommonServices.UploadFiles(foldername, filename, review.ImageFile);
-                review.ImagePath = ImagePath; 
+                review.ImagePath = ImagePath;
             }
 
             using (con)
@@ -128,7 +129,7 @@ namespace NDE_Digital_Market.Controllers
          SellerId, ReviewDate, ImagePath, AddedDate, AddedBy, AddedPc)
     VALUES
         (@OrderDetailId, @ReviewText, @RatingValue, @BuyerId, @ProductGroupID, @ProductId, 
-         @SellerId, @ReviewDate, @ImagePath, @AddedDate, @AddedBy, @AddedPc);"; 
+         @SellerId, @ReviewDate, @ImagePath, @AddedDate, @AddedBy, @AddedPc);";
 
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 {
@@ -140,19 +141,39 @@ namespace NDE_Digital_Market.Controllers
                     cmd.Parameters.AddWithValue("@ProductId", review.ProductId ?? (object)DBNull.Value);
                     cmd.Parameters.AddWithValue("@SellerId", review.SellerId ?? (object)DBNull.Value);
                     cmd.Parameters.AddWithValue("@ReviewDate", DateTime.Now);
-                    cmd.Parameters.AddWithValue("@ImagePath", ImagePath);
+                    cmd.Parameters.AddWithValue("@ImagePath", ImagePath ?? (object)DBNull.Value);
                     cmd.Parameters.AddWithValue("@AddedDate", DateTime.Now);
                     cmd.Parameters.AddWithValue("@AddedBy", review.AddedBy ?? (object)DBNull.Value);
                     cmd.Parameters.AddWithValue("@AddedPc", review.AddedPc ?? (object)DBNull.Value);
                     try
                     {
                         await con.OpenAsync();
-                        await cmd.ExecuteNonQueryAsync();
-                        return Ok("Review added successfully.");
+                        int a = await cmd.ExecuteNonQueryAsync();
+
+                        if (a > 0)
+                        {
+                            SqlCommand command = new SqlCommand("UPDATE OrderDetails SET Status = 'Reviewed' WHERE OrderDetailId = " + review.OrderDetailId + "", con);
+
+                            int updateResult = await command.ExecuteNonQueryAsync();
+
+                            if (updateResult <= 0)
+                            {
+
+
+                                return BadRequest(new { message = "product review status isn't change or not found." });
+                            }
+                        }
+                        else
+                        {
+                            return BadRequest(new { message = "product review data isn't Inserted Successfully." });
+                        }
+
+                        return Ok(new { message = "Review added successfully." });
+
                     }
                     catch (Exception ex)
                     {
-                        
+
                         return StatusCode(500, "Error adding review: " + ex.Message);
                     }
                 }
