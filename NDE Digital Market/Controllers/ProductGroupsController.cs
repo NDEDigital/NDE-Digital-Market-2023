@@ -118,77 +118,113 @@ namespace NDE_Digital_Market.Controllers
         public async Task<List<ProductGroupsModel>> GetProductGroupsListAsync()
         {
             List<ProductGroupsModel> lst = new List<ProductGroupsModel>();
-            await con.OpenAsync();
-            string query = @"SELECT [ProductGroupID],[ProductGroupCode],[ProductGroupName],[ProductGroupPrefix],[ProductGroupDetails],
-                [IsActive] FROM ProductGroups WHERE IsActive = 1 ORDER BY [ProductGroupID] DESC;";
 
-            using (SqlCommand cmd = new SqlCommand(query, con))
+            try
             {
-                using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
-                {
-                    while (await reader.ReadAsync())
-                    {
-                        ProductGroupsModel modelObj = new ProductGroupsModel();
-                        modelObj.ProductGroupID = Convert.ToInt32(reader["ProductGroupID"]);
-                        modelObj.ProductGroupCode = reader["ProductGroupCode"].ToString();
-                        modelObj.ProductGroupName = reader["ProductGroupName"].ToString();
-                        modelObj.ProductGroupPrefix = reader["ProductGroupPrefix"].ToString();
-                        modelObj.ProductGroupDetails = reader["ProductGroupDetails"].ToString();
-                        modelObj.IsActive = Convert.ToBoolean(reader["IsActive"]);
+                await con.OpenAsync();
+                string query = @"SELECT [ProductGroupID],[ProductGroupCode],[ProductGroupName],[ProductGroupPrefix],[ProductGroupDetails],
+            [IsActive] FROM ProductGroups WHERE IsActive = 1 ORDER BY [ProductGroupID] DESC;";
 
-                        lst.Add(modelObj);
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            ProductGroupsModel modelObj = new ProductGroupsModel();
+                            modelObj.ProductGroupID = Convert.ToInt32(reader["ProductGroupID"]);
+                            modelObj.ProductGroupCode = reader["ProductGroupCode"].ToString();
+                            modelObj.ProductGroupName = reader["ProductGroupName"].ToString();
+                            modelObj.ProductGroupPrefix = reader["ProductGroupPrefix"].ToString();
+                            modelObj.ProductGroupDetails = reader["ProductGroupDetails"].ToString();
+                            modelObj.IsActive = Convert.ToBoolean(reader["IsActive"]);
+
+                            lst.Add(modelObj);
+                        }
                     }
                 }
             }
-
+            catch (Exception ex)
+            {
+                // Handle the exception here. You can log the exception or perform any other necessary actions.
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                // You might want to throw the exception again if you cannot handle it at this level.
+                throw;
+            }
+            finally
+            {
+                // Ensure the connection is closed, even in case of an exception.
+                if (con.State == ConnectionState.Open)
+                {
+                    await con.CloseAsync();
+                }
+            }
 
             return lst;
-        } 
+        }
+
+
         [HttpGet]
         [Route("GetProductGroupsListByStatus")]
-        public async Task<List<ProductGroupByStatusDTO>> GetProductGroupsListByStatus( Int32? status=null)
+        public async Task<List<ProductGroupByStatusDTO>> GetProductGroupsListByStatus(Int32? status = null)
         {
             List<ProductGroupByStatusDTO> lst = new List<ProductGroupByStatusDTO>();
-            await con.OpenAsync();
 
-            string query = "";
-            if (status != null)
+            try
             {
-                query = @"SELECT * FROM ProductGroups WHERE IsActive= @IsActive ORDER BY ProductGroupID  DESC;";
+                await con.OpenAsync();
 
-            }
-            else
-             query = @"SELECT * FROM ProductGroups WHERE CONVERT(DATE, DateAdded) = CONVERT(DATE, GETDATE()) ORDER BY ProductGroupID  DESC";
-            {
-
-            }
-
-            using (SqlCommand cmd = new SqlCommand(query, con))
-            {
+                string query = "";
                 if (status != null)
                 {
-                    cmd.Parameters.Add(new SqlParameter("@IsActive", status));
-
+                    query = @"SELECT * FROM ProductGroups WHERE IsActive= @IsActive ORDER BY ProductGroupID  DESC;";
                 }
-                using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                else
                 {
-                    while (await reader.ReadAsync())
-                    {
-                        ProductGroupByStatusDTO modelObj = new ProductGroupByStatusDTO();
-                        modelObj.ProductGroupID = Convert.ToInt32(reader["ProductGroupID"]);
-                        modelObj.ProductGroupCode = reader["ProductGroupCode"].ToString();
-                        modelObj.ProductGroupName = reader["ProductGroupName"].ToString();
-                        modelObj.ProductGroupPrefix = reader["ProductGroupPrefix"].ToString();
-                        modelObj.ProductGroupDetails = reader["ProductGroupDetails"].ToString();
-                        modelObj.IsActive = Convert.ToBoolean(reader["IsActive"]);
-                        modelObj.Imagepath = reader["Imagepath"].ToString();
-                        modelObj.DateAdded = reader.IsDBNull(reader.GetOrdinal("DateAdded")) ? (DateTime?)null : (DateTime?)reader["DateAdded"];
+                    query = @"SELECT * FROM ProductGroups WHERE CONVERT(DATE, DateAdded) = CONVERT(DATE, GETDATE()) ORDER BY ProductGroupID  DESC";
+                }
 
-                        lst.Add(modelObj);
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    if (status != null)
+                    {
+                        cmd.Parameters.Add(new SqlParameter("@IsActive", status));
+                    }
+
+                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            ProductGroupByStatusDTO modelObj = new ProductGroupByStatusDTO();
+                            modelObj.ProductGroupID = Convert.ToInt32(reader["ProductGroupID"]);
+                            modelObj.ProductGroupCode = reader["ProductGroupCode"].ToString();
+                            modelObj.ProductGroupName = reader["ProductGroupName"].ToString();
+                            modelObj.ProductGroupPrefix = reader["ProductGroupPrefix"].ToString();
+                            modelObj.ProductGroupDetails = reader["ProductGroupDetails"].ToString();
+                            modelObj.IsActive = Convert.ToBoolean(reader["IsActive"]);
+                            modelObj.Imagepath = reader["Imagepath"].ToString();
+                            modelObj.DateAdded = reader.IsDBNull(reader.GetOrdinal("DateAdded")) ? (DateTime?)null : (DateTime?)reader["DateAdded"];
+
+                            lst.Add(modelObj);
+                        }
                     }
                 }
             }
-
+            catch (Exception ex)
+            {
+                // Handle the exception here. You can log the exception or perform any other necessary actions.
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                // You might want to throw the exception again if you cannot handle it at this level.
+                throw;
+            }
+            finally
+            {
+                // Ensure the connection is closed, even in case of an exception.
+                if (con.State == ConnectionState.Open)
+                {
+                    await con.CloseAsync();
+                }
+            }
 
             return lst;
         }

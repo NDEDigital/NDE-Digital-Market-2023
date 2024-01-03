@@ -35,55 +35,63 @@ namespace NDE_Digital_Market.Controllers
         public async Task<IActionResult> GetInvoiceDataForBuyer(int OrderMasterId)
         {
             GetOrderInvoiceByMasterIdDto invoice = new GetOrderInvoiceByMasterIdDto();
-            SqlConnection con = new SqlConnection(connectionHealthCare);
-            string queryForBuyer = "GetOrderInvoiceByMasterId";
-            con.Open();
-            SqlCommand cmdForBuyer = new SqlCommand(queryForBuyer, con);
-            cmdForBuyer.CommandType = CommandType.StoredProcedure;
 
-            cmdForBuyer.Parameters.AddWithValue("@OrderMasterId", OrderMasterId);
-            SqlDataAdapter adapter = new SqlDataAdapter(cmdForBuyer);
-            DataSet ds = new DataSet();
-            adapter.Fill(ds);
-            DataTable reader = ds.Tables[0];
-            DataTable reader1 = ds.Tables[1];
-            con.Close();
-            for (int i = 0; i < reader.Rows.Count; i++)
+            try
             {
-                invoice.InvoiceNumber = reader.Rows[i]["InvoiceNumber"].ToString();
-                invoice.OrderDate = Convert.ToDateTime(reader.Rows[i]["OrderDate"].ToString());
-                invoice.BuyerName = reader.Rows[i]["BuyerName"].ToString();
-                invoice.Address = reader.Rows[i]["Address"].ToString();
-                invoice.Phone = reader.Rows[i]["Phone"].ToString();
-                invoice.PaymentMethod = reader.Rows[i]["PaymentMethod"].ToString();
-                invoice.NumberOfItem = Convert.ToInt32(reader.Rows[i]["NumberOfItem"].ToString());
-                invoice.TotalPrice = Convert.ToDecimal(reader.Rows[i]["TotalPrice"].ToString());
+                SqlConnection con = new SqlConnection(connectionHealthCare);
+                string queryForBuyer = "GetOrderInvoiceByMasterId";
+                con.Open();
+                SqlCommand cmdForBuyer = new SqlCommand(queryForBuyer, con);
+                cmdForBuyer.CommandType = CommandType.StoredProcedure;
 
-                //invoice.OrderInvoiceDetailList.Add(buyerdata);
-            }
-            for (int i = 0; i < reader1.Rows.Count; i++)
-            {
-                OrderInvoiceDetails orderDetails = new OrderInvoiceDetails
+                cmdForBuyer.Parameters.AddWithValue("@OrderMasterId", OrderMasterId);
+                SqlDataAdapter adapter = new SqlDataAdapter(cmdForBuyer);
+                DataSet ds = new DataSet();
+                adapter.Fill(ds);
+                DataTable reader = ds.Tables[0];
+                DataTable reader1 = ds.Tables[1];
+                con.Close();
+                for (int i = 0; i < reader.Rows.Count; i++)
                 {
-                    ProductName = reader1.Rows[i]["ProductName"].ToString(),
-                    Specification = reader1.Rows[i]["Specification"].ToString(),
-                    Quantity = Convert.ToInt32(reader1.Rows[i]["Quantity"].ToString()),
-                    Unit = reader1.Rows[i]["Unit"].ToString(),
-                    Price = Convert.ToDecimal(reader1.Rows[i]["Price"].ToString()),
-                    DeliveryCharge = Convert.ToDecimal(reader1.Rows[i]["DeliveryCharge"].ToString()),
-                    DiscountAmount = Convert.ToDecimal(reader1.Rows[i]["DiscountAmount"].ToString()),
-                    DiscountPct = Convert.ToDecimal(reader1.Rows[i]["DiscountPct"].ToString()),
-                    NetPrice = Convert.ToDecimal(reader1.Rows[i]["NetPrice"].ToString()),
-                    DetailDeliveryCharge = Convert.ToDecimal(reader1.Rows[i]["DetailDeliveryCharge"].ToString()),
-                    SubTotalPrice = Convert.ToDecimal(reader1.Rows[i]["SubTotalPrice"].ToString()),
-                    SelesPerson = reader1.Rows[i]["SelesPerson"].ToString(),
-                    SelesAddress = reader1.Rows[i]["SelesAddress"].ToString(),
-                    SellerContact = reader1.Rows[i]["SellerContact"].ToString(),
-                    Company = reader1.Rows[i]["Company"].ToString(),
-                };
-                invoice.OrderInvoiceDetailList.Add(orderDetails);
+                    invoice.InvoiceNumber = reader.Rows[i]["InvoiceNumber"].ToString();
+                    invoice.OrderDate = Convert.ToDateTime(reader.Rows[i]["OrderDate"].ToString());
+                    invoice.BuyerName = reader.Rows[i]["BuyerName"].ToString();
+                    invoice.Address = reader.Rows[i]["Address"].ToString();
+                    invoice.Phone = reader.Rows[i]["Phone"].ToString();
+                    invoice.PaymentMethod = reader.Rows[i]["PaymentMethod"].ToString();
+                    invoice.NumberOfItem = Convert.ToInt32(reader.Rows[i]["NumberOfItem"].ToString());
+                    invoice.TotalPrice = Convert.ToDecimal(reader.Rows[i]["TotalPrice"].ToString());
+                }
+                for (int i = 0; i < reader1.Rows.Count; i++)
+                {
+                    OrderInvoiceDetails orderDetails = new OrderInvoiceDetails
+                    {
+                        ProductName = reader1.Rows[i]["ProductName"].ToString(),
+                        Specification = reader1.Rows[i]["Specification"].ToString(),
+                        Quantity = Convert.ToInt32(reader1.Rows[i]["Quantity"].ToString()),
+                        Unit = reader1.Rows[i]["Unit"].ToString(),
+                        Price = Convert.ToDecimal(reader1.Rows[i]["Price"].ToString()),
+                        DeliveryCharge = Convert.ToDecimal(reader1.Rows[i]["DeliveryCharge"].ToString()),
+                        DiscountAmount = Convert.ToDecimal(reader1.Rows[i]["DiscountAmount"].ToString()),
+                        DiscountPct = Convert.ToDecimal(reader1.Rows[i]["DiscountPct"].ToString()),
+                        NetPrice = Convert.ToDecimal(reader1.Rows[i]["NetPrice"].ToString()),
+                        DetailDeliveryCharge = Convert.ToDecimal(reader1.Rows[i]["DetailDeliveryCharge"].ToString()),
+                        SubTotalPrice = Convert.ToDecimal(reader1.Rows[i]["SubTotalPrice"].ToString()),
+                        SelesPerson = reader1.Rows[i]["SelesPerson"].ToString(),
+                        SelesAddress = reader1.Rows[i]["SelesAddress"].ToString(),
+                        SellerContact = reader1.Rows[i]["SellerContact"].ToString(),
+                        Company = reader1.Rows[i]["Company"].ToString(),
+                    };
+                    invoice.OrderInvoiceDetailList.Add(orderDetails);
+                }
+
+                return Ok(new { message = "Buyer Order Invoice got successfully", invoice });
             }
-            return Ok(new { message = "Buyer Order Invoice got successfully", invoice });
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                return StatusCode(500, new { message = "Internal Server Error" });
+            }
         }
 
 
@@ -158,55 +166,61 @@ namespace NDE_Digital_Market.Controllers
         public async Task<IActionResult> GetInvoiceDataForSeller(int SSMId)
         {
             SellerInvoice invoice = new SellerInvoice();
-            SqlConnection con = new SqlConnection(connectionHealthCare);
-            string queryForSeller = "SellerInvoice";
-            con.Open();
-            SqlCommand cmdForSeller = new SqlCommand(queryForSeller, con);
-            cmdForSeller.CommandType = CommandType.StoredProcedure;
-            cmdForSeller.Parameters.AddWithValue("@SSMId", SSMId);
-            SqlDataAdapter adapter = new SqlDataAdapter(cmdForSeller);
-            DataSet ds = new DataSet();
-            adapter.Fill(ds);
-            DataTable reader = ds.Tables[0];
-            DataTable reader1 = ds.Tables[1];
-            con.Close();
-            for (int i = 0; i < reader.Rows.Count; i++)
+
+            try
             {
-
-
-                invoice.SSMCode = reader.Rows[i]["SSMCode"].ToString();
-                invoice.SSMDate = Convert.ToDateTime(reader.Rows[i]["SSMDate"].ToString());
-                invoice.SelesPerson = reader.Rows[i]["SelesPerson"].ToString();
-                invoice.Company = reader.Rows[i]["Company"].ToString();
-                invoice.SelesAddress = reader.Rows[i]["SelesAddress"].ToString();
-                invoice.Phone = reader.Rows[i]["Phone"].ToString();
-                invoice.Challan = reader.Rows[i]["Challan"].ToString();
-                invoice.Remarks = reader.Rows[i]["Remarks"].ToString();
-            }
-
-            for (int i = 0; i < reader1.Rows.Count; i++)
-            {
-
-                SellerInvoiceDetails sellerDetails = new SellerInvoiceDetails
+                SqlConnection con = new SqlConnection(connectionHealthCare);
+                string queryForSeller = "SellerInvoice";
+                con.Open();
+                SqlCommand cmdForSeller = new SqlCommand(queryForSeller, con);
+                cmdForSeller.CommandType = CommandType.StoredProcedure;
+                cmdForSeller.Parameters.AddWithValue("@SSMId", SSMId);
+                SqlDataAdapter adapter = new SqlDataAdapter(cmdForSeller);
+                DataSet ds = new DataSet();
+                adapter.Fill(ds);
+                DataTable reader = ds.Tables[0];
+                DataTable reader1 = ds.Tables[1];
+                con.Close();
+                for (int i = 0; i < reader.Rows.Count; i++)
                 {
-                    OrderNo = reader1.Rows[i]["OrderNo"].ToString(),
-                    ProductGroupName = reader1.Rows[i]["ProductGroupName"].ToString(),
-                    ProductName = reader1.Rows[i]["ProductName"].ToString(),
-                    Specification = reader1.Rows[i]["Specification"].ToString(),
-                    StockQty = Convert.ToDecimal(reader1.Rows[i]["StockQty"].ToString()),
-                    SaleQty = Convert.ToInt32(reader1.Rows[i]["SaleQty"].ToString()),
-                    Unit = reader1.Rows[i]["Unit"].ToString(),
-                    NetPrice = Convert.ToDecimal(reader1.Rows[i]["NetPrice"].ToString()),
-                    SSLRemarks = reader1.Rows[i]["SSLRemarks"].ToString(),
-                    BuyerName = reader1.Rows[i]["BuyerName"].ToString(),
-                    BuyerPhone = reader1.Rows[i]["BuyerPhone"].ToString(),
-                    Address = reader1.Rows[i]["Address"].ToString(),
+                    invoice.SSMCode = reader.Rows[i]["SSMCode"].ToString();
+                    invoice.SSMDate = Convert.ToDateTime(reader.Rows[i]["SSMDate"].ToString());
+                    invoice.SelesPerson = reader.Rows[i]["SelesPerson"].ToString();
+                    invoice.Company = reader.Rows[i]["Company"].ToString();
+                    invoice.SelesAddress = reader.Rows[i]["SelesAddress"].ToString();
+                    invoice.Phone = reader.Rows[i]["Phone"].ToString();
+                    invoice.Challan = reader.Rows[i]["Challan"].ToString();
+                    invoice.Remarks = reader.Rows[i]["Remarks"].ToString();
+                }
 
-                };
-                // Add the ProductDetails object to the productDetailsList
-                invoice.SellerInvoiceDetailList.Add(sellerDetails);
+                for (int i = 0; i < reader1.Rows.Count; i++)
+                {
+                    SellerInvoiceDetails sellerDetails = new SellerInvoiceDetails
+                    {
+                        OrderNo = reader1.Rows[i]["OrderNo"].ToString(),
+                        ProductGroupName = reader1.Rows[i]["ProductGroupName"].ToString(),
+                        ProductName = reader1.Rows[i]["ProductName"].ToString(),
+                        Specification = reader1.Rows[i]["Specification"].ToString(),
+                        StockQty = Convert.ToDecimal(reader1.Rows[i]["StockQty"].ToString()),
+                        SaleQty = Convert.ToInt32(reader1.Rows[i]["SaleQty"].ToString()),
+                        Unit = reader1.Rows[i]["Unit"].ToString(),
+                        NetPrice = Convert.ToDecimal(reader1.Rows[i]["NetPrice"].ToString()),
+                        SSLRemarks = reader1.Rows[i]["SSLRemarks"].ToString(),
+                        BuyerName = reader1.Rows[i]["BuyerName"].ToString(),
+                        BuyerPhone = reader1.Rows[i]["BuyerPhone"].ToString(),
+                        Address = reader1.Rows[i]["Address"].ToString(),
+                    };
+                    invoice.SellerInvoiceDetailList.Add(sellerDetails);
+                }
+
+                return Ok(new { message = "Sellers Order Invoice got successfully", invoice });
             }
-            return Ok(new { message = "Sellers Order Invoice got successfully", invoice });
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+  
+                return StatusCode(500, new { message = "Internal Server Error" });
+            }
         }
 
 

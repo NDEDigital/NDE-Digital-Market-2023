@@ -44,7 +44,6 @@ namespace NDE_Digital_Market.Controllers
         [HttpPost("InsertOrderData")]
         public async Task<IActionResult> InsertOrderDateAsync(OrderMasterDto orderdata)
         {
-            // Start a transaction
             SqlTransaction transaction = null;
 
             try
@@ -52,7 +51,6 @@ namespace NDE_Digital_Market.Controllers
                 string systemCode = string.Empty;
                 await con.OpenAsync();
                 transaction = con.BeginTransaction();
-                // Execute the stored procedure to generate the system code
                 SqlCommand cmdSP = new SqlCommand("spMakeSystemCode", con, transaction);
                 {
                     cmdSP.CommandType = CommandType.StoredProcedure;
@@ -64,7 +62,6 @@ namespace NDE_Digital_Market.Controllers
                 }
                 int OrderMasterId = int.Parse(systemCode.Split('%')[0]);
                 string OrderNo = systemCode.Split('%')[1];
-                // SP END
 
                 SqlCommand cmd = new SqlCommand("InsertOrderMaster", con, transaction);
                 cmd.CommandType = CommandType.StoredProcedure;
@@ -97,13 +94,11 @@ namespace NDE_Digital_Market.Controllers
                 {
                     return BadRequest(new { message = "Order Master data isn't Inserted Successfully." });
                 }
-                // If everything is fine, commit the transaction
                 transaction.Commit();
                 return Ok(new { message = "Order data Inserted Successfully." });
             }
             catch (Exception ex)
             {
-                // If there is any error, rollback the transaction
                 if (transaction != null)
                 {
                     transaction.Rollback();
@@ -112,7 +107,6 @@ namespace NDE_Digital_Market.Controllers
             }
             finally
             {
-                // Finally block to ensure the connection is always closed
                 if (con.State == ConnectionState.Open)
                 {
                     await con.CloseAsync();
@@ -127,7 +121,6 @@ namespace NDE_Digital_Market.Controllers
                 for (int i = 0; i < OrderDetailsList.Count; i++)
                 {
                     string query = "InsertOrderDetails";
-                    //checking if user already exect for not.
                     SqlCommand CheckCMD = new SqlCommand(query, con, transaction);
                     CheckCMD.CommandType = CommandType.StoredProcedure;
 
@@ -145,7 +138,6 @@ namespace NDE_Digital_Market.Controllers
                     CheckCMD.Parameters.AddWithValue("@DeliveryCharge", OrderDetailsList[i].DeliveryCharge);
                     CheckCMD.Parameters.AddWithValue("@DeliveryDate", OrderDetailsList[i].DeliveryDate);
                     CheckCMD.Parameters.AddWithValue("@DiscountPct",OrderDetailsList[i].DiscountPct != null ? (object)OrderDetailsList[i].DiscountPct : DBNull.Value);
-                    //CheckCMD.Parameters.AddWithValue("@DiscountPct", OrderDetailsList[i].DiscountPct ?? (object)DBNull.Value);
                     CheckCMD.Parameters.AddWithValue("@NetPrice", OrderDetailsList[i].NetPrice );
 
                     CheckCMD.Parameters.AddWithValue("@AddedBy", OrderDetailsList[i].AddedBy);
@@ -163,8 +155,6 @@ namespace NDE_Digital_Market.Controllers
             {
                 return BadRequest(ex.Message);
             }
-
-            //return Ok(new { message = "Order Details data Inserted Successfully." });
         }
 
 
@@ -176,7 +166,6 @@ namespace NDE_Digital_Market.Controllers
         [HttpGet("GetOrderMasterData")]
         public async Task<IActionResult> GetOrderMasterData(string? status)
         {
-            //string DecryptId = CommonServices.DecryptPassword(companyCode);
             var products = new List<OrderDataBaseOnStatusDto>();
 
             try
@@ -216,93 +205,79 @@ namespace NDE_Digital_Market.Controllers
                     }
                 }
 
-                //if (products.Count == 0)
-                //{
-                //    return NotFound(new { message = "No Order found for the given Status." });
-                //}
-
                 return Ok(products);
             }
             catch (Exception ex)
             {
-                // Log the exception here
                 return StatusCode(500, "An error occurred while retrieving products: " + ex.Message);
             }
         }
-        [HttpGet("GetOrderDetailData")]
-        public async Task<IActionResult> GetOrderDetailData(int? OrderMasterId, string? status = null)
-        {
-            var orderDetails = new List<OrderDetailStatusDto>();
+        //[HttpGet("GetOrderDetailData")]
+        //public async Task<IActionResult> GetOrderDetailData(int? OrderMasterId, string? status = null)
+        //{
+        //    var orderDetails = new List<OrderDetailStatusDto>();
 
-            try
-            {
-                using (var connection = new SqlConnection(_healthCareConnection))
-                {
-                    using (var command = new SqlCommand("GetOrderDetailStatus", connection))
-                    {
-                        command.CommandType = CommandType.StoredProcedure;
-                        if (status != null)
-                        {
-                            command.Parameters.Add(new SqlParameter("@Status", status));
-                        }
-                        command.Parameters.Add(new SqlParameter("@OrderMasterId", OrderMasterId));
+        //    try
+        //    {
+        //        using (var connection = new SqlConnection(_healthCareConnection))
+        //        {
+        //            using (var command = new SqlCommand("GetOrderDetailStatus", connection))
+        //            {
+        //                command.CommandType = CommandType.StoredProcedure;
+        //                if (status != null)
+        //                {
+        //                    command.Parameters.Add(new SqlParameter("@Status", status));
+        //                }
+        //                command.Parameters.Add(new SqlParameter("@OrderMasterId", OrderMasterId));
 
-                        await connection.OpenAsync();
+        //                await connection.OpenAsync();
 
-                        using (var reader = await command.ExecuteReaderAsync())
-                        {
-                            while (await reader.ReadAsync())
-                            {
-                                var orderDetail = new OrderDetailStatusDto();
+        //                using (var reader = await command.ExecuteReaderAsync())
+        //                {
+        //                    while (await reader.ReadAsync())
+        //                    {
+        //                        var orderDetail = new OrderDetailStatusDto();
 
-                                orderDetail.OrderDetailId = reader.IsDBNull(reader.GetOrdinal("OrderDetailId")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("OrderDetailId"));
-                                orderDetail.OrderMasterId = reader.IsDBNull(reader.GetOrdinal("OrderMasterId")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("OrderMasterId"));
-                                orderDetail.UserId = reader.IsDBNull(reader.GetOrdinal("UserId")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("UserId"));
-                                orderDetail.ProductId = reader.IsDBNull(reader.GetOrdinal("ProductId")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("ProductId"));
-                                orderDetail.ProductGroupCode = reader.IsDBNull(reader.GetOrdinal("ProductGroupCode")) ? null : reader.GetString(reader.GetOrdinal("ProductGroupCode"));
-                                orderDetail.FullName = reader.IsDBNull(reader.GetOrdinal("FullName")) ? null : reader.GetString(reader.GetOrdinal("FullName"));
-                                orderDetail.ProductName = reader.IsDBNull(reader.GetOrdinal("ProductName")) ? null : reader.GetString(reader.GetOrdinal("ProductName"));
-                                orderDetail.Specification = reader.IsDBNull(reader.GetOrdinal("Specification")) ? null : reader.GetString(reader.GetOrdinal("Specification"));
-                                orderDetail.Unit = reader.IsDBNull(reader.GetOrdinal("Unit")) ? null : reader.GetString(reader.GetOrdinal("Unit"));
-                                orderDetail.Status = reader.IsDBNull(reader.GetOrdinal("Status")) ? null : reader.GetString(reader.GetOrdinal("Status"));
-                                orderDetail.Qty = reader.IsDBNull(reader.GetOrdinal("Qty")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("Qty"));
-                                orderDetail.UnitId = reader.IsDBNull(reader.GetOrdinal("UnitId")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("UnitId"));
-                                orderDetail.DiscountAmount = reader.IsDBNull(reader.GetOrdinal("DiscountAmount")) ? (decimal?)null : reader.GetDecimal(reader.GetOrdinal("DiscountAmount"));
-                                orderDetail.Price = reader.IsDBNull(reader.GetOrdinal("Price")) ? (decimal?)null : reader.GetDecimal(reader.GetOrdinal("Price"));
-                                orderDetail.DeliveryCharge = reader.IsDBNull(reader.GetOrdinal("DeliveryCharge")) ? (decimal?)null : reader.GetDecimal(reader.GetOrdinal("DeliveryCharge"));
-                                orderDetail.DeliveryDate = reader.IsDBNull(reader.GetOrdinal("DeliveryDate")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("DeliveryDate"));
-                                orderDetail.DiscountPct = reader.IsDBNull(reader.GetOrdinal("DiscountPct")) ? (decimal?)null : reader.GetDecimal(reader.GetOrdinal("DiscountPct"));
-                                orderDetail.NetPrice = reader.IsDBNull(reader.GetOrdinal("NetPrice")) ? (decimal?)null : reader.GetDecimal(reader.GetOrdinal("NetPrice"));
+        //                        orderDetail.OrderDetailId = reader.IsDBNull(reader.GetOrdinal("OrderDetailId")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("OrderDetailId"));
+        //                        orderDetail.OrderMasterId = reader.IsDBNull(reader.GetOrdinal("OrderMasterId")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("OrderMasterId"));
+        //                        orderDetail.UserId = reader.IsDBNull(reader.GetOrdinal("UserId")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("UserId"));
+        //                        orderDetail.ProductId = reader.IsDBNull(reader.GetOrdinal("ProductId")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("ProductId"));
+        //                        orderDetail.ProductGroupCode = reader.IsDBNull(reader.GetOrdinal("ProductGroupCode")) ? null : reader.GetString(reader.GetOrdinal("ProductGroupCode"));
+        //                        orderDetail.FullName = reader.IsDBNull(reader.GetOrdinal("FullName")) ? null : reader.GetString(reader.GetOrdinal("FullName"));
+        //                        orderDetail.ProductName = reader.IsDBNull(reader.GetOrdinal("ProductName")) ? null : reader.GetString(reader.GetOrdinal("ProductName"));
+        //                        orderDetail.Specification = reader.IsDBNull(reader.GetOrdinal("Specification")) ? null : reader.GetString(reader.GetOrdinal("Specification"));
+        //                        orderDetail.Unit = reader.IsDBNull(reader.GetOrdinal("Unit")) ? null : reader.GetString(reader.GetOrdinal("Unit"));
+        //                        orderDetail.Status = reader.IsDBNull(reader.GetOrdinal("Status")) ? null : reader.GetString(reader.GetOrdinal("Status"));
+        //                        orderDetail.Qty = reader.IsDBNull(reader.GetOrdinal("Qty")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("Qty"));
+        //                        orderDetail.UnitId = reader.IsDBNull(reader.GetOrdinal("UnitId")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("UnitId"));
+        //                        orderDetail.DiscountAmount = reader.IsDBNull(reader.GetOrdinal("DiscountAmount")) ? (decimal?)null : reader.GetDecimal(reader.GetOrdinal("DiscountAmount"));
+        //                        orderDetail.Price = reader.IsDBNull(reader.GetOrdinal("Price")) ? (decimal?)null : reader.GetDecimal(reader.GetOrdinal("Price"));
+        //                        orderDetail.DeliveryCharge = reader.IsDBNull(reader.GetOrdinal("DeliveryCharge")) ? (decimal?)null : reader.GetDecimal(reader.GetOrdinal("DeliveryCharge"));
+        //                        orderDetail.DeliveryDate = reader.IsDBNull(reader.GetOrdinal("DeliveryDate")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("DeliveryDate"));
+        //                        orderDetail.DiscountPct = reader.IsDBNull(reader.GetOrdinal("DiscountPct")) ? (decimal?)null : reader.GetDecimal(reader.GetOrdinal("DiscountPct"));
+        //                        orderDetail.NetPrice = reader.IsDBNull(reader.GetOrdinal("NetPrice")) ? (decimal?)null : reader.GetDecimal(reader.GetOrdinal("NetPrice"));
 
-                                orderDetails.Add(orderDetail);
-                            }
-                        }
-                    }
-                }
+        //                        orderDetails.Add(orderDetail);
+        //                    }
+        //                }
+        //            }
+        //        }
 
-                //if (orderDetails.Count == 0)
-                //{
-                //    return NotFound(new { message = "No Order details found for the given parameters." });
-                //}
-
-                return Ok(orderDetails);
-            }
-            catch (Exception ex)
-            {
-                // Log the exception here
-                return StatusCode(500, "An error occurred while retrieving order details: " + ex.Message);
-            }
-        }
+        //        return Ok(orderDetails);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, "An error occurred while retrieving order details: " + ex.Message);
+        //    }
+        //}
 
 
 
 
-        //made by tushar
-        // [HttpPut("AdminOrderUpdateStatus"), Authorize(Roles = "admin")]
+
         [HttpPut("AdminOrderUpdateStatus")]
         public async Task<IActionResult> UpdateOrderStatusAsync(String orderMasterId, String? detailsCancelledId, string status)
         {
-            // Start a transaction
             SqlTransaction transaction = null;
             try
             {
@@ -321,7 +296,6 @@ namespace NDE_Digital_Market.Controllers
                     string masterStatusChangeQuery = "UPDATE OrderMaster SET Status = @value  WHERE OrderMasterId IN (" + MasterIdString + ") ;";
 
                     SqlCommand cmd1 = new SqlCommand(masterStatusChangeQuery, con, transaction);
-                    //cmd1.Parameters.AddWithValue("@orderMasterId", orderMasterId);
                     cmd1.Parameters.AddWithValue("@value", status);
 
                     int masteRES = await cmd1.ExecuteNonQueryAsync();
@@ -338,7 +312,6 @@ namespace NDE_Digital_Market.Controllers
                         }
                         else
                         {
-                            // If there is any error, rollback the transaction
                             if (transaction != null)
                             {
                                 transaction.Rollback();
@@ -348,7 +321,6 @@ namespace NDE_Digital_Market.Controllers
                     }
                     else
                     {
-                        // If there is any error, rollback the transaction
                         if (transaction != null)
                         {
                             transaction.Rollback();
@@ -584,8 +556,6 @@ namespace NDE_Digital_Market.Controllers
             {
                 return BadRequest(ex.Message);
             }
-
-            //return Ok(new { message = "Order Details data Inserted Successfully." });
         }
 
 
@@ -641,10 +611,6 @@ namespace NDE_Digital_Market.Controllers
 
                     await con.OpenAsync();
                     SqlDataReader reader = await sqlCommand.ExecuteReaderAsync();
-                    //if (!reader.HasRows)
-                    //{
-                    //    return BadRequest(new { message = "No Data Found." });
-                    //}
                     while (await reader.ReadAsync())
                     {
                         GetSellerOrderBasedOnUserCodeDto details = new GetSellerOrderBasedOnUserCodeDto();
@@ -703,15 +669,15 @@ namespace NDE_Digital_Market.Controllers
 
                     await con.OpenAsync();
                     SqlDataReader reader = await sqlCommand.ExecuteReaderAsync();
-                    //if (!reader.HasRows)
-                    //{
-                    //    return BadRequest(new { message = "No Data Found." });
-                    //}
+
                     while (await reader.ReadAsync())
                     {
                         GetBuyerOrderBasedOnUserIDDto details = new GetBuyerOrderBasedOnUserIDDto();
                         {
+<<<<<<< HEAD
                             details.OrderDetailId = Convert.ToInt32(reader["OrderDetailId"].ToString());
+=======
+>>>>>>> Stemp2
                             details.OrderNo = reader["OrderNo"].ToString();
                             details.OrderDate = reader.IsDBNull(reader.GetOrdinal("OrderDate")) ? (DateTime?)null : (DateTime?)reader.GetDateTime(reader.GetOrdinal("OrderDate"));
                             details.Address = reader["Address"].ToString();
