@@ -847,11 +847,11 @@ namespace NDE_Digital_Market.Controllers
                 using (SqlConnection con = new SqlConnection(_healthCareConnection))
                 {
                     string query = "GetSellerSelesBySellerId";
-                    SqlCommand sqlCommand = new SqlCommand(query , con);
+                    SqlCommand sqlCommand = new SqlCommand(query, con);
 
                     sqlCommand.CommandType = CommandType.StoredProcedure;
                     sqlCommand.Parameters.AddWithValue("@SellerId", userid);
-                    if(status != null)
+                    if (status != null)
                     {
                         sqlCommand.Parameters.AddWithValue("@Status", status);
                     }
@@ -859,11 +859,14 @@ namespace NDE_Digital_Market.Controllers
 
                     await con.OpenAsync();
                     SqlDataReader reader = await sqlCommand.ExecuteReaderAsync();
+
                     while (await reader.ReadAsync())
                     {
                         GetSellerOrderBasedOnUserCodeDto details = new GetSellerOrderBasedOnUserCodeDto();
                         {
                             details.OrderDetailId = Convert.ToInt32(reader["OrderDetailId"].ToString());
+                            details.OrderMasterId = Convert.ToInt32(reader["OrderMasterId"].ToString());
+
                             details.OrderNo = reader["OrderNo"].ToString();
                             details.Address = reader["Address"].ToString();
                             details.BUserId = Convert.ToInt32(reader["BUserId"]);
@@ -878,6 +881,9 @@ namespace NDE_Digital_Market.Controllers
                             details.Unit = reader["Unit"].ToString();
                             details.NetPrice = reader.IsDBNull(reader.GetOrdinal("NetPrice")) ? (Decimal?)null : (Decimal?)reader.GetDecimal(reader.GetOrdinal("NetPrice"));
                             details.Status = reader["Status"].ToString();
+                            details.ReturnTypeName = reader["ReturnTypeName"] is DBNull || reader["ReturnTypeName"].ToString() == null ? (string?)null : reader["ReturnTypeName"].ToString();
+
+
 
                         }
 
@@ -921,6 +927,8 @@ namespace NDE_Digital_Market.Controllers
                     {
                         GetBuyerOrderBasedOnUserIDDto details = new GetBuyerOrderBasedOnUserIDDto();
                         {
+                            details.OrderDetailId = Convert.ToInt32(reader["OrderDetailId"].ToString());
+                            details.OrderMasterId = Convert.ToInt32(reader["OrderMasterId"].ToString());
                             details.OrderNo = reader["OrderNo"].ToString();
                             details.OrderDate = reader.IsDBNull(reader.GetOrdinal("OrderDate")) ? (DateTime?)null : (DateTime?)reader.GetDateTime(reader.GetOrdinal("OrderDate"));
                             details.Address = reader["Address"].ToString();

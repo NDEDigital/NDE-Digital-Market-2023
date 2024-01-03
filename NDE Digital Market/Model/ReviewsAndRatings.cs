@@ -5,6 +5,20 @@ namespace NDE_Digital_Market.Model
     public class ReviewsAndRatings
     {
 
+        public int GoodsId { get; set; }
+
+        public string BuyerName { get; set; }
+
+        public string SellerName { get; set; }
+        public string GroupName { get; set; }
+        public string GroupCode { get; set; }
+        public DateTime DateTime { get; set; }
+
+
+
+        public string EmptyRatingArray { get; set; }
+        public string RatingArray { get; set; }
+        public string BuyerCode { get; set; }
         public int? ReviewId { get; set; }
 
         public int? OrderDetailId { get; set; }
@@ -36,6 +50,5 @@ namespace NDE_Digital_Market.Model
         public string? UpdatedBy { get; set; }
         public string? AddedPc { get; set; }
         public string? UpdatedPC { get; set; }
-
     }
 }

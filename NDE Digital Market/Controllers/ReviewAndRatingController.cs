@@ -106,6 +106,88 @@ namespace NDE_Digital_Market.Controllers
 
         //    return Ok(new { message = "Sellers ", reviewsAndRatings , ratingsArray, totalCount });
         //}
+        [HttpGet]
+        [Route("getReviewRatingsDataForDetailsPage")]
+        public async Task<IActionResult> getReviewRatingsData(int ProductId)
+        {
+            int totalRating = 5;
+
+            int totalCount = 0;
+            int[] ratingsArray = new int[totalRating];
+
+            try
+            {
+                using (con)
+                {
+                    List<ReviewsAndRatings> reviewsAndRatings = new List<ReviewsAndRatings>();
+
+                    await con.OpenAsync();
+
+                    using (SqlCommand cmdForReviews = new SqlCommand("GetReviewRatings", con))
+                    {
+                        cmdForReviews.CommandType = CommandType.StoredProcedure;
+
+                        cmdForReviews.Parameters.AddWithValue("@ProductId", ProductId);
+
+                        using (SqlDataAdapter adapter = new SqlDataAdapter(cmdForReviews))
+                        {
+                            DataSet ds = new DataSet();
+                            adapter.Fill(ds);
+
+                            DataTable ratingCount = ds.Tables[0];
+                            DataTable Reviews = ds.Tables[1];
+
+                            if (ratingCount.Rows.Count > 0)
+                            {
+                                DataRow ratingRow = ratingCount.Rows[0];
+                                ratingsArray[4] = Convert.ToInt32(ratingRow["CountRating1"]);
+                                ratingsArray[3] = Convert.ToInt32(ratingRow["CountRating2"]);
+                                ratingsArray[2] = Convert.ToInt32(ratingRow["CountRating3"]);
+                                ratingsArray[1] = Convert.ToInt32(ratingRow["CountRating4"]);
+                                ratingsArray[0] = Convert.ToInt32(ratingRow["CountRating5"]);
+                                totalCount = Convert.ToInt32(ratingRow["TotalCount"]);
+                            }
+
+                            foreach (DataRow row in Reviews.Rows)
+                            {
+                                ReviewsAndRatings reviews = new ReviewsAndRatings
+                                {
+                                    ReviewId = Convert.ToInt32(row["ReviewId"]),
+
+                                    OrderDetailId = Convert.ToInt32(row["OrderDetailId"]),
+                                    BuyerId = Convert.ToInt32(row["BuyerId"]),
+                                    BuyerName = row["BuyerName"].ToString(),
+                                    SellerId = Convert.ToInt32(row["SellerId"]),
+                                    SellerName = row["SellerName"].ToString(),
+
+
+                                    ReviewDate = Convert.ToDateTime(row["ReviewDate"]),
+                                    ReviewText = row["ReviewText"].ToString(),
+                                    RatingValue = Convert.ToInt32(row["RatingValue"]),
+                                    ImagePath = row["ImagePath"].ToString(),
+
+                                };
+
+                                int emptyRating = totalRating - reviews.RatingValue ?? 0;
+                                int ratingValue = reviews.RatingValue ?? 0;
+                                int[] emptyRatingArray = Enumerable.Range(1, emptyRating).ToArray();
+                                reviews.EmptyRatingArray = JsonConvert.SerializeObject(emptyRatingArray);
+                                int[] ratingArray = Enumerable.Range(1, ratingValue).ToArray();
+                                reviews.RatingArray = JsonConvert.SerializeObject(ratingArray);
+
+                                reviewsAndRatings.Add(reviews);
+                            }
+
+                            return Ok(new { message = "Sellers ", reviewsAndRatings, ratingsArray, totalCount });
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
 
 
         [HttpPost]

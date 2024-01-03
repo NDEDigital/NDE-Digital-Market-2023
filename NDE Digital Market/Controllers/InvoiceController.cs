@@ -30,15 +30,15 @@ namespace NDE_Digital_Market.Controllers
         //========================================== Added By Maru =================================
         // Get Invoice data For Admin
         //[HttpGet, Authorize(Roles = "admin")]
+
         [HttpGet]
         [Route("GetInvoiceDataForBuyer")]
         public async Task<IActionResult> GetInvoiceDataForBuyer(int OrderMasterId)
         {
-            GetOrderInvoiceByMasterIdDto invoice = new GetOrderInvoiceByMasterIdDto();
-
+            SqlConnection con = new SqlConnection(connectionHealthCare);
             try
             {
-                SqlConnection con = new SqlConnection(connectionHealthCare);
+                GetOrderInvoiceByMasterIdDto invoice = new GetOrderInvoiceByMasterIdDto();
                 string queryForBuyer = "GetOrderInvoiceByMasterId";
                 con.Open();
                 SqlCommand cmdForBuyer = new SqlCommand(queryForBuyer, con);
@@ -50,14 +50,13 @@ namespace NDE_Digital_Market.Controllers
                 adapter.Fill(ds);
                 DataTable reader = ds.Tables[0];
                 DataTable reader1 = ds.Tables[1];
-                con.Close();
                 for (int i = 0; i < reader.Rows.Count; i++)
                 {
                     invoice.InvoiceNumber = reader.Rows[i]["InvoiceNumber"].ToString();
                     invoice.OrderDate = Convert.ToDateTime(reader.Rows[i]["OrderDate"].ToString());
                     invoice.BuyerName = reader.Rows[i]["BuyerName"].ToString();
                     invoice.Address = reader.Rows[i]["Address"].ToString();
-                    invoice.Phone = reader.Rows[i]["Phone"].ToString();
+                    invoice.Phone = reader.Rows[i]["PhoneNumber"].ToString();
                     invoice.PaymentMethod = reader.Rows[i]["PaymentMethod"].ToString();
                     invoice.NumberOfItem = Convert.ToInt32(reader.Rows[i]["NumberOfItem"].ToString());
                     invoice.TotalPrice = Convert.ToDecimal(reader.Rows[i]["TotalPrice"].ToString());
@@ -66,13 +65,17 @@ namespace NDE_Digital_Market.Controllers
                 {
                     OrderInvoiceDetails orderDetails = new OrderInvoiceDetails
                     {
+
                         ProductName = reader1.Rows[i]["ProductName"].ToString(),
+                        Status = reader1.Rows[i]["Status"].ToString(),
                         Specification = reader1.Rows[i]["Specification"].ToString(),
                         Quantity = Convert.ToInt32(reader1.Rows[i]["Quantity"].ToString()),
+                        SellerId = Convert.ToInt32(reader1.Rows[i]["SellerId"].ToString()),
                         Unit = reader1.Rows[i]["Unit"].ToString(),
                         Price = Convert.ToDecimal(reader1.Rows[i]["Price"].ToString()),
                         DeliveryCharge = Convert.ToDecimal(reader1.Rows[i]["DeliveryCharge"].ToString()),
                         DiscountAmount = Convert.ToDecimal(reader1.Rows[i]["DiscountAmount"].ToString()),
+                        // DeliveryDate = Convert.ToDateTime(reader.Rows[i]["DeliveryDate"].ToString()),
                         DiscountPct = Convert.ToDecimal(reader1.Rows[i]["DiscountPct"].ToString()),
                         NetPrice = Convert.ToDecimal(reader1.Rows[i]["NetPrice"].ToString()),
                         DetailDeliveryCharge = Convert.ToDecimal(reader1.Rows[i]["DetailDeliveryCharge"].ToString()),
@@ -89,11 +92,16 @@ namespace NDE_Digital_Market.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                return StatusCode(500, new { message = "Internal Server Error" });
+                return BadRequest(new { message = "An error occurred while fetching the Buyer Order Invoice data." });
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
             }
         }
-
 
         //public IActionResult GetInvoiceDataForAdmin(int OrderID)
         //{
