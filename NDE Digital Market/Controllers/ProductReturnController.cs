@@ -29,49 +29,54 @@ namespace NDE_Digital_Market.Controllers
         [Route("InsertReturnedData")]
         public IActionResult InsertProductReturn([FromForm] ProductReturnModel returnData)
         {
-
-           int returnId = 0;
-            SqlConnection con = new SqlConnection(_connectionDigitalMarket);
-
-            SqlCommand getLastReturnId = new SqlCommand("SELECT ISNULL(MAX(ReturnId), 0) FROM ProductReturn;", con);
-            con.Open();
-
-            returnId = Convert.ToInt32(getLastReturnId.ExecuteScalar()) + 1;  
-            SqlCommand cmd = new SqlCommand("INSERT INTO  [ProductReturn] ([ReturnId], [GroupName],GoodsName, [GroupCode], [GoodsId], [TypeId], [Remarks],[Price],[DetailsId],[SellerCode],[ApplyDate],[OrderNo], [DeliveryDate]) VALUES (@ReturnId, @GroupName,@GoodsName, @GroupCode, @GoodsId, @TypeId, @Remarks , @Price, @DetailsId, @SellerCode,GETDATE(),@OrderNo,@DeliveryDate);", con);
-          
-            using (cmd)
+            try
             {
-                cmd.Parameters.AddWithValue("@returnId", returnId);
-                cmd.Parameters.AddWithValue("@GroupName", returnData.GroupName);
-                cmd.Parameters.AddWithValue("@GroupCode", returnData.GroupCode);
-                cmd.Parameters.AddWithValue("@GoodsId", returnData.GoodsId);
-                cmd.Parameters.AddWithValue("@TypeId", returnData.TypeId);
-                cmd.Parameters.AddWithValue("@Remarks", string.IsNullOrEmpty(returnData.Remarks) ? (object)DBNull.Value : returnData.Remarks);
-                cmd.Parameters.AddWithValue("@Price", returnData.Price);
-                cmd.Parameters.AddWithValue("@DetailsId", returnData.DetailsId);
-                cmd.Parameters.AddWithValue("@SellerCode", returnData.SellerCode);
-                cmd.Parameters.AddWithValue("@OrderNo", returnData.OrderNo);
-                cmd.Parameters.AddWithValue("@GoodsName", returnData.GoodsName ?? " ");
-                cmd.Parameters.AddWithValue("@DeliveryDate", returnData.DeliveryDate);
+                int returnId = 0;
+                SqlConnection con = new SqlConnection(_connectionDigitalMarket);
 
+                SqlCommand getLastReturnId = new SqlCommand("SELECT ISNULL(MAX(ReturnId), 0) FROM ProductReturn;", con);
+                con.Open();
 
-                cmd.ExecuteNonQuery();
+                returnId = Convert.ToInt32(getLastReturnId.ExecuteScalar()) + 1;
+                SqlCommand cmd = new SqlCommand("INSERT INTO  [ProductReturn] ([ReturnId], [GroupName],GoodsName, [GroupCode], [GoodsId], [TypeId], [Remarks],[Price],[DetailsId],[SellerCode],[ApplyDate],[OrderNo], [DeliveryDate]) VALUES (@ReturnId, @GroupName,@GoodsName, @GroupCode, @GoodsId, @TypeId, @Remarks , @Price, @DetailsId, @SellerCode,GETDATE(),@OrderNo,@DeliveryDate);", con);
+
+                using (cmd)
+                {
+                    cmd.Parameters.AddWithValue("@returnId", returnId);
+                    cmd.Parameters.AddWithValue("@GroupName", returnData.GroupName);
+                    cmd.Parameters.AddWithValue("@GroupCode", returnData.GroupCode);
+                    cmd.Parameters.AddWithValue("@GoodsId", returnData.GoodsId);
+                    cmd.Parameters.AddWithValue("@TypeId", returnData.TypeId);
+                    cmd.Parameters.AddWithValue("@Remarks", string.IsNullOrEmpty(returnData.Remarks) ? (object)DBNull.Value : returnData.Remarks);
+                    cmd.Parameters.AddWithValue("@Price", returnData.Price);
+                    cmd.Parameters.AddWithValue("@DetailsId", returnData.DetailsId);
+                    cmd.Parameters.AddWithValue("@SellerCode", returnData.SellerCode);
+                    cmd.Parameters.AddWithValue("@OrderNo", returnData.OrderNo);
+                    cmd.Parameters.AddWithValue("@GoodsName", returnData.GoodsName ?? " ");
+                    cmd.Parameters.AddWithValue("@DeliveryDate", returnData.DeliveryDate);
+
+                    cmd.ExecuteNonQuery();
+                }
+
+                con.Close();
+
+                SqlCommand command = new SqlCommand("UPDATE OrderDetails SET Status = 'to Return' WHERE OrderDetailId = " + returnData.DetailsId + "", con);
+
+                con.Open();
+                command.ExecuteNonQuery();
+                con.Close();
+
+                return Ok();
             }
-
-
-
-            con.Close();
-
-
-
-            SqlCommand command = new SqlCommand("UPDATE OrderDetails SET Status = 'to Return' WHERE OrderDetailId = " + returnData.DetailsId + "", con);
- 
-            con.Open();
-            command.ExecuteNonQuery();
-            con.Close();
-            return Ok();
-            
+            catch (Exception ex)
+            {
+                // Handle the exception here. You can log the exception or perform any other necessary actions.
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                // You might want to return a specific error response or customize as needed.
+                return StatusCode(500, new { message = "Internal Server Error" });
+            }
         }
+
 
         [HttpGet, Authorize(Roles = "buyer")]
         [Route("GetReturnType")]
@@ -113,9 +118,6 @@ namespace NDE_Digital_Market.Controllers
             }
         }
     }
-
-
-
 }
 
 

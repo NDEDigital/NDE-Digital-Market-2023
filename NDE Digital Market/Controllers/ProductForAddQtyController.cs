@@ -124,8 +124,6 @@ namespace NDE_Digital_Market.Controllers
                 cmd.Parameters.AddWithValue("@MaterialReceivedDate", DateTime.Now);
                 cmd.Parameters.AddWithValue("@ChallanNo", portaldata.ChallanNo ?? String.Empty);
 
-                //cmd.Parameters.AddWithValue("@ChallanNo", (object)portaldata.ChallanNo ?? DBNull.Value);
-                //cmd.Parameters.AddWithValue("@ChallanNo", (object)portaldata.ChallanNo ?? DBNull.Value);
 
 
                 cmd.Parameters.AddWithValue("@ChallanDate", portaldata.ChallanDate ?? (object)DBNull.Value);
@@ -204,9 +202,6 @@ namespace NDE_Digital_Market.Controllers
                     CheckCMD.Parameters.AddWithValue("@AddedBy", PortalReceivedDetailsList[i].AddedBy);
                     CheckCMD.Parameters.AddWithValue("@DateAdded", DateTime.Now);
                     CheckCMD.Parameters.AddWithValue("@AddedPC", PortalReceivedDetailsList[i].AddedPC);
-                    //cmd.Parameters.AddWithValue("@UpdatedBy", "UpdatedBy");
-                    //cmd.Parameters.AddWithValue("@UpdatedDate", (object)groups.UpdatedDate ?? DBNull.Value);
-                    //cmd.Parameters.AddWithValue("@UpdatedPC", "Default UpdatedPC");
 
                     await CheckCMD.ExecuteNonQueryAsync();
 
@@ -275,7 +270,6 @@ namespace NDE_Digital_Market.Controllers
                     cmd.Parameters.AddWithValue("@Status", "Pending");
                     cmd.Parameters.AddWithValue("@IsActive", 1);
                     cmd.Parameters.AddWithValue("@TotalPrice", sellerproductdata.TotalPrice);
-                    //cmd.Parameters.AddWithValue("@CompanyCode", sellerproductdata.CompanyCode);
 
                     cmd.Parameters.AddWithValue("@AddedBy", sellerproductdata.AddedBy);
                     cmd.Parameters.AddWithValue("@AddedDate", DateTime.Now);
