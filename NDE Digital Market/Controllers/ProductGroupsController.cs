@@ -170,9 +170,9 @@ namespace NDE_Digital_Market.Controllers
                                     cmd.Parameters.AddWithValue("@ImagePath", ImagePath);
                                     cmd.Parameters.AddWithValue("@ProductGroupPrefix", productGroupsDto.ProductGroupPrefix);
                                     cmd.Parameters.AddWithValue("@ProductGroupDetails", productGroupsDto.ProductGroupDetails ?? string.Empty);
-                                    cmd.Parameters.AddWithValue("@UpdatedBy", productGroupsDto.UpdatedBy);
+                                    cmd.Parameters.AddWithValue("@UpdatedBy", productGroupsDto.UpdatedBy ?? string.Empty);
                                     cmd.Parameters.AddWithValue("@DateUpdated", DateTime.Now);
-                                    cmd.Parameters.AddWithValue("@UpdatedPC", productGroupsDto.UpdatedPC);
+                                    cmd.Parameters.AddWithValue("@UpdatedPC", productGroupsDto.UpdatedPC );
 
                                     await cmd.ExecuteNonQueryAsync();
                                 }
@@ -203,7 +203,7 @@ namespace NDE_Digital_Market.Controllers
                         }
                         finally
                         {
-                            con.Close();  // Close the connection in the finally block
+                            con.Close();
                         }
                     }
                 }
