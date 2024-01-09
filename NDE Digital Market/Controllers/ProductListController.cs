@@ -144,8 +144,8 @@ namespace NDE_Digital_Market.Controllers
 
         //======================================================================
 
-        [HttpPut("UpdateProductGroups")]
-        public async Task<IActionResult> UpdateProductGroupsAsync([FromForm] ProductListDto productListDto)
+        [HttpPut("UpdateProductList")]
+        public async Task<IActionResult> UpdateProductListAsync([FromForm] ProductListDto productListDto)
         {
             try
             {
