@@ -123,7 +123,9 @@ namespace NDE_Digital_Market.Controllers
             {
                 List<GetProductListDto> lst = new List<GetProductListDto>();
                 await con.OpenAsync();
-                string query = "select ProductId, ProductName from ProductList where IsActive = 1 ORDER BY ProductId DESC;";
+                string query = @"select PL.ProductId, PL.ProductName, PL.UnitId, U.Name as UnitName from ProductList PL 
+                                  join Units U on U.UnitId = PL.UnitId
+                                  where IsActive = 1 ORDER BY ProductId DESC; ";
 
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 {
@@ -134,6 +136,8 @@ namespace NDE_Digital_Market.Controllers
                             GetProductListDto modelObj = new GetProductListDto();
                             modelObj.ProductId = Convert.ToInt32(reader["ProductId"]);
                             modelObj.ProductName = reader["ProductName"].ToString();
+                            modelObj.UnitId = Convert.ToInt32(reader["UnitId"]);
+                            modelObj.UnitName = reader["UnitName"].ToString();
 
                             lst.Add(modelObj);
                         }
@@ -142,12 +146,13 @@ namespace NDE_Digital_Market.Controllers
 
                 return Ok(lst);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(new { message = ex.Message });
             }
 
         }
+
 
         [HttpGet]
         [Route("GetProductListByStatus")]
@@ -203,5 +208,39 @@ namespace NDE_Digital_Market.Controllers
             }
 
         }
+
+
+        //========================tushar=========================
+
+        [HttpPut("MakeProductActiveOrInactive")]
+        public async Task<IActionResult> MakeProductActiveOrInactiveAsync(int? productId, bool? IsActive)
+        {
+            try
+            {
+                string query = @"UPDATE ProductList
+                                    SET IsActive = @IsActive
+                                    WHERE ProductId = @ProductId";
+                using (SqlCommand command = new SqlCommand(query, con))
+                {
+                    command.Parameters.AddWithValue("@IsActive", IsActive);
+                    command.Parameters.AddWithValue("@ProductId", productId);
+
+                    await con.OpenAsync();
+                    // Execute the command
+                    int Res = await command.ExecuteNonQueryAsync();
+                    if (Res == 0)
+                    {
+                        return BadRequest(new { message = $"Product didnot found." });
+                    }
+                    await con.CloseAsync();
+                }
+                return Ok(new { message = $"Product IsActive status changed." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = $"Product IsActive status not change : {ex.Message}" });
+            }
+        }
+
     }
 }
