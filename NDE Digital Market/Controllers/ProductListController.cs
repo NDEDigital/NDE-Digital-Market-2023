@@ -283,20 +283,17 @@ namespace NDE_Digital_Market.Controllers
                 string query = "";
                 if (status != null)
                 {
-                    query = @"SELECT * FROM ProductList WHERE IsActive= @IsActive ORDER BY ProductId  DESC;";
-
+                    query = @"SELECT ProductId,PL.ProductName,PL.ProductGroupID,PG.ProductGroupName,PL.Specification,PL.UnitId,U.Name Unit,PL.IsActive,PL.AddedDate,PL.UpdatedDate,PL.AddedBy,PL.UpdatedBy,PL.AddedPC,PL.UpdatedPC,PL.ImagePath,PL.Status,ProductSubName FROM ProductList PL LEFT JOIN ProductGroups PG ON PL.ProductGroupID=PG.ProductGroupID LEFT JOIN Units U ON PL.UnitId = U.UnitId WHERE PL.IsActive= @IsActive ORDER BY ProductId  DESC;";
                 }
                 else
                 {
-                    query = @"SELECT * FROM ProductList WHERE CONVERT(DATE, AddedDate) = CONVERT(DATE, GETDATE()) ORDER BY ProductId  DESC";
-
+                    query = @"SELECT ProductId,PL.ProductName,PL.ProductGroupID,PG.ProductGroupName,PL.Specification,PL.UnitId,U.Name Unit,PL.IsActive,PL.AddedDate,PL.UpdatedDate,PL.AddedBy,PL.UpdatedBy,PL.AddedPC,PL.UpdatedPC,PL.ImagePath,PL.Status,ProductSubName FROM ProductList PL LEFT JOIN ProductGroups PG ON PL.ProductGroupID=PG.ProductGroupID LEFT JOIN Units U ON PL.UnitId = U.UnitId WHERE CONVERT(DATE, AddedDate) = CONVERT(DATE, GETDATE()) ORDER BY ProductId  DESC";
                 }
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 {
                     if (status != null)
                     {
                         cmd.Parameters.Add(new SqlParameter("@IsActive", status));
-
                     }
                     using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                     {
@@ -305,14 +302,16 @@ namespace NDE_Digital_Market.Controllers
                             GetProductListByStatusDto modelObj = new GetProductListByStatusDto();
                             modelObj.ProductId = Convert.ToInt32(reader["ProductId"]);
                             modelObj.UnitId = Convert.ToInt32(reader["UnitId"]);
+                            modelObj.Unit = reader["Unit"].ToString();
                             modelObj.ProductGroupID = Convert.ToInt32(reader["ProductGroupID"]);
+                            modelObj.ProductGroupName = reader["ProductGroupName"].ToString();
                             modelObj.ProductName = reader["ProductName"].ToString();
                             modelObj.Specification = reader["Specification"].ToString();
                             modelObj.ImagePath = reader["ImagePath"].ToString();
                             modelObj.ProductSubName = reader["ProductSubName"].ToString();
                             modelObj.IsActive = reader["IsActive"] is DBNull ? (bool?)null : (bool)reader["IsActive"];
                             modelObj.AddedDate = reader["AddedDate"] is DBNull ? (DateTime?)null : (DateTime)reader["AddedDate"];
-                            
+
                             lst.Add(modelObj);
                         }
                     }
