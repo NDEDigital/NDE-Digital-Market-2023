@@ -29,7 +29,42 @@ namespace NDE_Digital_Market.Controllers
             foldername = commonServices.FilesPath + "SellerProductPriceAndOfferFiles";
         }
 
- 
+
+        [HttpGet]
+        [Route("ProductGroupsDropdownByUserId/{userID}")]
+        public async Task<IActionResult> ProductGroupsDropdownByUserId(int userID)
+        {
+            var productGroupsDropdownByUserId = new List<ProductGroupsDropdown>();
+            try
+            {
+                using (var connection = new SqlConnection(_healthCareConnection))
+                {
+                    using (var command = new SqlCommand("GetProductGroupsDropdownByUserId", connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.Add(new SqlParameter("@userID", userID));
+                        await connection.OpenAsync();
+                        using (var reader = await command.ExecuteReaderAsync())
+                        {
+                            while (await reader.ReadAsync())
+                            {
+                                var productGroupsDropdown = new ProductGroupsDropdown();
+                                productGroupsDropdown.ProductGroupID = Convert.ToInt32(reader["ProductGroupID"]);
+                                productGroupsDropdown.ProductGroupName = reader["ProductGroupName"].ToString();
+                                productGroupsDropdownByUserId.Add(productGroupsDropdown);
+                            }
+                        }
+                    }
+                }
+                return Ok(productGroupsDropdownByUserId);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An error occurred while retrieving companies: " + ex.Message);
+            }
+        }
+
+
         [HttpGet("GetProductForAddQtyByUserId/{UserId}")]
         public async Task<IActionResult> GetProductForAddQtyByUserId(int UserId)
         {
@@ -348,6 +383,121 @@ namespace NDE_Digital_Market.Controllers
                 return StatusCode(500, "An error occurred while retrieving companies: " + ex.Message);
             }
         }
+
+
+
+
+
+        [HttpGet("GetPortalReceivedByUserId")]
+        public async Task<ActionResult> GetPortalReceivedByUserId(int userId)
+        {
+            try
+            {
+                List<PortalReceived> portalReceivedList = new List<PortalReceived>();
+
+                using (con)
+                {
+                    using (var command = new SqlCommand("SELECT [PortalReceivedId], [PortalReceivedCode], [MaterialReceivedDate], UserId FROM [PortalReceivedMaster] WHERE UserId = @UserId ORDER BY [PortalReceivedCode] DESC ", con))
+                    {
+                        command.Parameters.AddWithValue("@UserId", userId);
+                        await con.OpenAsync();
+
+                        using (var reader = await command.ExecuteReaderAsync())
+                        {
+                            while (await reader.ReadAsync())
+                            {
+                                PortalReceived portalReceived = new PortalReceived
+                                {
+                                    PortalReceivedId = Convert.ToInt32(reader["PortalReceivedId"]),
+                                    PortalReceivedCode = reader["PortalReceivedCode"].ToString(),
+                                    MaterialReceivedDate = reader["MaterialReceivedDate"] != DBNull.Value ? Convert.ToDateTime(reader["MaterialReceivedDate"]) : (DateTime?)null,
+                                    UserId = Convert.ToInt32(reader["UserId"])
+                                };
+                                portalReceivedList.Add(portalReceived);
+                            }
+                        }
+                    }
+                }
+
+                if (portalReceivedList.Count == 0)
+                {
+                    return NotFound("No data found for the given user ID.");
+                }
+
+                return Ok(portalReceivedList);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An error occurred while retrieving data: " + ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("GetPortalData")]
+        public async Task<IActionResult> GetPortalData(int PortalReceivedId)
+        {
+            using (var connection = new SqlConnection(_healthCareConnection))
+            {
+                try
+                {
+                    PortalAfterInsert portalAfterInsert = new PortalAfterInsert();
+                    string portalAfter = "GetPortalDataAfterInsertByPortalReceivedId";
+                    connection.Open();
+                    SqlCommand cmdportal = new SqlCommand(portalAfter, connection);
+                    cmdportal.CommandType = CommandType.StoredProcedure;
+                    cmdportal.Parameters.AddWithValue("@PortalReceivedId", PortalReceivedId);
+                    SqlDataAdapter adapter = new SqlDataAdapter(cmdportal);
+                    DataSet ds = new DataSet();
+                    adapter.Fill(ds);
+                    DataTable reader = ds.Tables[0];
+                    DataTable reader1 = ds.Tables[1];
+                    for (int i = 0; i < reader.Rows.Count; i++)
+                    {
+                        portalAfterInsert.PortalReceivedId = Convert.ToInt32(reader.Rows[i]["PortalReceivedId"].ToString());
+                        portalAfterInsert.PortalReceivedCode = reader.Rows[i]["PortalReceivedCode"].ToString();
+                        portalAfterInsert.MaterialReceivedDate = Convert.ToDateTime(reader.Rows[i]["MaterialReceivedDate"].ToString());
+                        portalAfterInsert.ChallanNo = reader.Rows[i]["ChallanNo"].ToString();
+                        portalAfterInsert.ChallanDate = reader.Rows[i]["ChallanDate"] != DBNull.Value ? Convert.ToDateTime(reader.Rows[i]["ChallanDate"]) : (DateTime?)null;
+                        portalAfterInsert.Remarks = reader.Rows[i]["Remarks"].ToString();
+                    }
+                    for (int i = 0; i < reader1.Rows.Count; i++)
+                    {
+                        PortalReceivedDetailAfterInsert portalReceivedDetailAfterInsert = new PortalReceivedDetailAfterInsert
+                        {
+                            PortalReceivedId = Convert.ToInt32(reader1.Rows[i]["PortalReceivedId"].ToString()),
+                            PortalDetailsId = Convert.ToInt32(reader1.Rows[i]["PortalDetailsId"].ToString()),
+                            ProductGroupId = Convert.ToInt32(reader1.Rows[i]["ProductGroupId"].ToString()),
+                            ProductGroupName = reader1.Rows[i]["ProductGroupName"].ToString(),
+                            ProductId = Convert.ToInt32(reader1.Rows[i]["ProductId"].ToString()),
+                            ProductName = reader1.Rows[i]["ProductName"].ToString(),
+                            Specification = reader1.Rows[i]["Specification"].ToString(),
+                            ReceivedQty = Convert.ToDecimal(reader1.Rows[i]["ReceivedQty"].ToString()),
+                            UnitId = Convert.ToInt32(reader1.Rows[i]["UnitId"].ToString()),
+                            Unit = reader1.Rows[i]["Unit"].ToString(),
+                            Price = Convert.ToDecimal(reader1.Rows[i]["Price"].ToString()),
+                            TotalPrice = Convert.ToDecimal(reader1.Rows[i]["TotalPrice"].ToString()),
+                            AvailableQty = Convert.ToDecimal(reader1.Rows[i]["AvailableQty"].ToString()),
+                            Remarks = reader1.Rows[i]["Remarks"].ToString(),
+                        };
+                        portalAfterInsert.PortalReceivedDetailAfterInsertlList.Add(portalReceivedDetailAfterInsert);
+                    }
+                    return Ok(new { message = "portal Data After Insert got successfully", portalAfterInsert });
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(new { message = "An error occurred while fetching the portal Data After Insert." });
+                }
+                finally
+                {
+                    if (connection.State == ConnectionState.Open)
+                    {
+                        connection.Close();
+                    }
+                }
+            }
+        }
+
+
 
     }
 }
