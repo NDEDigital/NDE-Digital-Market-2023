@@ -75,7 +75,10 @@ namespace NDE_Digital_Market.Controllers
                         Price = Convert.ToDecimal(reader1.Rows[i]["Price"].ToString()),
                         DeliveryCharge = Convert.ToDecimal(reader1.Rows[i]["DeliveryCharge"].ToString()),
                         DiscountAmount = Convert.ToDecimal(reader1.Rows[i]["DiscountAmount"].ToString()),
-                        // DeliveryDate = Convert.ToDateTime(reader.Rows[i]["DeliveryDate"].ToString()),
+                        //DeliveryDate = Convert.ToDateTime(reader.Rows[i]["DeliveryDate"].ToString()),
+                        DeliveryDate = reader1.Rows[i]["DeliveryDate"] != DBNull.Value ?
+                        Convert.ToDateTime(reader1.Rows[i]["DeliveryDate"]) :
+                        DateTime.MinValue,
                         DiscountPct = Convert.ToDecimal(reader1.Rows[i]["DiscountPct"].ToString()),
                         NetPrice = Convert.ToDecimal(reader1.Rows[i]["NetPrice"].ToString()),
                         DetailDeliveryCharge = Convert.ToDecimal(reader1.Rows[i]["DetailDeliveryCharge"].ToString()),
