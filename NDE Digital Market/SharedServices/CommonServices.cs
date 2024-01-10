@@ -2,7 +2,6 @@
 using NDE_Digital_Market.Model.MaterialStock;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
-using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.Processing;
 using System.Data.SqlClient;
 using System.Security.Cryptography;
