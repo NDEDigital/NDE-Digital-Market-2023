@@ -65,10 +65,11 @@ namespace NDE_Digital_Market.Controllers
         }
 
 
-        [HttpGet("GetProductForAddQtyByUserId/{UserId}")]
-        public async Task<IActionResult> GetProductForAddQtyByUserId(int UserId)
+
+
+        [HttpGet("GetProductForAddQtyByUserId/{UserId}/{productGroupId}")]
+        public async Task<IActionResult> GetProductForAddQtyByUserId(int UserId, int productGroupId)
         {
-            //string DecryptId = CommonServices.DecryptPassword(companyCode);
             var products = new List<SellerPoductListModel>();
 
             try
@@ -79,6 +80,7 @@ namespace NDE_Digital_Market.Controllers
                     {
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.Add(new SqlParameter("@UserId", UserId));
+                        command.Parameters.Add(new SqlParameter("@productGroupId", productGroupId));
                         await connection.OpenAsync();
 
                         using (var reader = await command.ExecuteReaderAsync())
@@ -92,7 +94,6 @@ namespace NDE_Digital_Market.Controllers
                                     ProductGroupId = reader.GetInt32(reader.GetOrdinal("ProductGroupID")),
                                     Specification = reader.IsDBNull(reader.GetOrdinal("Specification")) ? null : reader.GetString(reader.GetOrdinal("Specification")),
                                     UnitId = reader.IsDBNull(reader.GetOrdinal("UnitId")) ? 0 : reader.GetInt32(reader.GetOrdinal("UnitId")),
-
                                     Unit = reader.IsDBNull(reader.GetOrdinal("Unit")) ? null : reader.GetString(reader.GetOrdinal("Unit")),
                                     Price = reader.IsDBNull(reader.GetOrdinal("Price")) ? 0 : reader.GetDecimal(reader.GetOrdinal("Price")),
                                     AvailableQty = reader.IsDBNull(reader.GetOrdinal("AvailableQty")) ? 0 : reader.GetDecimal(reader.GetOrdinal("AvailableQty"))
@@ -103,16 +104,15 @@ namespace NDE_Digital_Market.Controllers
                     }
                 }
 
-                if (products.Count == 0)
-                {
-                    return NotFound("No products found for the given user ID.");
-                }
+                //if (products.Count == 0)
+                //{
+                //    return NotFound("No products found for the given user ID.");
+                //}
 
                 return Ok(products);
             }
             catch (Exception ex)
             {
-                // Log the exception here
                 return StatusCode(500, "An error occurred while retrieving products: " + ex.Message);
             }
 
