@@ -102,6 +102,7 @@ namespace NDE_Digital_Market.Controllers
                                 modelObj.TotalPrice = reader["TotalPrice"] != DBNull.Value ? Convert.ToDecimal(reader["TotalPrice"]) : 0;
                                 modelObj.SellerId = Convert.ToInt32(reader["SellerId"]);
                                 modelObj.AvailableQty = Convert.ToInt32(reader["AvailableQty"]);
+                               
 
                                 lst.Add(modelObj);
                             }

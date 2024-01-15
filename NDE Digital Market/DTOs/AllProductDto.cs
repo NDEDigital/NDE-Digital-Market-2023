@@ -17,5 +17,6 @@
         public decimal? TotalPrice { get; set; }
         public int? SellerId { get; set; }
         public int? AvailableQty { get; set; }
+       
     }
 }

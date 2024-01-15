@@ -27,7 +27,7 @@ namespace NDE_Digital_Market.Controllers
         }
 
         [HttpGet("GetSearchedProduct")]
-        public IActionResult GetSearchedProduct(string productName, string sortDirection)
+        public IActionResult GetSearchedProduct(string productName, string sortDirection, int nextCount,int offset)
         {
             try
             {
@@ -35,12 +35,17 @@ namespace NDE_Digital_Market.Controllers
 
                 using (SqlConnection connection = new SqlConnection(_healthCareConnection))
                 {
+                    if (offset > 0)
+                    {
+                        offset = (offset-1) * 20;
+                    }                      
                     using (SqlCommand cmd = new SqlCommand("ProductSearch", connection))
                     {
                         cmd.CommandType = CommandType.StoredProcedure;
                         cmd.Parameters.Add(new SqlParameter("@ProductName", productName));
                         cmd.Parameters.Add(new SqlParameter("@SortDirection", sortDirection));
-
+                        cmd.Parameters.Add(new SqlParameter("@Offset", offset));
+                        cmd.Parameters.Add(new SqlParameter("@NextCount", nextCount));
                         connection.Open();
 
                         using (SqlDataReader reader = cmd.ExecuteReader())
