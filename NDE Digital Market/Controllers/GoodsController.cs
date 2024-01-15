@@ -102,7 +102,19 @@ namespace NDE_Digital_Market.Controllers
                                 modelObj.TotalPrice = reader["TotalPrice"] != DBNull.Value ? Convert.ToDecimal(reader["TotalPrice"]) : 0;
                                 modelObj.SellerId = Convert.ToInt32(reader["SellerId"]);
                                 modelObj.AvailableQty = Convert.ToInt32(reader["AvailableQty"]);
-                               
+                                DateTime? endDate = null;
+                                if (reader["EndDate"] != DBNull.Value)
+                                {
+                                    endDate = Convert.ToDateTime(reader["EndDate"]);
+                                    if (endDate <= DateTime.Now)
+                                    {
+
+                                        modelObj.TotalPrice = modelObj.Price;
+                                        modelObj.DiscountAmount = 0;
+                                        modelObj.DiscountPct = 0;
+                                    }
+                                }
+
 
                                 lst.Add(modelObj);
                             }
@@ -199,6 +211,18 @@ namespace NDE_Digital_Market.Controllers
                                     SellerId = Convert.ToInt32(reader["SellerId"]),
                                     AvailableQty = Convert.ToInt32(reader["AvailableQty"])
                                 };
+                                DateTime? endDate = null;
+                                if (reader["EndDate"] != DBNull.Value)
+                                {
+                                    endDate = Convert.ToDateTime(reader["EndDate"]);
+                                    if (endDate <= DateTime.Now)
+                                    {
+
+                                        goodsQuantity.TotalPrice = goodsQuantity.Price;
+                                        goodsQuantity.DiscountAmount = 0;
+                                        goodsQuantity.DiscountPct = 0;
+                                    }
+                                }
                                 goodsQuantitys.Add(goodsQuantity);
                             }
                         }
