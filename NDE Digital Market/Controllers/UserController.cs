@@ -233,44 +233,57 @@ namespace NDE_Digital_Market.Controllers
         [HttpPost]
         [Route("login")]
         public async Task<IActionResult> LoginUser(LoginUserDto user)
-        //public IActionResult LoginUser(string phone, string pass)
         {
-            //UserModel user = new UserModel();
-            //string encryptedPassword = CommonServices.EncryptPassword(user.Password);
-            SqlCommand cmd = new SqlCommand("SELECT * FROM  [UserRegistration] WHERE PhoneNumber = @phoneNumber ", _healthCareConnection);
-            cmd.CommandType = CommandType.Text;
-            cmd.Parameters.AddWithValue("@phoneNumber", user.PhoneNumber);
-            //cmd.Parameters.AddWithValue("@Password", user.Password);
-           await _healthCareConnection.OpenAsync();
-            SqlDataReader reader = await cmd.ExecuteReaderAsync();
-            if (await reader.ReadAsync())
+            try
             {
-                int userId =(int) reader["UserId"];
-     
-                bool IsBuyer = (bool)reader["IsBuyer"];
-                bool IsSeller = (bool)reader["IsSeller"];
-                bool IsAdmin = (bool)reader["IsAdmin"];
+                string query = @"SELECT UR.UserId, UR.IsBuyer, UR.IsAdmin, UR.IsSeller, UR.PasswordHash, UR.PasswordSalt,CR.CompanyAdminId  FROM  UserRegistration UR
+                                    LEFT JOIN CompanyRegistration CR ON CR.CompanyCode = UR.CompanyCode AND CR.CompanyAdminId = UR.UserId
+                                    WHERE PhoneNumber = @PhoneNumber";
+                SqlCommand cmd = new SqlCommand(query, _healthCareConnection);
+                cmd.CommandType = CommandType.Text;
+                cmd.Parameters.AddWithValue("@phoneNumber", user.PhoneNumber);
 
-                byte[] storedPasswordHash = (byte[])reader["PasswordHash"];
-                byte[] storedPasswordSalt = (byte[])reader["PasswordSalt"];
-                await _healthCareConnection.CloseAsync();
-              
-                string role = IsAdmin ? "admin" : IsSeller ? "seller" : IsBuyer ? "buyer" : "";
-                string token = CreateToken(role);
-                var newRefreshToken = CreateRefreshToken(userId.ToString());
+                await _healthCareConnection.OpenAsync();
+                SqlDataReader reader = await cmd.ExecuteReaderAsync();
 
-                if (!VerifyPasswordHash(user.Password, storedPasswordHash, storedPasswordSalt))
+                if (await reader.ReadAsync())
                 {
-                    return BadRequest(new { message = "Invalid password" });
+                    int userId = (int)reader["UserId"];
+                    bool IsBuyer = (bool)reader["IsBuyer"];
+                    bool IsSeller = (bool)reader["IsSeller"];
+                    bool IsAdmin = (bool)reader["IsAdmin"];
+                    bool IsSellerAdmin = false;
+                    string adminId = reader["CompanyAdminId"]?.ToString();
+                    if (adminId.Length > 0)
+                    {
+                        IsSellerAdmin = true;
+                    }
+                    byte[] storedPasswordHash = (byte[])reader["PasswordHash"];
+                    byte[] storedPasswordSalt = (byte[])reader["PasswordSalt"];
+
+                    await _healthCareConnection.CloseAsync();
+
+                    string role = IsAdmin ? "admin" : IsSeller ? "seller" : IsBuyer ? "buyer" : "";
+                    string token = CreateToken(role);
+                    var newRefreshToken = CreateRefreshToken(userId.ToString());
+
+                    if (!VerifyPasswordHash(user.Password, storedPasswordHash, storedPasswordSalt))
+                    {
+                        return BadRequest(new { message = "Invalid password" });
+                    }
+
+
+                    return Ok(new { message = "Login successful", userId, role, token, newRefreshToken, IsSellerAdmin });
                 }
-                //await SetRefreshToken(newRefreshToken, encryptedUserCode);
-                // Return the user object as a response
-                return Ok(new { message = "Login successful", userId, role, token, newRefreshToken });
+                else
+                {
+                    return BadRequest(new { message = "Invalid phone number or Password" });
+                }
             }
-            else
+            catch (Exception ex)
             {
-             
-                return BadRequest(new { message = "Invalid phone number or Password"});
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                return BadRequest(new { message = "An error occurred while processing the request." });
             }
         }
 
