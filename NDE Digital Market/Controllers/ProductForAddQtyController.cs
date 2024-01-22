@@ -332,6 +332,107 @@ namespace NDE_Digital_Market.Controllers
             }
         }
 
+
+        [HttpPut("UpdateSellerProductPriceAndOffer")]
+        public async Task<IActionResult> UpdateSellerProductPriceAndOffer([FromForm] SellerProductPriceAndOfferDto sellerproductdata)
+        {
+            try
+            {
+                // Validation
+                if (sellerproductdata == null)
+                {
+                    return BadRequest(new { message = "Invalid request data." });
+                }
+
+                // Additional validation as needed for required fields, e.g., ProductId, UserId, Price, etc.
+
+                Boolean check = await SellerProductPriceAndOfferCheck(sellerproductdata.ProductId, sellerproductdata.UserId);
+
+                if (check)
+                {
+                    await con.OpenAsync();
+
+                    using (SqlTransaction transaction = con.BeginTransaction())
+                    {
+                        try
+                        {
+
+                            string ImagePath = CommonServices.UploadFiles(foldername, filename, sellerproductdata.ImageFile);
+
+                            string query = "UpdateSellerProductPriceAndOffer";
+                            SqlCommand cmd = new SqlCommand(query, con, transaction);
+                            cmd.CommandType = CommandType.StoredProcedure;
+
+
+                            if (ImagePath != null)
+                            {
+                                // Adding parameters with null checks
+                                cmd.Parameters.AddWithValue("@ProductId", sellerproductdata.ProductId);
+                                cmd.Parameters.AddWithValue("@UserId", sellerproductdata.UserId);
+                                cmd.Parameters.AddWithValue("@Price", sellerproductdata.Price ?? (object)DBNull.Value);
+                                cmd.Parameters.AddWithValue("@DiscountAmount", sellerproductdata.DiscountAmount ?? (object)DBNull.Value);
+                                cmd.Parameters.AddWithValue("@DiscountPct", sellerproductdata.DiscountPct ?? (object)DBNull.Value);
+                                cmd.Parameters.AddWithValue("@EffectivateDate", sellerproductdata.EffectivateDate ?? (object)DBNull.Value);
+                                cmd.Parameters.AddWithValue("@EndDate", sellerproductdata.EndDate ?? (object)DBNull.Value);
+                                cmd.Parameters.AddWithValue("@Status", "Pending");
+                                cmd.Parameters.AddWithValue("@IsActive", 1);
+                                cmd.Parameters.AddWithValue("@UpdatedBy", sellerproductdata.UpdatedBy ?? (object)DBNull.Value);
+                                cmd.Parameters.AddWithValue("@UpdatedDate", DateTime.Now);
+                                cmd.Parameters.AddWithValue("@UpdatedPC", sellerproductdata.UpdatedPC ?? (object)DBNull.Value);
+                                cmd.Parameters.AddWithValue("@TotalPrice", sellerproductdata.TotalPrice ?? (object)DBNull.Value);
+                                cmd.Parameters.AddWithValue("@ImagePath", ImagePath);
+
+                                await cmd.ExecuteNonQueryAsync();
+                            }
+                            else
+                            {
+                                // Adding parameters with null checks
+                                cmd.Parameters.AddWithValue("@ProductId", sellerproductdata.ProductId);
+                                cmd.Parameters.AddWithValue("@UserId", sellerproductdata.UserId);
+                                cmd.Parameters.AddWithValue("@Price", sellerproductdata.Price ?? (object)DBNull.Value);
+                                cmd.Parameters.AddWithValue("@DiscountAmount", sellerproductdata.DiscountAmount ?? (object)DBNull.Value);
+                                cmd.Parameters.AddWithValue("@DiscountPct", sellerproductdata.DiscountPct ?? (object)DBNull.Value);
+                                cmd.Parameters.AddWithValue("@EffectivateDate", sellerproductdata.EffectivateDate ?? (object)DBNull.Value);
+                                cmd.Parameters.AddWithValue("@EndDate", sellerproductdata.EndDate ?? (object)DBNull.Value);
+                                cmd.Parameters.AddWithValue("@Status", "Pending");
+                                cmd.Parameters.AddWithValue("@IsActive", 1);
+                                cmd.Parameters.AddWithValue("@UpdatedBy", sellerproductdata.UpdatedBy ?? (object)DBNull.Value);
+                                cmd.Parameters.AddWithValue("@UpdatedDate", DateTime.Now);
+                                cmd.Parameters.AddWithValue("@UpdatedPC", sellerproductdata.UpdatedPC ?? (object)DBNull.Value);
+                                cmd.Parameters.AddWithValue("@TotalPrice", sellerproductdata.TotalPrice ?? (object)DBNull.Value);
+
+                                await cmd.ExecuteNonQueryAsync();
+                            }
+
+
+
+                            transaction.Commit();
+                            return Ok(new { message = "Price updated successfully." });
+                        }
+                        catch (Exception ex)
+                        {
+                            transaction.Rollback();
+                            return BadRequest(new { message = $"Error updating price: {ex.Message}" });
+                        }
+                        finally
+                        {
+                            con.Close();
+                        }
+                    }
+                }
+                else
+                {
+                    return NotFound(new { message = "Price not found!" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = $"Error updating price: {ex.Message}" });
+            }
+        }
+
+
+
         [HttpGet]
         [Route("GetSellerProductsByCompanyCode")]
         public async Task<IActionResult> GetSellerProductsByCompanyCode(string userID, Int32? status=null)

@@ -15,9 +15,12 @@
         public decimal? TotalPrice { get; set; }
         public string? CompanyCode { get; set; }
         //public Boolean? IsActive { get; set; }
-        //public DateTime? AddedDate { get; set; }
+        //public DateTime? AddedDate { get; set; } 
         public string? AddedBy { get; set; }
         public string? AddedPC { get; set; }
+
+        public string? UpdatedPC { get; set; }
+        public string? UpdatedBy { get; set; }
 
     }
 }
