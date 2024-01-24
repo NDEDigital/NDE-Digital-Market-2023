@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Controllers\ate\" />
     <Folder Include="images\Uploads\Review\" />
   </ItemGroup>
 
