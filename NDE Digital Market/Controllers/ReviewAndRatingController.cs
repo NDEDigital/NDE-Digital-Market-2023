@@ -189,7 +189,6 @@ namespace NDE_Digital_Market.Controllers
             }
         }
 
-
         [HttpPost]
         [Route("getReviewRatingsData")]
         public async Task<IActionResult> AddReview([FromForm] ReviewsAndRatings review)
