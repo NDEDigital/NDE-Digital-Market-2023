@@ -27,79 +27,109 @@ namespace NDE_Digital_Market.Controllers
         public async Task<List<NavModel>> GetNavData()
         {
             List<NavModel> lst = new List<NavModel>();
-            using (SqlConnection con = new SqlConnection(_healthCareConnection))
-            {
-                await con.OpenAsync();
-                string query = @"SELECT * FROM ProductGroups Where IsActive = 1";
 
-                using (SqlCommand cmd = new SqlCommand(query, con))
+            try
+            {
+                using (SqlConnection con = new SqlConnection(_healthCareConnection))
                 {
-                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    await con.OpenAsync();
+                    string query = @"SELECT * FROM ProductGroups Where IsActive = 1";
+
+                    using (SqlCommand cmd = new SqlCommand(query, con))
                     {
-                        while (await reader.ReadAsync())
+                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                         {
-                            NavModel modelObj = new NavModel
+                            while (await reader.ReadAsync())
                             {
-                                ProductGroupCode = reader["ProductGroupCode"].ToString(),
-                                ProductGroupName = reader["ProductGroupName"].ToString(),
-                                ProductGroupPrefix = reader["ProductGroupPrefix"].ToString(),
-                                ProductGroupDetails = reader["ProductGroupDetails"].ToString(),
-                                ImagePath = reader["ImagePath"].ToString(),
-                                ProductGroupID = Convert.ToInt32(reader["ProductGroupID"])
-                            };
-                            lst.Add(modelObj);
+                                NavModel modelObj = new NavModel
+                                {
+                                    ProductGroupCode = reader["ProductGroupCode"].ToString(),
+                                    ProductGroupName = reader["ProductGroupName"].ToString(),
+                                    ProductGroupPrefix = reader["ProductGroupPrefix"].ToString(),
+                                    ProductGroupDetails = reader["ProductGroupDetails"].ToString(),
+                                    ImagePath = reader["ImagePath"].ToString(),
+                                    ProductGroupID = Convert.ToInt32(reader["ProductGroupID"])
+                                };
+                                lst.Add(modelObj);
+                            }
                         }
                     }
                 }
-
             }
-
-
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                throw;
+            }
             return lst;
         }
 
-       
+
+
 
         [HttpGet]
         [Route("GetGoodsList")]
         public async Task<List<AllProductDto>> GetGoodsList()
         {
             List<AllProductDto> lst = new List<AllProductDto>();
-            using (SqlConnection con = new SqlConnection(_healthCareConnection))
-            {
-                await con.OpenAsync();
-                string query = "GetAllProductListWithAvailableQty";
-                using (SqlCommand cmd = new SqlCommand(query, con))
-                {
-                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
-                    {
-                        while (await reader.ReadAsync())
-                        {
-                            AllProductDto modelObj = new AllProductDto();
-                            modelObj.CompanyName = reader["CompanyName"].ToString();
-                            modelObj.ProductGroupName = reader["ProductGroupName"].ToString();
-                            modelObj.ProductId = Convert.ToInt32(reader["ProductId"]);
-                            modelObj.ProductName = reader["ProductName"].ToString();
-                            modelObj.ProductGroupID = Convert.ToInt32(reader["ProductGroupID"]);
-                            modelObj.Specification = reader["Specification"].ToString();
-                            modelObj.UnitId = Convert.ToInt32(reader["UnitId"]);
-                            modelObj.Unit = reader["Unit"].ToString();
-                            modelObj.Price = reader["Price"] != DBNull.Value ? Convert.ToDecimal(reader["Price"]) : 0;
-                            modelObj.DiscountAmount = reader["DiscountAmount"] != DBNull.Value ? Convert.ToDecimal(reader["DiscountAmount"]) : 0;
-                            modelObj.DiscountPct = reader["DiscountPct"] != DBNull.Value ? Convert.ToDecimal(reader["DiscountPct"]) : 0;
-                            modelObj.ImagePath = reader["ImagePath"].ToString();
-                            modelObj.TotalPrice = reader["TotalPrice"] != DBNull.Value ? Convert.ToDecimal(reader["TotalPrice"]) : 0;
-                            modelObj.SellerId = Convert.ToInt32(reader["SellerId"]);
-                            modelObj.AvailableQty = Convert.ToInt32(reader["AvailableQty"]);
 
-                            lst.Add(modelObj);
+            try
+            {
+                using (SqlConnection con = new SqlConnection(_healthCareConnection))
+                {
+                    await con.OpenAsync();
+                    string query = "GetAllProductListWithAvailableQty";
+
+                    using (SqlCommand cmd = new SqlCommand(query, con))
+                    {
+                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                        {
+                            while (await reader.ReadAsync())
+                            {
+                                AllProductDto modelObj = new AllProductDto();
+                                modelObj.CompanyName = reader["CompanyName"].ToString();
+                                modelObj.ProductGroupName = reader["ProductGroupName"].ToString();
+                                modelObj.ProductId = Convert.ToInt32(reader["ProductId"]);
+                                modelObj.ProductName = reader["ProductName"].ToString();
+                                modelObj.ProductGroupID = Convert.ToInt32(reader["ProductGroupID"]);
+                                modelObj.Specification = reader["Specification"].ToString();
+                                modelObj.UnitId = Convert.ToInt32(reader["UnitId"]);
+                                modelObj.Unit = reader["Unit"].ToString();
+                                modelObj.Price = reader["Price"] != DBNull.Value ? Convert.ToDecimal(reader["Price"]) : 0;
+                                modelObj.DiscountAmount = reader["DiscountAmount"] != DBNull.Value ? Convert.ToDecimal(reader["DiscountAmount"]) : 0;
+                                modelObj.DiscountPct = reader["DiscountPct"] != DBNull.Value ? Convert.ToDecimal(reader["DiscountPct"]) : 0;
+                                modelObj.ImagePath = reader["ImagePath"].ToString();
+                                modelObj.TotalPrice = reader["TotalPrice"] != DBNull.Value ? Convert.ToDecimal(reader["TotalPrice"]) : 0;
+                                modelObj.SellerId = Convert.ToInt32(reader["SellerId"]);
+                                modelObj.AvailableQty = Convert.ToInt32(reader["AvailableQty"]);
+                                DateTime? endDate = null;
+                                if (reader["EndDate"] != DBNull.Value)
+                                {
+                                    endDate = Convert.ToDateTime(reader["EndDate"]);
+                                    if (endDate <= DateTime.Now)
+                                    {
+
+                                        modelObj.TotalPrice = modelObj.Price;
+                                        modelObj.DiscountAmount = 0;
+                                        modelObj.DiscountPct = 0;
+                                    }
+                                }
+
+
+                                lst.Add(modelObj);
+                            }
                         }
                     }
                 }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                throw;
+            }
+
             return lst;
         }
-
 
 
         //====================== ProductCompany =================
@@ -134,12 +164,6 @@ namespace NDE_Digital_Market.Controllers
                         }
                     }
                 }
-                //if (companiesByProductGroup.Count == 0)
-                //{
-                //    return BadRequest(new {
-                //        message = "No companies found for the given product group code."}
-                //    );
-                //}
                 return Ok(companiesByProductGroup);
             }
             catch (Exception ex)
@@ -187,6 +211,18 @@ namespace NDE_Digital_Market.Controllers
                                     SellerId = Convert.ToInt32(reader["SellerId"]),
                                     AvailableQty = Convert.ToInt32(reader["AvailableQty"])
                                 };
+                                DateTime? endDate = null;
+                                if (reader["EndDate"] != DBNull.Value)
+                                {
+                                    endDate = Convert.ToDateTime(reader["EndDate"]);
+                                    if (endDate <= DateTime.Now)
+                                    {
+
+                                        goodsQuantity.TotalPrice = goodsQuantity.Price;
+                                        goodsQuantity.DiscountAmount = 0;
+                                        goodsQuantity.DiscountPct = 0;
+                                    }
+                                }
                                 goodsQuantitys.Add(goodsQuantity);
                             }
                         }

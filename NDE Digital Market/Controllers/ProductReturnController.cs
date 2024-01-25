@@ -37,7 +37,6 @@ namespace NDE_Digital_Market.Controllers
                 transaction = con.BeginTransaction();
                 string systemCode = string.Empty;
 
-                // Execute the stored procedure to generate the system code
                 SqlCommand cmdSP = new SqlCommand("spMakeSystemCode", con, transaction);
                 {
                     cmdSP.CommandType = CommandType.StoredProcedure;
@@ -50,7 +49,6 @@ namespace NDE_Digital_Market.Controllers
                 }
                 int ProductReturnId = int.Parse(systemCode.Split('%')[0]);
                 string ProductReturnCode = systemCode.Split('%')[1];
-                // SP END
 
                 string query = @"INSERT INTO ProductReturn(ProductReturnId,ProductReturnCode,ReturnTypeId,ProductGroupId,ProductId,OrderNo,Price,
                                     OrderDetailsId,SellerId,ApplyDate,DeliveryDate,Remarks,AddedDate,AddedBy,AddedPc)
@@ -97,14 +95,12 @@ namespace NDE_Digital_Market.Controllers
                     return BadRequest(new { message = "ProductReturn data isn't Inserted Successfully." });
                 }
 
-                // If everything is fine, commit the transaction
                 transaction.Commit();
                 return Ok(new { message = "ProductReturn data Inserted Successfully." });
 
             }
             catch (Exception ex)
             {
-                // If there is any error, rollback the transaction
                 if (transaction != null)
                 {
                     transaction.Rollback();
@@ -113,7 +109,6 @@ namespace NDE_Digital_Market.Controllers
             }
             finally
             {
-                // Finally block to ensure the connection is always closed
                 if (con.State == ConnectionState.Open)
                 {
                     await con.CloseAsync();
@@ -123,9 +118,67 @@ namespace NDE_Digital_Market.Controllers
         }
 
 
+        //private readonly string _connectionDigitalMarket;
+        //public ProductReturnController(IConfiguration config)
+        //{
+
+
+        //    _connectionDigitalMarket = config.GetConnectionString("DigitalMarketConnection");
+        //}
 
 
 
+        //[HttpPost, Authorize(Roles = "buyer")]
+        //[Route("InsertReturnedData")]
+        //public IActionResult InsertProductReturn([FromForm] ProductReturnModel returnData)
+        //{
+        //    try
+        //    {
+        //        int returnId = 0;
+        //        SqlConnection con = new SqlConnection(_connectionDigitalMarket);
+
+        //        SqlCommand getLastReturnId = new SqlCommand("SELECT ISNULL(MAX(ReturnId), 0) FROM ProductReturn;", con);
+        //        con.Open();
+
+        //        returnId = Convert.ToInt32(getLastReturnId.ExecuteScalar()) + 1;
+        //        SqlCommand cmd = new SqlCommand("INSERT INTO  [ProductReturn] ([ReturnId], [GroupName],GoodsName, [GroupCode], [GoodsId], [TypeId], [Remarks],[Price],[DetailsId],[SellerCode],[ApplyDate],[OrderNo], [DeliveryDate]) VALUES (@ReturnId, @GroupName,@GoodsName, @GroupCode, @GoodsId, @TypeId, @Remarks , @Price, @DetailsId, @SellerCode,GETDATE(),@OrderNo,@DeliveryDate);", con);
+
+        //        using (cmd)
+        //        {
+        //            cmd.Parameters.AddWithValue("@returnId", returnId);
+        //            cmd.Parameters.AddWithValue("@GroupName", returnData.GroupName);
+        //            cmd.Parameters.AddWithValue("@GroupCode", returnData.GroupCode);
+        //            cmd.Parameters.AddWithValue("@GoodsId", returnData.GoodsId);
+        //            cmd.Parameters.AddWithValue("@TypeId", returnData.TypeId);
+        //            cmd.Parameters.AddWithValue("@Remarks", string.IsNullOrEmpty(returnData.Remarks) ? (object)DBNull.Value : returnData.Remarks);
+        //            cmd.Parameters.AddWithValue("@Price", returnData.Price);
+        //            cmd.Parameters.AddWithValue("@DetailsId", returnData.DetailsId);
+        //            cmd.Parameters.AddWithValue("@SellerCode", returnData.SellerCode);
+        //            cmd.Parameters.AddWithValue("@OrderNo", returnData.OrderNo);
+        //            cmd.Parameters.AddWithValue("@GoodsName", returnData.GoodsName ?? " ");
+        //            cmd.Parameters.AddWithValue("@DeliveryDate", returnData.DeliveryDate);
+
+        //            cmd.ExecuteNonQuery();
+        //        }
+
+        //        con.Close();
+
+        //        SqlCommand command = new SqlCommand("UPDATE OrderDetails SET Status = 'to Return' WHERE OrderDetailId = " + returnData.DetailsId + "", con);
+
+        //        con.Open();
+        //        command.ExecuteNonQuery();
+        //        con.Close();
+
+        //        return Ok();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        // Handle the exception here. You can log the exception or perform any other necessary actions.
+        //        Console.WriteLine($"An error occurred: {ex.Message}");
+        //        // You might want to return a specific error response or customize as needed.
+        //        return StatusCode(500, new { message = "Internal Server Error" });
+        //    }
+        //}
 
 
         //[HttpGet, Authorize(Roles = "buyer")]
@@ -167,15 +220,10 @@ namespace NDE_Digital_Market.Controllers
         //        }
         //    }
         //}
-
-
     }
-
-
-
 }
 
 
 
 
-
+ 

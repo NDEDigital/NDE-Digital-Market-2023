@@ -27,32 +27,31 @@ namespace NDE_Digital_Market.Controllers
         }
 
         [HttpGet("GetSearchedProduct")]
-        public IActionResult GetSearchedProduct(string productName, string sortDirection)
+        public IActionResult GetSearchedProduct(string productName, string sortDirection, int nextCount,int offset)
         {
-            //if (offset != 0)
-            //{
-            //    offset = 20 * (offset - 1);
-            //}
-
-            var resultList = new List<ProductSearchDto>();
-
-            using (SqlConnection connection = new SqlConnection(_healthCareConnection))
+            try
             {
-                using (SqlCommand cmd = new SqlCommand("ProductSearch", connection))
+                var resultList = new List<ProductSearchDto>();
+
+                using (SqlConnection connection = new SqlConnection(_healthCareConnection))
                 {
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.Add(new SqlParameter("@ProductName", productName));
-                    cmd.Parameters.Add(new SqlParameter("@SortDirection", sortDirection));
-                    //cmd.Parameters.Add(new SqlParameter("@NextCount", nextCount));
-                    //cmd.Parameters.Add(new SqlParameter("@Offset", offset));
-
-                    connection.Open();
-
-                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    if (offset > 0)
                     {
-                        while (reader.Read())
-                        {
+                        offset = (offset-1) * 20;
+                    }                      
+                    using (SqlCommand cmd = new SqlCommand("ProductSearch", connection))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.Add(new SqlParameter("@ProductName", productName));
+                        cmd.Parameters.Add(new SqlParameter("@SortDirection", sortDirection));
+                        cmd.Parameters.Add(new SqlParameter("@Offset", offset));
+                        cmd.Parameters.Add(new SqlParameter("@NextCount", nextCount));
+                        connection.Open();
 
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
                                 var productSearchDto = new ProductSearchDto();
 
                                 productSearchDto.CompanyName = reader["CompanyName"] is DBNull ? null : (string)reader["CompanyName"];
@@ -71,17 +70,34 @@ namespace NDE_Digital_Market.Controllers
                                 productSearchDto.SellerId = reader["SellerId"] is DBNull ? (int?)null : (int)reader["SellerId"];
                                 productSearchDto.AvailableQty = reader["AvailableQty"] is DBNull ? (decimal?)null : (decimal)reader["AvailableQty"];
                                 productSearchDto.TotalCount = reader["TotalCount"] is DBNull ? (int?)null : (int)reader["TotalCount"];
+                                DateTime? endDate = null;
+                                if (reader["EndDate"] != DBNull.Value)
+                                {
+                                    endDate = Convert.ToDateTime(reader["EndDate"]);
+                                    if (endDate <= DateTime.Now)
+                                    {
 
+                                        productSearchDto.TotalPrice = productSearchDto.Price;
+                                        productSearchDto.DiscountAmount = 0;
+                                        productSearchDto.DiscountPct = 0;
+                                    }
+                                }
                                 resultList.Add(productSearchDto);
-
+                            }
                         }
                     }
                 }
+
+                return Ok(resultList);
             }
-
-            return Ok(resultList);
+            catch (Exception ex)
+            {
+                // Handle the exception here. You can log the exception or perform any other necessary actions.
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                // You might want to return a specific error response or customize as needed.
+                return StatusCode(500, new { message = "Internal Server Error" });
+            }
         }
-
 
     }
 

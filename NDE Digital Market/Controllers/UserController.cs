@@ -233,44 +233,57 @@ namespace NDE_Digital_Market.Controllers
         [HttpPost]
         [Route("login")]
         public async Task<IActionResult> LoginUser(LoginUserDto user)
-        //public IActionResult LoginUser(string phone, string pass)
         {
-            //UserModel user = new UserModel();
-            //string encryptedPassword = CommonServices.EncryptPassword(user.Password);
-            SqlCommand cmd = new SqlCommand("SELECT * FROM  [UserRegistration] WHERE PhoneNumber = @phoneNumber ", _healthCareConnection);
-            cmd.CommandType = CommandType.Text;
-            cmd.Parameters.AddWithValue("@phoneNumber", user.PhoneNumber);
-            //cmd.Parameters.AddWithValue("@Password", user.Password);
-           await _healthCareConnection.OpenAsync();
-            SqlDataReader reader = await cmd.ExecuteReaderAsync();
-            if (await reader.ReadAsync())
+            try
             {
-                int userId =(int) reader["UserId"];
-     
-                bool IsBuyer = (bool)reader["IsBuyer"];
-                bool IsSeller = (bool)reader["IsSeller"];
-                bool IsAdmin = (bool)reader["IsAdmin"];
+                string query = @"SELECT UR.UserId, UR.IsBuyer, UR.IsAdmin, UR.IsSeller, UR.PasswordHash, UR.PasswordSalt,CR.CompanyAdminId  FROM  UserRegistration UR
+                                    LEFT JOIN CompanyRegistration CR ON CR.CompanyCode = UR.CompanyCode AND CR.CompanyAdminId = UR.UserId
+                                    WHERE PhoneNumber = @PhoneNumber AND UR.IsActive = 1";
+                SqlCommand cmd = new SqlCommand(query, _healthCareConnection);
+                cmd.CommandType = CommandType.Text;
+                cmd.Parameters.AddWithValue("@phoneNumber", user.PhoneNumber);
 
-                byte[] storedPasswordHash = (byte[])reader["PasswordHash"];
-                byte[] storedPasswordSalt = (byte[])reader["PasswordSalt"];
-                await _healthCareConnection.CloseAsync();
-              
-                string role = IsAdmin ? "admin" : IsSeller ? "seller" : IsBuyer ? "buyer" : "";
-                string token = CreateToken(role);
-                var newRefreshToken = CreateRefreshToken(userId.ToString());
+                await _healthCareConnection.OpenAsync();
+                SqlDataReader reader = await cmd.ExecuteReaderAsync();
 
-                if (!VerifyPasswordHash(user.Password, storedPasswordHash, storedPasswordSalt))
+                if (await reader.ReadAsync())
                 {
-                    return BadRequest(new { message = "Invalid password" });
+                    int userId = (int)reader["UserId"];
+                    bool IsBuyer = (bool)reader["IsBuyer"];
+                    bool IsSeller = (bool)reader["IsSeller"];
+                    bool IsAdmin = (bool)reader["IsAdmin"];
+                    bool IsSellerAdmin = false;
+                    string adminId = reader["CompanyAdminId"]?.ToString();
+                    if (adminId.Length > 0)
+                    {
+                        IsSellerAdmin = true;
+                    }
+                    byte[] storedPasswordHash = (byte[])reader["PasswordHash"];
+                    byte[] storedPasswordSalt = (byte[])reader["PasswordSalt"];
+
+                    await _healthCareConnection.CloseAsync();
+
+                    string role = IsAdmin ? "admin" : IsSeller ? "seller" : IsBuyer ? "buyer" : "";
+                    string token = CreateToken(role);
+                    var newRefreshToken = CreateRefreshToken(userId.ToString());
+
+                    if (!VerifyPasswordHash(user.Password, storedPasswordHash, storedPasswordSalt))
+                    {
+                        return BadRequest(new { message = "Invalid password" });
+                    }
+
+
+                    return Ok(new { message = "Login successful", userId, role, token, newRefreshToken, IsSellerAdmin });
                 }
-                //await SetRefreshToken(newRefreshToken, encryptedUserCode);
-                // Return the user object as a response
-                return Ok(new { message = "Login successful", userId, role, token, newRefreshToken });
+                else
+                {
+                    return BadRequest(new { message = "Invalid phone number or Password" });
+                }
             }
-            else
+            catch (Exception ex)
             {
-             
-                return BadRequest(new { message = "Invalid phone number or Password"});
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                return BadRequest(new { message = "An error occurred while processing the request." });
             }
         }
 
@@ -507,25 +520,41 @@ namespace NDE_Digital_Market.Controllers
         [Route("getSingleUserInfo")]
         public IActionResult getSingleUser(int? userId)
         {
-            UserModel user = new UserModel();
+            UserDetailsDTO user = new UserDetailsDTO();
             //byte[] userCodeBytes = Encoding.UTF8.GetBytes(userCode);
-  
+
             //string DecryptedUserCode = ConvertBytesToHexString(user.UserCode);
-            SqlCommand cmd = new SqlCommand("SELECT * FROM UserRegistration WHERE UserId = @UserId ", _healthCareConnection);
+            SqlCommand cmd = new SqlCommand("SELECT\r\n     UR.UserId,\r\n\tUR.UserCode,   UR.FullName,\r\n    UR.IsAdmin,\r\n    UR.IsBuyer,\r\n    UR.IsSeller,\r\n    UR.PhoneNumber,\r\n    UR.Email,\r\n    UR.Address,\r\n    CR.CompanyName,\r\n   DATEDIFF(YEAR, CR.CompanyFoundationDate, GETDATE()) as YearsInBusiness,\r\n\tCR.BusinessRegistrationNumber,\r\n\tCR.TaxIdentificationNumber,\r\n\tCR.PreferredPaymentMethodID,\r\n\tPM.PMName,\r\n\tCR.BankNameID,\r\n\tPD.PMBankName,\r\n\tCR.AccountNumber,\r\n\tCR.AccountHolderName\r\n\r\n\r\nFROM\r\n    UserRegistration UR\r\nLEFT JOIN\r\n    CompanyRegistration CR ON UR.CompanyCode = CR.CompanyCode\r\nLEFT JOIN\r\n    HK_PaymentMethodMaster PM ON CR.PreferredPaymentMethodID = PM.PMMasterID\r\nLEFT JOIN\r\n    HK_PaymentMethodDetails PD ON CR.BankNameID = PD.PMDetailsID\r\nWHERE\r\n    UR.UserId = @UserId ", _healthCareConnection);
             cmd.CommandType = CommandType.Text;
             cmd.Parameters.AddWithValue("@UserId", userId);
-            //Console.WriteLine(decryptedUserCode);
             _healthCareConnection.Open();
             SqlDataReader reader = cmd.ExecuteReader();
             if (reader.Read())
             {
                 user.UserId = (int)reader["UserId"];
                 user.UserCode = reader["UserCode"].ToString();
- 
                 user.FullName = reader["FullName"].ToString();
+                user.IsAdmin = reader["IsAdmin"] as bool?;
+                user.IsBuyer = reader["IsBuyer"] as bool?;
+                user.IsSeller = reader["IsSeller"] as bool?;
                 user.PhoneNumber = reader["PhoneNumber"].ToString();
                 user.Email = reader["Email"].ToString();
                 user.Address = reader["Address"].ToString();
+                if (user.IsSeller == true)
+                {
+                    user.CompanyName = reader["CompanyName"].ToString();
+                    user.YearsInBusiness = (int)reader["YearsInBusiness"];
+                    user.BusinessRegistrationNumber = reader["BusinessRegistrationNumber"].ToString();
+                    user.TaxIdentificationNumber = reader["TaxIdentificationNumber"].ToString();
+                    user.PreferredPaymentMethodID = reader["PreferredPaymentMethodID"] as int?;
+                    user.PMName = reader["PMName"].ToString();
+                    user.BankNameID = reader["BankNameID"] as int?;
+                    user.PMBankName = reader["PMBankName"].ToString();
+                    user.AccountNumber = reader["AccountNumber"].ToString();
+                    user.AccountHolderName = reader["AccountHolderName"].ToString();
+
+                }
+
                 _healthCareConnection.Close();
                 // Return the user object as a response
                 return Ok(new { message = "GET single data successful", user });
@@ -536,7 +565,6 @@ namespace NDE_Digital_Market.Controllers
                 return BadRequest(new { message = "Invalid Inforamtion" });
             }
         }
-
 
 
         //// =================================================== isAdmin ===================================
@@ -567,50 +595,101 @@ namespace NDE_Digital_Market.Controllers
         //    }
         //}
 
-
         // ============================= Update Pass =============================
+
 
         [HttpPut]
         [Route("updatePass")]
         public IActionResult UpdatePasss(UpdatePasswordModel user)
         {
-            SqlCommand cmd = new SqlCommand("SELECT * FROM UserRegistration WHERE UserId = @UserId", _healthCareConnection);
-
-            cmd.Parameters.AddWithValue("@UserId", user.userId);
-
-            createPasswordHash(user.newPassword, out byte[] passwordHash, out byte[] passwordSalt);
-
-            _healthCareConnection.Open();
-            SqlDataReader reader = cmd.ExecuteReader();
-
-            if (reader.HasRows)
+            try
             {
-                reader.Read();
-                byte[] storedPasswordHash = (byte[])reader["PasswordHash"];
-                byte[] storedPasswordSalt = (byte[])reader["PasswordSalt"];
-                reader.Close();
+                SqlCommand cmd = new SqlCommand("SELECT * FROM UserRegistration WHERE UserId = @UserId", _healthCareConnection);
+                cmd.Parameters.AddWithValue("@UserId", user.userId);
 
-                if (!VerifyPasswordHash(user.oldPassword, storedPasswordHash, storedPasswordSalt))
+                createPasswordHash(user.newPassword, out byte[] passwordHash, out byte[] passwordSalt);
+
+                _healthCareConnection.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                if (reader.HasRows)
                 {
-                    return BadRequest(new { message = "Password did not match!" });
+                    reader.Read();
+                    byte[] storedPasswordHash = (byte[])reader["PasswordHash"];
+                    byte[] storedPasswordSalt = (byte[])reader["PasswordSalt"];
+                    reader.Close();
+
+                    if (!VerifyPasswordHash(user.oldPassword, storedPasswordHash, storedPasswordSalt))
+                    {
+                        return BadRequest(new { message = "Password did not match!" });
+                    }
+
+                    SqlCommand cmd2 = new SqlCommand("UPDATE UserRegistration SET [PasswordHash] = @passwordHash, [PasswordSalt] = @passwordSalt WHERE UserId = @userId", _healthCareConnection);
+                    cmd2.Parameters.AddWithValue("@userId", user.userId);
+                    cmd2.Parameters.AddWithValue("@passwordHash", passwordHash);
+                    cmd2.Parameters.AddWithValue("@passwordSalt", passwordSalt);
+
+                    int rowsAffected = cmd2.ExecuteNonQuery();
+
+                    if (rowsAffected > 0)
+                    {
+                        _healthCareConnection.Close();
+                        return Ok(new { message = "Password updated successfully!", user.userCode });
+                    }
                 }
 
-                SqlCommand cmd2 = new SqlCommand("UPDATE UserRegistration SET [PasswordHash] = @passwordHash, [PasswordSalt] = @passwordSalt WHERE UserId = @userId", _healthCareConnection);
-                cmd2.Parameters.AddWithValue("@userId", user.userId);
-                cmd2.Parameters.AddWithValue("@passwordHash", passwordHash);
-                cmd2.Parameters.AddWithValue("@passwordSalt", passwordSalt);
-
-                int rowsAffected = cmd2.ExecuteNonQuery();
-
-                if (rowsAffected > 0)
-                {
-                    _healthCareConnection.Close();
-                    return Ok(new { message = "Password updated successfully!", user.userCode });
-                }
+                _healthCareConnection.Close();
+                return BadRequest(new { message = "Password did not match!" });
             }
+            catch (Exception ex)
+            {
+                // Handle the exception here. You can log the exception or perform any other necessary actions.
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                // You might want to return a specific error response or customize as needed.
+                return StatusCode(500, new { message = "Internal Server Error" });
+            }
+        }
 
-            _healthCareConnection.Close();
-            return BadRequest(new { message = "Password did not match!" });
+
+
+
+        //========================tushar=========================
+        [HttpPut]
+        [Route("UpdateUserProfile")]
+        public async Task<IActionResult> UpdateUserProfileAsync([FromBody] UserModel userModel)
+        {
+            try
+            {
+                string query = @"UPDATE UserRegistration SET Email = @email, Address = @address WHERE UserId = @userID";
+                if (userModel.Email == null || userModel.Email == "")
+                {
+                    return BadRequest(new { message = $"User Email is not Provided." });
+                }
+                if (userModel.Address == null || userModel.Address == "")
+                {
+                    return BadRequest(new { message = $"User Address is not Provided." });
+                }
+                using (SqlCommand command = new SqlCommand(query, _healthCareConnection))
+                {
+                    command.Parameters.AddWithValue("@email", userModel.Email);
+                    command.Parameters.AddWithValue("@address", userModel.Address);
+                    command.Parameters.AddWithValue("@userID", userModel.UserId);
+
+                    await _healthCareConnection.OpenAsync();
+                    // Execute the command
+                    int Res = await command.ExecuteNonQueryAsync();
+                    if (Res == 0)
+                    {
+                        return BadRequest(new { message = $"User didnot found." });
+                    }
+                    await _healthCareConnection.CloseAsync();
+                }
+                return Ok(new { message = $"User Profile Updated." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = $"User profile update error: {ex.Message}" });
+            }
         }
 
     }

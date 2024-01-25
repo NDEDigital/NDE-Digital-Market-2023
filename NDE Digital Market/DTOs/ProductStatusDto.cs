@@ -18,5 +18,11 @@
 
         public string? CompanyCode { get; set; }
         public string? CompanyName { get; set; }
+
+        public decimal? PreviousPrice { get; set; }
+        public decimal? PreviousDiscountAmount { get; set; }
+        public decimal? PreviousDiscountPct { get; set; }
+
+        public decimal? PreviousTotalPrice { get; set; }
     }
 }
