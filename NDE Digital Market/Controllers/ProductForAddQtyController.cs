@@ -469,7 +469,8 @@ namespace NDE_Digital_Market.Controllers
                                 sellerProduct.TotalPrice = reader["TotalPrice"] != DBNull.Value ? Convert.ToDecimal(reader["TotalPrice"]) : 0;
                                 sellerProduct.AddedDate = reader["AddedDate"] != DBNull.Value ? Convert.ToDateTime(reader["AddedDate"]) : DateTime.MinValue;
                                 sellerProduct.UnitName = reader["UnitName"].ToString();
-
+                                sellerProduct.ProductGroupName = reader["ProductGroupName"].ToString();
+                                sellerProduct.ProductGroupID = Convert.ToInt32(reader["ProductGroupID"]);
 
                                 sellerProductsByCompanyCode.Add(sellerProduct);
                             }
