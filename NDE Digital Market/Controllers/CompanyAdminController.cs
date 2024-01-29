@@ -30,7 +30,7 @@ namespace NDE_Digital_Market.Controllers
                 {
                     con.Open();
 
-                    using (SqlCommand cmd = new SqlCommand(@"SELECT
+                    using (SqlCommand cmd = new SqlCommand(@"  SELECT
                                             UR.UserId,
                                             UR.FullName,
                                             UR.PhoneNumber,
@@ -47,11 +47,12 @@ namespace NDE_Digital_Market.Controllers
                                         WHERE
                                             CR.IsActive = 1
                                             AND UR.IsActive = @IsActive
-                                            AND CR.CompanyAdminId = @UserId
+                                            
                                             AND EXISTS (
-                                                SELECT 1
+                                                SELECT *
                                                 FROM UserRegistration
-                                                WHERE CompanyCode = CR.CompanyCode AND UserId = @UserId
+                                                WHERE CompanyCode = CR.CompanyCode AND UserId = @userId
+                                          
                                             );", con))
                     {
                         cmd.Parameters.AddWithValue("@UserId", userId);

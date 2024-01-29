@@ -66,7 +66,7 @@ public async Task<IActionResult> GetPermissionData(int UserId)
                        FROM Permission P 
                        JOIN MenuList M ON P.MenuId=M.MenuId
                        JOIN UserRegistration U ON P.UserId=U.UserId
-                       WHERE M.IsAdmin!=1 AND M.IsActive=1 AND U.CompanyCode=(select CompanyCode from UserRegistration WHERE UserId=@UserId);";
+                       WHERE M.IsAdmin!=1 AND M.IsActive=1 AND U.CompanyCode=(select CompanyCode from UserRegistration WHERE UserId=@UserId) AND P.UserId!=@UserId;";
 
             await con.OpenAsync();
 
