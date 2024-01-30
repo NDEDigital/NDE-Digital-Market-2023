@@ -13,6 +13,7 @@
         public bool IsActive { get; set; }
         public bool IsSeller { get; set; }
         public bool? IsBuyer { get; set; }
+      
 
         public string? CompanyCode { get; set; }
         public string CompanyName { get; set; }

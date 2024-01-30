@@ -30,7 +30,7 @@ namespace NDE_Digital_Market.Controllers
                 {
                     con.Open();
 
-                    using (SqlCommand cmd = new SqlCommand(@"SELECT
+                    using (SqlCommand cmd = new SqlCommand(@"  SELECT
                                             UR.UserId,
                                             UR.FullName,
                                             UR.PhoneNumber,
@@ -39,7 +39,9 @@ namespace NDE_Digital_Market.Controllers
                                             UR.AddedDate,
                                             CR.IsActive,
                                             CR.CompanyCode,
-                                            CR.CompanyName
+                                            CR.CompanyName,
+                                                            CR.CompanyAdminId
+
                                         FROM
                                             UserRegistration UR
                                         JOIN
@@ -47,11 +49,13 @@ namespace NDE_Digital_Market.Controllers
                                         WHERE
                                             CR.IsActive = 1
                                             AND UR.IsActive = @IsActive
-                                            AND CR.CompanyAdminId = @UserId
+                                            		AND UR.UserId!=  CR.CompanyAdminId
+                                                                    AND UR.UserId!=@userId
                                             AND EXISTS (
-                                                SELECT 1
+                                                SELECT *
                                                 FROM UserRegistration
-                                                WHERE CompanyCode = CR.CompanyCode AND UserId = @UserId
+                                                WHERE CompanyCode = CR.CompanyCode AND UserId = @userId
+                                          
                                             );", con))
                     {
                         cmd.Parameters.AddWithValue("@UserId", userId);
@@ -73,6 +77,8 @@ namespace NDE_Digital_Market.Controllers
                                     IsActive = reader["IsActive"] as bool? ?? IsActive,
                                     CompanyCode = reader["CompanyCode"].ToString(),
                                     CompanyName = reader["CompanyName"].ToString(),
+                                    CompanyAdminId = reader["CompanyName"].ToString(),
+
 
 
 
