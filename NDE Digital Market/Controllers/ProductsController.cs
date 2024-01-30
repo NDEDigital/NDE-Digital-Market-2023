@@ -262,6 +262,7 @@ namespace NDE_Digital_Market.Controllers
                     {
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.Add(new SqlParameter("@Status", status));
+                        //command.Parameters.Add(new SqlParameter("@userID", userId));
 
                         await connection.OpenAsync();
 

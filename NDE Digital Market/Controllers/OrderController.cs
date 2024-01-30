@@ -163,6 +163,8 @@ namespace NDE_Digital_Market.Controllers
 
 
 
+        //admin order getdata
+
         [HttpGet("GetOrderMasterData")]
         public async Task<IActionResult> GetOrderMasterData(string? status)
         {
@@ -172,10 +174,15 @@ namespace NDE_Digital_Market.Controllers
             {
                 using (var connection = new SqlConnection(_healthCareConnection))
                 {
-                    using (var command = new SqlCommand("GetOrderMasterByStatus", connection))
+                    string spConnection = "GetOrderMasterByStatus";
+                    if (status == "Cancelled")
+                    {
+                        spConnection = "GetOrderMasterByCancelled";
+                    }
+                    using (var command = new SqlCommand(spConnection, connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
-                        if(status != null)
+                        if (status != null && status != "Cancelled")
                         {
                             command.Parameters.Add(new SqlParameter("@Status", status));
                         }
@@ -203,8 +210,10 @@ namespace NDE_Digital_Market.Controllers
                             }
                         }
                     }
-                }
 
+
+
+                }
                 return Ok(products);
             }
             catch (Exception ex)
@@ -212,6 +221,9 @@ namespace NDE_Digital_Market.Controllers
                 return StatusCode(500, "An error occurred while retrieving products: " + ex.Message);
             }
         }
+
+
+
         [HttpGet("GetOrderDetailData")]
         public async Task<IActionResult> GetOrderDetailData(int? OrderMasterId, string? status = null)
         {

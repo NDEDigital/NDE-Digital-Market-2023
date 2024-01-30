@@ -272,6 +272,8 @@ namespace NDE_Digital_Market.Controllers
         }
 
 
+
+
         [HttpGet]
         [Route("GetProductGroupsListByStatus")]
         public async Task<List<ProductGroupByStatusDTO>> GetProductGroupsListByStatus(Int32? status = null)

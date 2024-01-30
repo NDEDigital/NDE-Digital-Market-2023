@@ -122,6 +122,13 @@ namespace NDE_Digital_Market.Controllers
 
 
 
+
+
+
+
+
+
+
         [HttpPost("PortalReceivedPost")]
         public async Task<IActionResult> InsertPortalReceivedAsync(PortalReceivedMasterDto portaldata)
         {
@@ -381,6 +388,7 @@ namespace NDE_Digital_Market.Controllers
                                 cmd.Parameters.AddWithValue("@UpdatedPC", sellerproductdata.UpdatedPC ?? (object)DBNull.Value);
                                 cmd.Parameters.AddWithValue("@TotalPrice", sellerproductdata.TotalPrice ?? (object)DBNull.Value);
                                 cmd.Parameters.AddWithValue("@ImagePath", ImagePath);
+                                
 
                                 await cmd.ExecuteNonQueryAsync();
                             }
@@ -400,7 +408,7 @@ namespace NDE_Digital_Market.Controllers
                                 cmd.Parameters.AddWithValue("@UpdatedDate", DateTime.Now);
                                 cmd.Parameters.AddWithValue("@UpdatedPC", sellerproductdata.UpdatedPC ?? (object)DBNull.Value);
                                 cmd.Parameters.AddWithValue("@TotalPrice", sellerproductdata.TotalPrice ?? (object)DBNull.Value);
-
+                               
                                 await cmd.ExecuteNonQueryAsync();
                             }
 
