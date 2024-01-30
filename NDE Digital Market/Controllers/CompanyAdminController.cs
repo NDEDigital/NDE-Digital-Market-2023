@@ -39,7 +39,9 @@ namespace NDE_Digital_Market.Controllers
                                             UR.AddedDate,
                                             CR.IsActive,
                                             CR.CompanyCode,
-                                            CR.CompanyName
+                                            CR.CompanyName,
+                                                            CR.CompanyAdminId
+
                                         FROM
                                             UserRegistration UR
                                         JOIN
@@ -47,7 +49,8 @@ namespace NDE_Digital_Market.Controllers
                                         WHERE
                                             CR.IsActive = 1
                                             AND UR.IsActive = @IsActive
-                                            
+                                            		AND UR.UserId!=  CR.CompanyAdminId
+                                                                    AND UR.UserId!=@userId
                                             AND EXISTS (
                                                 SELECT *
                                                 FROM UserRegistration
@@ -74,6 +77,8 @@ namespace NDE_Digital_Market.Controllers
                                     IsActive = reader["IsActive"] as bool? ?? IsActive,
                                     CompanyCode = reader["CompanyCode"].ToString(),
                                     CompanyName = reader["CompanyName"].ToString(),
+                                    CompanyAdminId = reader["CompanyName"].ToString(),
+
 
 
 

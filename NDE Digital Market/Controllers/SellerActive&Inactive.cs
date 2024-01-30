@@ -46,7 +46,7 @@ namespace NDE_Digital_Market.Controllers
                                                             UR.CompanyCode,
                                                             UR.IsBuyer,
                                                             UR.IsSeller,
-                                                            CR.IsAdmin
+                                                        
 	                                                        CR.CompanyCode,
 	                                                        CR.CompanyName,
                                                             CR.CompanyAdminId
@@ -89,7 +89,7 @@ namespace NDE_Digital_Market.Controllers
                                 bid.AddedDate = (DateTime)(reader["AddedDate"] as DateTime?);
                                 bid.IsActive = reader["IsActive"] as bool? ?? IsActive;
                                 bid.IsSeller = reader["IsSeller"] as bool? ?? IsActive;
-                                bid.IsAdmin = reader["IsAdmin"] as bool? ;
+                               
 
                                 bid.CompanyCode = reader["CompanyCode"].ToString();
                                 bid.CompanyAdminId = Convert.ToInt32(reader["CompanyAdminId"]);
