@@ -291,7 +291,7 @@ namespace NDE_Digital_Market.Controllers
                                         PreviousDiscountAmount = reader.IsDBNull(reader.GetOrdinal("PDiscountAmount")) ? (decimal?)null : (decimal?)reader.GetDecimal(reader.GetOrdinal("PDiscountAmount")),
                                         PreviousDiscountPct = reader.IsDBNull(reader.GetOrdinal("PDiscountPct")) ? (decimal?)null : (decimal?)reader.GetDecimal(reader.GetOrdinal("PDiscountPct")),
                                         PreviousTotalPrice = reader.IsDBNull(reader.GetOrdinal("PTotalPrice")) ? (decimal?)null : (decimal?)reader.GetDecimal(reader.GetOrdinal("PTotalPrice"))
-
+                                        //UpdatedDate = reader.IsDBNull(reader.GetOrdinal("EndDate")) ? (DateTime?)null : (DateTime?)reader.GetDateTime(reader.GetOrdinal("EndDate")),
                                     };
                                 products.Add(product);
                             }
@@ -345,7 +345,7 @@ namespace NDE_Digital_Market.Controllers
         {
             try
             {
-                string query = @"UPDATE SellerProductPriceAndOffer SET Status = @Status WHERE ProductId = @ProductId AND UserId = @UserId AND CompanyCode = @CompanyCode";
+                string query = @"UPDATE SellerProductPriceAndOffer SET Status = @Status, UpdatedDate = @UpdatedDate WHERE ProductId = @ProductId AND UserId = @UserId AND CompanyCode = @CompanyCode ";
                 using (var connection = new SqlConnection(_healthCareConnection))
                 {
                     using (SqlCommand command = new SqlCommand(query, connection))
@@ -354,6 +354,9 @@ namespace NDE_Digital_Market.Controllers
                         command.Parameters.AddWithValue("@UserId", productStatus.UserId);
                         command.Parameters.AddWithValue("@CompanyCode", productStatus.CompanyCode);
                         command.Parameters.AddWithValue("@ProductId", productStatus.ProductId);
+                        command.Parameters.AddWithValue("@UpdatedDate", DateTime.Now);
+
+
 
                         await connection.OpenAsync();
                         // Execute the command

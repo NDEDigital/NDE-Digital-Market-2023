@@ -24,5 +24,7 @@
         public decimal? PreviousDiscountPct { get; set; }
 
         public decimal? PreviousTotalPrice { get; set; }
+
+        public DateTime? UpdatedDate { get; set; }
     }
 }
