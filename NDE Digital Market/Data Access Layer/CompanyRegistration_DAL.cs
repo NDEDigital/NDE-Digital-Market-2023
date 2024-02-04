@@ -186,7 +186,7 @@ public class CompanyRegistration_DAL
             cmd.Parameters.AddWithValue("@MaxUser", companyDto.MaxUser);
         }
         cmd.Parameters.AddWithValue("@CompanyCode", companyDto.CompanyCode);
-        cmd.Parameters.AddWithValue("@DateUpdated", DateTime.N);
+        cmd.Parameters.AddWithValue("@DateUpdated", DateTime.Now);
         await connection.OpenAsync();
         // Execute the update
         int res = await cmd.ExecuteNonQueryAsync();
