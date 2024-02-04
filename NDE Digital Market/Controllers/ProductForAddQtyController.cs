@@ -480,6 +480,22 @@ namespace NDE_Digital_Market.Controllers
                                 sellerProduct.ProductGroupName = reader["ProductGroupName"].ToString();
                                 sellerProduct.ProductGroupID = Convert.ToInt32(reader["ProductGroupID"]);
 
+
+                                DateTime? endDate = null;
+                                if (reader["EndDate"] != DBNull.Value)
+                                {
+                                    endDate = Convert.ToDateTime(reader["EndDate"]);
+                                    if (endDate <= DateTime.Now)
+                                    {
+                                        sellerProduct.TotalPrice = sellerProduct.Price;
+                                        sellerProduct.DiscountAmount = 0;
+                                        sellerProduct.DiscountPct = 0;
+                                    }
+                                }
+
+
+
+
                                 sellerProductsByCompanyCode.Add(sellerProduct);
                             }
 
