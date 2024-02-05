@@ -22,11 +22,11 @@ namespace NDE_Digital_Market.Controllers
         {
             _configuration = configuration;
             CommonServices commonServices = new CommonServices(_configuration);
-            con = new SqlConnection(commonServices.HealthCareConnection);       
+            con = new SqlConnection(commonServices.HealthCareConnection);
             foldername = commonServices.FilesPath + "Productfiles";
         }
 
-        private async Task<Boolean> ProductNameCheck(string ProductName,string Specification)
+        private async Task<Boolean> ProductNameCheck(string ProductName, string Specification)
         {
 
             string query = @"SELECT COUNT(*) FROM ProductList WHERE ProductName = @ProductName AND Specification = @Specification;";
@@ -101,9 +101,9 @@ namespace NDE_Digital_Market.Controllers
                         await con.CloseAsync();
                     }
                     string ImagePath = CommonServices.UploadFiles(foldername, filename, productListDto.ImageFile);
-                    if(ImagePath == null)
+                    if (ImagePath == null)
                     {
-                         return BadRequest(new { message = "Image Problem" });
+                        return BadRequest(new { message = "Image Problem" });
                     }
 
                     int ProductID = int.Parse(systemCode.Split('%')[0]);
@@ -332,7 +332,7 @@ namespace NDE_Digital_Market.Controllers
 
                 return Ok(lst);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(new { message = ex.Message });
             }
@@ -346,7 +346,7 @@ namespace NDE_Digital_Market.Controllers
 
         [HttpGet]
         [Route("GetProductNameByProductGroupId")]
-        public async Task<List<ProductNameByGroup>> GetProductNameByProductGroupId( int ProductGroupId)
+        public async Task<List<ProductNameByGroup>> GetProductNameByProductGroupId(int ProductGroupId)
         {
             List<ProductNameByGroup> lst = new List<ProductNameByGroup>();
 
@@ -403,34 +403,51 @@ namespace NDE_Digital_Market.Controllers
         //========================tushar=========================
 
         [HttpPut("MakeProductActiveOrInactive")]
-        public async Task<IActionResult> MakeProductActiveOrInactiveAsync(int? productId, bool? IsActive)
+
+
+        public async Task<IActionResult> MakeProductActiveOrInactiveAsync(List<int> productIds, bool? IsActive)
         {
             try
             {
                 string query = @"UPDATE ProductList
-                                    SET IsActive = @IsActive
-                                    WHERE ProductId = @ProductId";
+                          SET IsActive = @IsActive
+                          WHERE ProductId IN ({0})";
+
+                // Create a parameterized list of parameters for the IN clause
+                string parameterList = string.Join(",", productIds.Select((_, index) => $"@ProductId{index}"));
+                query = string.Format(query, parameterList);
+
                 using (SqlCommand command = new SqlCommand(query, con))
                 {
+                    // Add parameters for productIds
+                    for (int i = 0; i < productIds.Count; i++)
+                    {
+                        command.Parameters.AddWithValue($"@ProductId{i}", productIds[i]);
+                    }
+
                     command.Parameters.AddWithValue("@IsActive", IsActive);
-                    command.Parameters.AddWithValue("@ProductId", productId);
 
                     await con.OpenAsync();
+
                     // Execute the command
-                    int Res = await command.ExecuteNonQueryAsync();
-                    if (Res == 0)
+                    int rowsAffected = await command.ExecuteNonQueryAsync();
+
+                    if (rowsAffected == 0)
                     {
-                        return BadRequest(new { message = $"Product didnot found." });
+                        return BadRequest(new { message = $"No products found." });
                     }
+
                     await con.CloseAsync();
                 }
-                return Ok(new { message = $"Product IsActive status changed." });
+
+                return Ok(new { message = $"Products' IsActive status changed." });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = $"Product IsActive status not change : {ex.Message}" });
+                return BadRequest(new { message = $"Products' IsActive status not changed: {ex.Message}" });
             }
         }
-
     }
-}
+    }
+
+    
