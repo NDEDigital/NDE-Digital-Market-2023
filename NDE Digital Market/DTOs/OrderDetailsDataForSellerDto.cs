@@ -17,5 +17,6 @@
         public int? ProductGroupID { get; set; }
 
         public string? Status { get; set; }
+        public string? ReturnTypeName { get; set; }
     }
 }

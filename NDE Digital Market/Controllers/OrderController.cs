@@ -1529,6 +1529,7 @@ namespace NDE_Digital_Market.Controllers
                                     Detail.ProductGroupID = reader.IsDBNull("ProductGroupID") ? (int?)null : Convert.ToInt32(reader["ProductGroupID"]);
 
 
+                                    Detail.ReturnTypeName = reader.IsDBNull("ReturnTypeName") ? null : reader["ReturnTypeName"].ToString();
                                     Detail.Status = reader.IsDBNull("Status") ? null : reader["Status"].ToString();
 
                                     Master.TotalPrice += Detail.Price * Detail.Qty;
@@ -1564,6 +1565,7 @@ namespace NDE_Digital_Market.Controllers
                                     Detail.Price = reader.IsDBNull(reader.GetOrdinal("Price")) ? (decimal?)null : (decimal?)reader.GetDecimal(reader.GetOrdinal("Price"));
                                     Detail.DeliveryCharge = reader.IsDBNull(reader.GetOrdinal("DeliveryCharge")) ? (decimal?)null : (decimal?)reader.GetDecimal(reader.GetOrdinal("DeliveryCharge"));
 
+                                    Detail.ReturnTypeName = reader.IsDBNull("ReturnTypeName") ? null : reader["ReturnTypeName"].ToString();
 
                                     Detail.Status = reader.IsDBNull("Status") ? null : reader["Status"].ToString();
 
