@@ -205,7 +205,7 @@ namespace NDE_Digital_Market.Controllers
             cmd.Parameters.AddWithValue("@AddedDate", userModel.AddedDate.HasValue ? (object)userModel.AddedDate.Value : DBNull.Value);
             cmd.Parameters.AddWithValue("@TimeStamp", userModel.AddedDate.HasValue ? (object)userModel.AddedDate.Value : DBNull.Value);
             cmd.Parameters.AddWithValue("@CompanyCode", userModel.CompanyCode);
-            cmd.Parameters.AddWithValue("@IsActive",true);
+            cmd.Parameters.AddWithValue("@IsActive",false);
 
             await _healthCareConnection.OpenAsync();
             await cmd.ExecuteNonQueryAsync();
@@ -219,7 +219,7 @@ namespace NDE_Digital_Market.Controllers
             var newRefreshToken = CreateRefreshToken(encryptedUserCode);
             return Ok(new
             {
-                message = "User created successfully",
+                message = "User created successfully wait for admin approval",
                 encryptedUserCode,
                 role,
                 token,  // Include the token in the response object
@@ -236,9 +236,9 @@ namespace NDE_Digital_Market.Controllers
         {
             try
             {
-                string query = @"SELECT UR.UserId, UR.IsBuyer, UR.IsAdmin, UR.IsSeller, UR.PasswordHash, UR.PasswordSalt,CR.CompanyAdminId  FROM  UserRegistration UR
+                string query = @"SELECT UR.UserId, UR.IsBuyer, UR.IsAdmin, UR.IsSeller, UR.PasswordHash, UR.PasswordSalt,CR.CompanyAdminId,UR.IsActive  FROM  UserRegistration UR
                                     LEFT JOIN CompanyRegistration CR ON CR.CompanyCode = UR.CompanyCode AND CR.CompanyAdminId = UR.UserId
-                                    WHERE PhoneNumber = @PhoneNumber AND UR.IsActive = 1";
+                                    WHERE PhoneNumber = @PhoneNumber";
                 SqlCommand cmd = new SqlCommand(query, _healthCareConnection);
                 cmd.CommandType = CommandType.Text;
                 cmd.Parameters.AddWithValue("@phoneNumber", user.PhoneNumber);
@@ -248,6 +248,7 @@ namespace NDE_Digital_Market.Controllers
 
                 if (await reader.ReadAsync())
                 {
+                    bool isActive = (bool)reader["IsActive"];
                     int userId = (int)reader["UserId"];
                     bool IsBuyer = (bool)reader["IsBuyer"];
                     bool IsSeller = (bool)reader["IsSeller"];
@@ -271,7 +272,10 @@ namespace NDE_Digital_Market.Controllers
                     {
                         return BadRequest(new { message = "Invalid password" });
                     }
-
+                    if (!isActive)
+                    {
+                        return BadRequest(new { message = "Please waiting for admin approval", userId, role, token, newRefreshToken, IsSellerAdmin });
+                    }
 
                     return Ok(new { message = "Login successful", userId, role, token, newRefreshToken, IsSellerAdmin });
                 }
