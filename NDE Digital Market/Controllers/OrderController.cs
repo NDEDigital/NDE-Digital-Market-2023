@@ -991,7 +991,7 @@ namespace NDE_Digital_Market.Controllers
 
                 if (status != null)
                 {
-                    query = @"select OM.OrderMasterId, OM.OrderNo, OM.OrderDate, OD.OrderDetailId, OD.ProductId, PL.ProductName, 
+                    query = @"select OM.OrderMasterId, OM.OrderNo, OM.OrderDate, OM.TotalPrice, OD.OrderDetailId, OD.ProductId, PL.ProductName, 
                                   PL.ImagePath, OD.Qty, OD.Price, OD.Status  from OrderMaster OM
                                   join OrderDetails OD on OM.OrderMasterId = OD.OrderMasterId
                                   join ProductList PL on PL.ProductId = OD.ProductId
@@ -999,7 +999,7 @@ namespace NDE_Digital_Market.Controllers
                 }
                 else
                 {
-                    query = @"select OM.OrderMasterId, OM.OrderNo, OM.OrderDate, OD.OrderDetailId, OD.ProductId, PL.ProductName, 
+                    query = @"select OM.OrderMasterId, OM.OrderNo, OM.OrderDate, OM.TotalPrice, OD.OrderDetailId, OD.ProductId, PL.ProductName, 
                                   PL.ImagePath, OD.Qty, OD.Price, OD.Status  from OrderMaster OM
                                   join OrderDetails OD on OM.OrderMasterId = OD.OrderMasterId
                                   join ProductList PL on PL.ProductId = OD.ProductId
@@ -1034,6 +1034,7 @@ namespace NDE_Digital_Market.Controllers
                                 Master.OrderMasterId = OrderMasterId;
                                 Master.OrderNo = reader.IsDBNull("OrderNo") ? (string?)null : reader["OrderNo"].ToString();
                                 Master.OrderDate = reader.IsDBNull(reader.GetOrdinal("OrderDate")) ? (DateTime?)null : (DateTime?)reader.GetDateTime(reader.GetOrdinal("OrderDate"));
+                                Master.TotalPrice = reader.IsDBNull(reader.GetOrdinal("TotalPrice")) ? (decimal?)null : (decimal?)reader.GetDecimal(reader.GetOrdinal("TotalPrice"));
 
                                 MasterList.Add(Master);
 
