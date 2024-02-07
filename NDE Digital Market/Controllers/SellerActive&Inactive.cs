@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualBasic;
 using NDE_Digital_Market.DTOs;
 using NDE_Digital_Market.SharedServices;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 
 namespace NDE_Digital_Market.Controllers
@@ -18,7 +20,7 @@ namespace NDE_Digital_Market.Controllers
 
         [HttpGet]
         [Route("getSellerActive&Inactive/{IsSeller}")]
-        public List<sellerStatus> CompanySellerDetails(string CompanyCode,bool IsSeller, bool IsActive)
+        public List<sellerStatus> CompanySellerDetails(string CompanyCode, bool IsSeller, bool IsActive)
         {
             List<sellerStatus> bidList = new List<sellerStatus>();
 
@@ -72,7 +74,7 @@ namespace NDE_Digital_Market.Controllers
                         cmd.Parameters.AddWithValue("@IsActive", IsActive);
 
                         cmd.Parameters.AddWithValue("@IsSeller", IsSeller);
-                      
+
 
 
                         using (SqlDataReader reader = cmd.ExecuteReader())
@@ -89,7 +91,7 @@ namespace NDE_Digital_Market.Controllers
                                 bid.AddedDate = (DateTime)(reader["AddedDate"] as DateTime?);
                                 bid.IsActive = reader["IsActive"] as bool? ?? IsActive;
                                 bid.IsSeller = reader["IsSeller"] as bool? ?? IsActive;
-                               
+
 
                                 bid.CompanyCode = reader["CompanyCode"].ToString();
                                 bid.CompanyAdminId = Convert.ToInt32(reader["CompanyAdminId"]);
@@ -103,11 +105,11 @@ namespace NDE_Digital_Market.Controllers
                     }
 
                     con.Close();
-                   
 
-                 
+
+
                 }
-              
+
 
 
                 return bidList;
@@ -119,42 +121,36 @@ namespace NDE_Digital_Market.Controllers
                 return null;
             }
         }
+
         [HttpPut]
-        [Route("updateSellerActive&Inactive/{userId}/{IsActive}")]
-        public IActionResult UpdateUserStatus(int userId, bool IsActive)
+        [Route("updateSellerActive&Inactive")]
+        public async Task<IActionResult> UpdateSellerProductStatusAsync(string userIds,bool isActive)
         {
             try
             {
-                using (SqlConnection con = new SqlConnection(_healthCareConnection))
+                string query = $" UPDATE UserRegistration SET IsActive = @IsActive WHERE UserId IN ({userIds})";
+
+                using (var connection = new SqlConnection(_healthCareConnection))
                 {
-                    con.Open();
-
-                    using (SqlCommand cmd = new SqlCommand(@"UPDATE UserRegistration
-                                                     SET IsActive = @IsActive
-                                                     WHERE UserId = @UserId;", con))
+                    
+                    using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        cmd.Parameters.AddWithValue("@UserId", userId);
-                        cmd.Parameters.AddWithValue("@IsActive", IsActive);
-
-                        int rowsAffected = cmd.ExecuteNonQuery();
-                        Console.WriteLine(rowsAffected + "ekhane Jhamela");
-                        if (rowsAffected > 0)
-                        {
-                            return Ok(new { message = "Updated Successfully" }); // Update successful
-                        }
-                        else
-                        {
-                            return BadRequest(); // User not found
-                        }
+                        await connection.OpenAsync();
+                        command.Parameters.AddWithValue("@IsActive", isActive);
+                        await command.ExecuteNonQueryAsync();
+                        await connection.CloseAsync();
                     }
+
+                  
                 }
+
+                return Ok(new { message = "updated seller" });
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error: {ex.Message}");
-                // You might want to handle errors more gracefully
-                return StatusCode(500, "Internal Server Error");
+                return BadRequest(new { message = ex.Message });
             }
+
         }
     }
 }
