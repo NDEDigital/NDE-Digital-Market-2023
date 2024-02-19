@@ -1452,7 +1452,7 @@ namespace NDE_Digital_Market.Controllers
 
 
         [HttpGet("getAllOrderForSeller")]
-        public async Task<IActionResult> getAllOrderForSellerAsync(int userid, string? status)
+        public async Task<IActionResult> getAllOrderForSellerAsync( string CompanyCode, string? status)
         {
             List<OrderMasterDataForSellerDto> MasterList = new List<OrderMasterDataForSellerDto>();
 
@@ -1476,12 +1476,12 @@ namespace NDE_Digital_Market.Controllers
                     cmd.CommandType = CommandType.StoredProcedure;
                     if (status != null)
                     {
-                        cmd.Parameters.AddWithValue("@UserId", userid);
+                        cmd.Parameters.AddWithValue("@CompanyCode", CompanyCode);
                         cmd.Parameters.AddWithValue("@Status", status);
                     }
                     else
                     {
-                        cmd.Parameters.AddWithValue("@UserId", userid);
+                        cmd.Parameters.AddWithValue("@CompanyCode", CompanyCode);
                     }
 
                     using (SqlDataReader reader = cmd.ExecuteReader())
