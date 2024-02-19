@@ -2,6 +2,7 @@
 {
     public class ProductSearchDto
     {
+        public int? CompanyId { get; set; } 
         public string? CompanyName { get; set; }
         public int? ProductId { get; set; }
         public string? ProductName { get; set; }

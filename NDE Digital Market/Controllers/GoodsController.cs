@@ -33,7 +33,48 @@ namespace NDE_Digital_Market.Controllers
                 using (SqlConnection con = new SqlConnection(_healthCareConnection))
                 {
                     await con.OpenAsync();
-                    string query = @"SELECT * FROM ProductGroups Where IsActive = 1";
+                    string query = @"WITH ProductReceived AS (
+        SELECT
+            ProductId,
+            COALESCE(SUM(ReceivedQty), 0) AS TotalQty,
+			CompanyCode
+        FROM
+            PortalReceivedDetails
+        GROUP BY
+            ProductId,
+			CompanyCode
+    ),
+    ProductSold AS (
+        SELECT
+            ProductId,
+            COALESCE(SUM(SaleQty), 0) AS SaleQty
+        FROM
+            SellerSalesDetail
+        GROUP BY
+            ProductId
+    )
+    SELECT DISTINCT(PG.ProductGroupID),
+		PG.ProductGroupCode,
+        PG.ProductGroupName,
+		PG.ImagePath
+    FROM
+        ProductList PL
+    LEFT JOIN
+        SellerProductPriceAndOffer SPL ON PL.ProductId = SPL.ProductId
+    LEFT JOIN
+        Units U ON PL.UnitId = U.UnitId
+    LEFT JOIN
+        ProductGroups PG ON PL.ProductGroupID = PG.ProductGroupID
+    LEFT JOIN
+        ProductReceived PR ON PL.ProductId = PR.ProductId
+		AND PR.CompanyCode=SPL.CompanyCode
+    LEFT JOIN
+        ProductSold PS ON PL.ProductId = PS.ProductId
+	LEFT JOIN
+        CompanyRegistration CR ON SPL.CompanyCode = CR.CompanyCode
+    WHERE
+	PG.IsActive = 1 and PL.IsActive = 1 and SPL.IsActive = 1 and SPL.Status = 'Approved' and SPL.TotalPrice > 0
+		and COALESCE(PR.TotalQty, 0) - COALESCE(PS.SaleQty, 0) > 0 and CR.IsActive =1 ;";
 
                     using (SqlCommand cmd = new SqlCommand(query, con))
                     {
@@ -45,8 +86,8 @@ namespace NDE_Digital_Market.Controllers
                                 {
                                     ProductGroupCode = reader["ProductGroupCode"].ToString(),
                                     ProductGroupName = reader["ProductGroupName"].ToString(),
-                                    ProductGroupPrefix = reader["ProductGroupPrefix"].ToString(),
-                                    ProductGroupDetails = reader["ProductGroupDetails"].ToString(),
+                                    //ProductGroupPrefix = reader["ProductGroupPrefix"].ToString(),
+                                    //ProductGroupDetails = reader["ProductGroupDetails"].ToString(),
                                     ImagePath = reader["ImagePath"].ToString(),
                                     ProductGroupID = Convert.ToInt32(reader["ProductGroupID"])
                                 };
@@ -87,6 +128,7 @@ namespace NDE_Digital_Market.Controllers
                             while (await reader.ReadAsync())
                             {
                                 AllProductDto modelObj = new AllProductDto();
+                                modelObj.CompanyCode = reader["CompanyCode"].ToString();
                                 modelObj.CompanyName = reader["CompanyName"].ToString();
                                 modelObj.ProductGroupName = reader["ProductGroupName"].ToString();
                                 modelObj.ProductId = Convert.ToInt32(reader["ProductId"]);
@@ -195,6 +237,7 @@ namespace NDE_Digital_Market.Controllers
                             {
                                 var goodsQuantity = new CompanyProductListDto
                                 {
+                                    CompanyCode = reader["CompanyCode"].ToString(),
                                     CompanyName = reader["CompanyName"].ToString(),
                                     ProductId = Convert.ToInt32(reader["ProductId"]),
                                     ProductName = reader["ProductName"].ToString(),

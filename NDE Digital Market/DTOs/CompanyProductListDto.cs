@@ -2,6 +2,7 @@
 {
     public class CompanyProductListDto
     {
+        public string? CompanyCode { get; set; }
         public string? CompanyName { get; set; }
         public string? ProductGroupName { get; set; }
         public int? ProductId { get; set; }
