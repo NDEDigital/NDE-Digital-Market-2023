@@ -126,6 +126,7 @@ namespace NDE_Digital_Market.Controllers
 
                     CheckCMD.Parameters.Clear();
                     CheckCMD.Parameters.AddWithValue("@OrderMasterId", OrderMasterId);
+                    CheckCMD.Parameters.AddWithValue("@CompanyCode", OrderDetailsList[i].CompanyCode);
                     CheckCMD.Parameters.AddWithValue("@UserId", OrderDetailsList[i].UserId);
                     CheckCMD.Parameters.AddWithValue("@ProductId", OrderDetailsList[i].ProductId);
                     CheckCMD.Parameters.AddWithValue("@ProductGroupID", OrderDetailsList[i].ProductGroupID);

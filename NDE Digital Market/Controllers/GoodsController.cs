@@ -128,7 +128,7 @@ namespace NDE_Digital_Market.Controllers
                             while (await reader.ReadAsync())
                             {
                                 AllProductDto modelObj = new AllProductDto();
-                                modelObj.CompanyId = Convert.ToInt32(reader["CompanyId"]);
+                                modelObj.CompanyCode = reader["CompanyCode"].ToString();
                                 modelObj.CompanyName = reader["CompanyName"].ToString();
                                 modelObj.ProductGroupName = reader["ProductGroupName"].ToString();
                                 modelObj.ProductId = Convert.ToInt32(reader["ProductId"]);
@@ -237,7 +237,7 @@ namespace NDE_Digital_Market.Controllers
                             {
                                 var goodsQuantity = new CompanyProductListDto
                                 {
-                                    CompanyId = Convert.ToInt32(reader["CompanyId"]),
+                                    CompanyCode = reader["CompanyCode"].ToString(),
                                     CompanyName = reader["CompanyName"].ToString(),
                                     ProductId = Convert.ToInt32(reader["ProductId"]),
                                     ProductName = reader["ProductName"].ToString(),
