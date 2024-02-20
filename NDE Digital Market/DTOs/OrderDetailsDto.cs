@@ -2,6 +2,7 @@
 {
     public class OrderDetailsDto
     {
+        public string CompanyCode { get; set; } 
         public int? OrderMasterId { get; set; }
         public int? UserId { get; set; }
         public int? ProductId { get; set; }
