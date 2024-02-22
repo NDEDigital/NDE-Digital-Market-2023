@@ -216,9 +216,9 @@ namespace NDE_Digital_Market.Controllers
 
         [HttpGet]
         [Route("GetGoodsDetails/{CompanyCode}/{ProductId}")]
-        public async Task<List<AllProductDto>> GetGoodsDetails(string CompanyCode,int ProductId)
+        public async Task<AllProductDto> GetGoodsDetails(string CompanyCode,int ProductId)
         {
-            List<AllProductDto> lst = new List<AllProductDto>();
+            AllProductDto modelObj = new AllProductDto();
 
             try
             {
@@ -309,7 +309,7 @@ namespace NDE_Digital_Market.Controllers
 
                             while (await reader.ReadAsync())
                             {
-                                AllProductDto modelObj = new AllProductDto();
+                               
                                 modelObj.CompanyCode = reader["CompanyCode"].ToString();
                                 modelObj.CompanyName = reader["CompanyName"].ToString();
                                 modelObj.ProductGroupName = reader["ProductGroupName"].ToString();
@@ -340,7 +340,7 @@ namespace NDE_Digital_Market.Controllers
                                 }
 
 
-                                lst.Add(modelObj);
+                                
                             }
                         }
                     }
@@ -352,7 +352,7 @@ namespace NDE_Digital_Market.Controllers
                 throw;
             }
 
-            return lst;
+            return modelObj;
         }
         //====================== ProductCompany =================
 
