@@ -53,7 +53,7 @@ namespace NDE_Digital_Market.Controllers
                             while (reader.Read())
                             {
                                 var productSearchDto = new ProductSearchDto();
-                                productSearchDto.CompanyId = reader["CompanyId"] is DBNull ? (int?)null : (int)reader["CompanyId"];
+                                productSearchDto.CompanyCode = reader["CompanyCode"] is DBNull ? null : (string)reader["CompanyCode"];
                                 productSearchDto.CompanyName = reader["CompanyName"] is DBNull ? null : (string)reader["CompanyName"];
                                 productSearchDto.ProductId = reader["ProductId"] is DBNull ? (int?)null : (int)reader["ProductId"];
                                 productSearchDto.ProductName = reader["ProductName"] is DBNull ? null : (string)reader["ProductName"];
