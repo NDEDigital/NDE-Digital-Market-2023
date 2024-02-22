@@ -104,7 +104,46 @@ namespace NDE_Digital_Market.Controllers
             }
             return lst;
         }
+        [HttpGet]
+        [Route("GetDataForDropdown")]
+        public async Task<ActionResult<List<NavModel>>> getForDropDown()
+        {
+            List<NavModel> lst = new List<NavModel>();
 
+            try
+            {
+                using (SqlConnection con = new SqlConnection(_healthCareConnection))
+                {
+                    await con.OpenAsync();
+                    string query = @"SELECT * FROM ProductGroups Where IsActive = 1";
+
+                    using (SqlCommand cmd = new SqlCommand(query, con))
+                    {
+                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                        {
+                            while (await reader.ReadAsync())
+                            {
+                                NavModel modelObj = new NavModel
+                                {
+                                    ProductGroupCode = reader["ProductGroupCode"].ToString(),
+                                    ProductGroupName = reader["ProductGroupName"].ToString(),
+                                    ProductGroupPrefix = reader["ProductGroupPrefix"].ToString(),
+                                    ProductGroupDetails = reader["ProductGroupDetails"].ToString(),
+                                    ImagePath = reader["ImagePath"].ToString(),
+                                    ProductGroupID = Convert.ToInt32(reader["ProductGroupID"])
+                                };
+                                lst.Add(modelObj);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+            return lst;
+        }
 
 
 
