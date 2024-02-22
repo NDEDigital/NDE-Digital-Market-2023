@@ -466,7 +466,7 @@ namespace NDE_Digital_Market.Controllers
         //[Route("UpdateReviewAndRatings")]
         //public IActionResult UpdateReviewAndRatings(int reviewId, int rating, String? review = null)
         //{
-        //    SqlConnection con = new SqlConnection(_connectionSteel);
+
         //    SqlCommand cmd = new SqlCommand("UPDATE ReviewRatings SET RatingValue =@RatingValue ,ReviewText =@ReviewText   WHERE ReviewId = @ReviewId", con);
         //    cmd.CommandType = CommandType.Text;
         //    cmd.Parameters.AddWithValue("@ReviewId", reviewId);
@@ -481,21 +481,22 @@ namespace NDE_Digital_Market.Controllers
 
 
 
-        //[HttpPut, Authorize(Roles = "buyer")]
-        //[Route("UpdateReviewAndRatings")]
-        //public IActionResult UpdateReviewAndRatings([FromForm] ReviewsAndRatings reviewAndRating)
-        //{
-        //    SqlConnection con = new SqlConnection(_connectionDigitalMarket);
-        //    SqlCommand cmd = new SqlCommand("UPDATE ReviewRatings SET RatingValue =@RatingValue ,ReviewText =@ReviewText   WHERE ReviewId = @ReviewId", con);
-        //    cmd.CommandType = CommandType.Text;
-        //    cmd.Parameters.AddWithValue("@ReviewId", reviewAndRating.ReviewId);
-        //    cmd.Parameters.AddWithValue("@RatingValue", reviewAndRating.RatingValue);
-        //    cmd.Parameters.AddWithValue("@ReviewText", (reviewAndRating.ReviewText != null) ? reviewAndRating.ReviewText : " ");
-        //    con.Open();
-        //    cmd.ExecuteNonQuery();
-        //    con.Close();
-        //    return Ok(new { message = "Review updated successfully" });
+        [HttpPut]
+        [Route("UpdateReviewAndRatings")]
+        public IActionResult UpdateReviewAndRatings([FromForm] ReviewsAndRatings reviewAndRating)
+        {
 
-        //}
+            SqlCommand cmd = new SqlCommand("UPDATE ReviewRatings SET RatingValue =@RatingValue ,ReviewText =@ReviewText   WHERE ReviewId = @ReviewId", con);
+            cmd.CommandType = CommandType.Text;
+            cmd.Parameters.AddWithValue("@ReviewId", reviewAndRating.ReviewId);
+            cmd.Parameters.AddWithValue("@RatingValue", reviewAndRating.RatingValue);
+            cmd.Parameters.AddWithValue("@ReviewText", (reviewAndRating.ReviewText != null) ? reviewAndRating.ReviewText : " ");
+            con.Open();
+            cmd.ExecuteNonQuery();
+            con.Close();
+            return Ok(new { message = "Review updated successfully" });
+
+        }
+
     }
 }
