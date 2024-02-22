@@ -104,12 +104,7 @@ namespace NDE_Digital_Market.Controllers
             }
             return lst;
         }
-        [HttpGet]
-        [Route("GetDataForDropdown")]
-        public async Task<ActionResult<List<NavModel>>> getForDropDown()
-        {
-            List<NavModel> lst = new List<NavModel>();
-
+     
         [HttpGet]
         [Route("GetDataForDropdown")]
         public async Task<ActionResult<List<NavModel>>> getForDropDown()
