@@ -236,8 +236,8 @@ namespace NDE_Digital_Market.Controllers
         {
             try
             {
-                string query = @"SELECT UR.UserId, UR.IsBuyer, UR.IsAdmin, UR.IsSeller, UR.PasswordHash, UR.PasswordSalt,CR.CompanyAdminId,UR.IsActive  FROM  UserRegistration UR
-                                    LEFT JOIN CompanyRegistration CR ON CR.CompanyCode = UR.CompanyCode AND CR.CompanyAdminId = UR.UserId
+                string query = @"SELECT UR.UserId, UR.IsBuyer, UR.IsAdmin, UR.IsSeller, UR.PasswordHash, UR.PasswordSalt,CR.CompanyAdminId,CR.CompanyCode,UR.IsActive  FROM  UserRegistration UR
+                                    LEFT JOIN CompanyRegistration CR ON CR.CompanyCode = UR.CompanyCode OR CR.CompanyAdminId = UR.UserId
                                     WHERE PhoneNumber = @PhoneNumber";
                 SqlCommand cmd = new SqlCommand(query, _healthCareConnection);
                 cmd.CommandType = CommandType.Text;
@@ -253,6 +253,9 @@ namespace NDE_Digital_Market.Controllers
                     bool IsBuyer = (bool)reader["IsBuyer"];
                     bool IsSeller = (bool)reader["IsSeller"];
                     bool IsAdmin = (bool)reader["IsAdmin"];
+                    object companyCodeObject = reader["companyCode"];
+                    string companyCode = (companyCodeObject != DBNull.Value) ? companyCodeObject.ToString() : null;
+
                     bool IsSellerAdmin = false;
                     string adminId = reader["CompanyAdminId"]?.ToString();
                     if (adminId.Length > 0)
@@ -277,7 +280,7 @@ namespace NDE_Digital_Market.Controllers
                         return BadRequest(new { message = "Please waiting for admin approval", userId, role, token, newRefreshToken, IsSellerAdmin });
                     }
 
-                    return Ok(new { message = "Login successful", userId, role, token, newRefreshToken, IsSellerAdmin });
+                    return Ok(new { message = "Login successful", userId, role, token, newRefreshToken, IsSellerAdmin,companyCode });
                 }
                 else
                 {
