@@ -19,7 +19,7 @@ namespace NDE_Digital_Market.Controllers
         }
 
         [HttpGet]
-        [Route("CompanySellerDetails/{userId}/{IsActive}")]
+        [Route("CompanySellerDetails/{userId}/{IsActive}")] //gets company seller list without companyAdmin
         public List<CompanySellerList> CompanySellerDetails(int userId,bool IsActive)
         {
             List<CompanySellerList> bidList = new List<CompanySellerList>();

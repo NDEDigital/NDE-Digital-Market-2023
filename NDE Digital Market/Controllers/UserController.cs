@@ -15,6 +15,8 @@ using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using NDE_Digital_Market.SharedServices;
+using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace NDE_Digital_Market.Controllers
 {
@@ -270,6 +272,19 @@ namespace NDE_Digital_Market.Controllers
                     string role = IsAdmin ? "admin" : IsSeller ? "seller" : IsBuyer ? "buyer" : "";
                     string token = CreateToken(role);
                     var newRefreshToken = CreateRefreshToken(userId.ToString());
+                    var cookieOptions = new CookieOptions
+                    {
+                        HttpOnly = true,
+                        Expires = DateTime.UtcNow.AddMinutes(10)
+
+                    }; var cookieOptions2 = new CookieOptions
+                    {
+                        HttpOnly = true,
+                        Expires = DateTime.UtcNow.AddDays(1)
+
+                    };
+                    Response.Cookies.Append("accessToken", token, cookieOptions);
+                    Response.Cookies.Append("refreshToken", newRefreshToken, cookieOptions2);
 
                     if (!VerifyPasswordHash(user.Password, storedPasswordHash, storedPasswordSalt))
                     {
@@ -401,12 +416,24 @@ namespace NDE_Digital_Market.Controllers
             // At this point, the token is considered valid, and we can generate a new access and refresh token
             string newAccessToken = CreateToken(role); // Replace "RoleFromYourSystem" with actual role retrieval logic
             string newRefreshToken = CreateRefreshToken(encryptedUserId); // This method should be defined to create a refresh token
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Expires= DateTime.UtcNow.AddMinutes(10)
 
+            };            var cookieOptions2 = new CookieOptions
+            {
+                HttpOnly = true,
+                Expires= DateTime.UtcNow.AddDays(1)
+
+            };
+            Response.Cookies.Append("accessToken", newAccessToken, cookieOptions);
+            Response.Cookies.Append("refreshToken", newRefreshToken, cookieOptions2);
             return Ok(new
             {
                 
-                accessToken = newAccessToken,
-                refreshToken = newRefreshToken
+                accessToken = "newAccessToken",
+                refreshToken = "newRefreshToken"
             });
         }
 
@@ -524,7 +551,7 @@ namespace NDE_Digital_Market.Controllers
 
         // =================================================== getSingleUserInfo ===================================
         [HttpGet]
-        [Route("getSingleUserInfo")]
+        [Route("getSingleUserInfo"), Authorize(Roles = "seller")]
         public IActionResult getSingleUser(int? userId)
         {
             UserDetailsDTO user = new UserDetailsDTO();

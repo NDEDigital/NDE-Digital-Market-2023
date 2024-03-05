@@ -6,6 +6,7 @@ using System.Text;
 using NDE_Digital_Market.Services.CompanyRegistrationServices;
 using NDE_Digital_Market.Services.HK_GetsServices;
 using NDE_Digital_Market.Data_Access_Layer;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,7 +25,9 @@ builder.Services.AddCors(options =>
 
 // Add services to the container.
 builder.Services.AddControllers();
-
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 //injecting user uservices
 builder.Services.AddScoped<IHK_Gets, HK_Gets>();
 builder.Services.AddScoped<HK_Gets_DAL>();
@@ -38,8 +41,7 @@ builder.Services.AddScoped<CompanyRegistration_DAL>();
 
 
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen(options =>
 {
     options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
@@ -52,6 +54,7 @@ builder.Services.AddSwaggerGen(options =>
 
     options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -63,8 +66,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuer = false,
             ValidateAudience = false,
             ValidateLifetime = true,
-            ClockSkew = TimeSpan.Zero
-
+            ClockSkew = TimeSpan.Zero // cancels out the 5min  delay of library
+        };
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                // Try to get the token from the "accessToken" cookie
+                if (context.Request.Cookies.ContainsKey("accessToken"))
+                {
+                    context.Token = context.Request.Cookies["accessToken"];
+                }
+                return Task.CompletedTask;
+            }
         };
     });
 
