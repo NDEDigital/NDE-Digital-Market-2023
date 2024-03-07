@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using NDE_Digital_Market.DTOs;
 using NDE_Digital_Market.SharedServices;
@@ -9,11 +10,13 @@ using System.Threading.Tasks;
 
 namespace NDE_Digital_Market.Controllers
 {
-    public class DashboardGetData : Controller
+    [ApiController]
+    [Authorize]
+    public class DashboardGetDataController : ControllerBase
     {
         private readonly string _healthCareConnection;
 
-        public DashboardGetData(IConfiguration config)
+        public DashboardGetDataController(IConfiguration config)
         {
             CommonServices commonServices = new CommonServices(config);
             _healthCareConnection = commonServices.HealthCareConnection;

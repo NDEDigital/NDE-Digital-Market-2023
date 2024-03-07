@@ -4,11 +4,13 @@ using NDE_Digital_Market.Model;
 using NDE_Digital_Market.DTOs;
 using NDE_Digital_Market.Services.CompanyRegistrationServices;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Authorization;
 
 namespace NDE_Digital_Market.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+  
     public class CompanyRegistrationController : ControllerBase
     {
         private readonly ICompanyRegistration _CompanyRegistration;

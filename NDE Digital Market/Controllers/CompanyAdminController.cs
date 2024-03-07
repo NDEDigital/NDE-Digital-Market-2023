@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration; // Make sure to import this namespace
 using NDE_Digital_Market.DTOs;
 using NDE_Digital_Market.SharedServices;
@@ -8,7 +9,9 @@ using System.Data.SqlClient;
 
 namespace NDE_Digital_Market.Controllers
 {
-    public class CompanyAdminController : Controller
+    [ApiController]
+    [Authorize(Roles = "seller")]
+    public class CompanyAdminController : ControllerBase
     {
         private readonly string _healthCareConnection;
 

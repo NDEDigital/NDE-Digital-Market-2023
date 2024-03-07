@@ -1,22 +1,25 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NDE_Digital_Market.DTOs;
 using NDE_Digital_Market.SharedServices;
+using System.Data;
 using System.Data.SqlClient;
 using System.Security.Cryptography;
-
 namespace NDE_Digital_Market.Controllers
 {
-    public class Dashboard : Controller
+    [ApiController]
+    [Authorize]
+    public class DashboardController : ControllerBase
     {
         private readonly string _healthCareConnection;
 
-        public Dashboard(IConfiguration config)
+        public DashboardController(IConfiguration config)
         {
             CommonServices commonServices = new CommonServices(config);
             _healthCareConnection = commonServices.HealthCareConnection;
         }
 
-     
+
 
         [HttpGet]
         [Route("sellerDashboard/{UserId}")]
@@ -47,15 +50,6 @@ namespace NDE_Digital_Market.Controllers
                                 db.MenuId = Convert.ToInt32(reader["MenuId"]);
                                 //UserId = reader.GetInt32(userId),
                                 db.MenuName = reader["MenuName"].ToString();
-
-
-                              
-
-
-
-
-
-
                                 dbList.Add(db);
 
                             }

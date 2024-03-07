@@ -8,11 +8,12 @@ using System.Threading.Tasks;
 
 namespace NDE_Digital_Market.Controllers
 {
-    public class PermissionToDashboard : Controller
+    [ApiController]
+    public class PermissionToDashboardController : ControllerBase
     {
         private readonly string _healthCareConnection;
 
-        public PermissionToDashboard(IConfiguration config)
+        public PermissionToDashboardController(IConfiguration config)
         {
             CommonServices commonServices = new CommonServices(config);
             _healthCareConnection = commonServices.HealthCareConnection;
