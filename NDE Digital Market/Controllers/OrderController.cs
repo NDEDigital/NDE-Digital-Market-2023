@@ -450,6 +450,7 @@ namespace NDE_Digital_Market.Controllers
         }
 
         [HttpPut("UpdateSellerOrderDetailsStatus")]
+        [Authorize(Roles ="seller")]
         public async Task<IActionResult> SellerOrderDetailsStatusChangedAsync(updateOrderClass updateOrder)
         {
 
@@ -852,6 +853,7 @@ namespace NDE_Digital_Market.Controllers
 
         //================================== Added By Tushar ==============================
         [HttpGet("GetSellerOrderBasedOnUserID")]
+        [Authorize(Roles = "seller")]
         public async Task<IActionResult> GetSellerOrderBasedOnUserCodeAsync(string userid, string? status)
         {
             try
@@ -1453,6 +1455,7 @@ namespace NDE_Digital_Market.Controllers
 
 
         [HttpGet("getAllOrderForSeller")]
+        [Authorize(Roles ="seller")]
         public async Task<IActionResult> getAllOrderForSellerAsync( string CompanyCode, string? status)
         {
             List<OrderMasterDataForSellerDto> MasterList = new List<OrderMasterDataForSellerDto>();
