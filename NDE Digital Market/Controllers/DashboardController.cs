@@ -8,7 +8,7 @@ using System.Security.Cryptography;
 namespace NDE_Digital_Market.Controllers
 {
     [ApiController]
-    [Authorize]
+    [Authorize(Roles ="seller")]
     public class DashboardController : ControllerBase
     {
         private readonly string _healthCareConnection;
