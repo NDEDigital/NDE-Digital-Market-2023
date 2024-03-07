@@ -12,6 +12,7 @@ namespace NDE_Digital_Market.Controllers
 
     [Route("api/[controller]")]
     [ApiController]
+    [au]
     public class InvoiceController : Controller
     {
 
