@@ -327,8 +327,8 @@ namespace NDE_Digital_Market.Controllers
         }
 
 
-
-        [HttpPut("AdminOrderUpdateStatus")]
+       
+        [HttpPut("AdminOrderUpdateStatus")]// [ Authorize(Roles = "admin")]
         public async Task<IActionResult> UpdateOrderStatusAsync(String orderMasterId, String? detailsCancelledId, string status)
         {
             SqlTransaction transaction = null;

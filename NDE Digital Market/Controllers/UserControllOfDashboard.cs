@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NDE_Digital_Market.SharedServices;
 using System.Data.SqlClient;
 
@@ -13,6 +14,7 @@ public class UserControllOfDashboard : ControllerBase
     }
 
     [HttpDelete("deleteMenuItems/{UserId}")]
+    [Authorize (Roles ="seller")]
     public async Task<IActionResult> DeleteMenuItems(int UserId, [FromBody] List<int> menuIdsToDelete)
     {
         try

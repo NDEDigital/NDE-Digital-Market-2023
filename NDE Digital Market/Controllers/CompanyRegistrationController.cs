@@ -4,9 +4,13 @@ using NDE_Digital_Market.Model;
 using NDE_Digital_Market.DTOs;
 using NDE_Digital_Market.Services.CompanyRegistrationServices;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Authorization;
+using System.Data;
 
 namespace NDE_Digital_Market.Controllers
 {
+
+
     [Route("api/[controller]")]
     [ApiController]
     public class CompanyRegistrationController : ControllerBase
@@ -40,6 +44,8 @@ namespace NDE_Digital_Market.Controllers
         }
 
         [HttpGet("GetCompaniesBasedOnStatus")]
+        
+        [Authorize(Roles = "seller")]
         public async Task<IActionResult> GetCompaniesAsync(int status)
         {
             var res = await _CompanyRegistration.GetCompaniesAsync(status);

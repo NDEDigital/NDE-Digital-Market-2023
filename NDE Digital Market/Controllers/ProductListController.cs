@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NDE_Digital_Market.DTOs;
 using NDE_Digital_Market.Model;
@@ -345,6 +346,7 @@ namespace NDE_Digital_Market.Controllers
         // ==============================productName by productGroupId===================
 
         [HttpGet]
+        [Authorize(Roles = "seller")]
         [Route("GetProductNameByProductGroupId")]
         public async Task<List<ProductNameByGroup>> GetProductNameByProductGroupId(int ProductGroupId)
         {

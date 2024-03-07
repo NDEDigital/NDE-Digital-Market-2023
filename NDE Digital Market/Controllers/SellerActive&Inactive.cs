@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualBasic;
 using NDE_Digital_Market.DTOs;
 using NDE_Digital_Market.SharedServices;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 
 namespace NDE_Digital_Market.Controllers
@@ -19,6 +21,7 @@ namespace NDE_Digital_Market.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "seller")]
         [Route("getSellerActive&Inactive/{IsSeller}")]
         public List<sellerStatus> CompanySellerDetails(string CompanyCode, bool IsSeller, bool IsActive)
         {
@@ -123,6 +126,7 @@ namespace NDE_Digital_Market.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = "seller")]
         [Route("updateSellerActive&Inactive")]
         public async Task<IActionResult> UpdateSellerProductStatusAsync(string userIds,bool isActive)
         {

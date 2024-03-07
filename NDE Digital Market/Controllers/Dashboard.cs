@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NDE_Digital_Market.DTOs;
 using NDE_Digital_Market.SharedServices;
 using System.Data.SqlClient;
@@ -19,6 +20,7 @@ namespace NDE_Digital_Market.Controllers
      
 
         [HttpGet]
+        [Authorize (Roles ="seller")]
         [Route("sellerDashboard/{UserId}")]
         public List<DashboardDto> CompanySellerDetails(string UserId)
         {

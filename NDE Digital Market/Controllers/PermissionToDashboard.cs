@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using NDE_Digital_Market.DTOs;
 using NDE_Digital_Market.SharedServices;
@@ -19,6 +20,7 @@ namespace NDE_Digital_Market.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "seller")]
         [Route("GiveAcessDashboard/{UserId}/{MenuId}")]
         public async Task<IActionResult> InsertPermissionToDashboard(int UserId, int MenuId)
         {
@@ -55,6 +57,7 @@ namespace NDE_Digital_Market.Controllers
             }
         }
       [HttpGet]
+        [Authorize(Roles = "seller")]
 [Route("GetPermissionData/{UserId}")]
 public async Task<IActionResult> GetPermissionData(int UserId)
 {

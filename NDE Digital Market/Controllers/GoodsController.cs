@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Data;
 using System.Data.SqlClient;
 using NDE_Digital_Market.SharedServices;
+using Microsoft.AspNetCore.Authorization;
 
 namespace NDE_Digital_Market.Controllers
 {
@@ -106,6 +107,7 @@ namespace NDE_Digital_Market.Controllers
         }
      
         [HttpGet]
+        [Authorize(Roles = "seller")]
         [Route("GetDataForDropdown")]
         public async Task<ActionResult<List<NavModel>>> getForDropDown()
         {

@@ -4,6 +4,7 @@ using NDE_Digital_Market.Model;
 using NDE_Digital_Market.DTOs;
 using System.Data.SqlClient;
 using System.Data;
+using Microsoft.AspNetCore.Authorization;
 
 namespace NDE_Digital_Market.Controllers
 {
@@ -31,6 +32,7 @@ namespace NDE_Digital_Market.Controllers
 
 
         [HttpGet]
+        [Authorize(Roles = "seller")]
         [Route("ProductGroupsDropdownByUserId/{userID}")]
         public async Task<IActionResult> ProductGroupsDropdownByUserId(int userID)
         {
@@ -68,6 +70,7 @@ namespace NDE_Digital_Market.Controllers
 
 
         [HttpGet("GetProductForAddQtyByUserId/{UserId}/{productGroupId}")]
+        [Authorize(Roles = "seller")]
         public async Task<IActionResult> GetProductForAddQtyByUserId(int UserId, int productGroupId)
         {
             var products = new List<SellerPoductListModel>();
@@ -130,6 +133,7 @@ namespace NDE_Digital_Market.Controllers
 
 
         [HttpPost("PortalReceivedPost")]
+        [Authorize(Roles ="seller")]
         public async Task<IActionResult> InsertPortalReceivedAsync(PortalReceivedMasterDto portaldata)
         {
 
@@ -281,6 +285,7 @@ namespace NDE_Digital_Market.Controllers
         }
 
         [HttpPost("CreateSellerProductPriceAndOffer")]
+        [Authorize(Roles = "seller")]
         public async Task<IActionResult> CreateSellerProductPriceAndOfferAsync([FromForm] SellerProductPriceAndOfferDto sellerproductdata)
         {
             try
@@ -341,6 +346,8 @@ namespace NDE_Digital_Market.Controllers
 
 
         [HttpPut("UpdateSellerProductPriceAndOffer")]
+
+        [Authorize(Roles = "seller")]
         public async Task<IActionResult> UpdateSellerProductPriceAndOffer([FromForm] SellerProductPriceAndOfferDto sellerproductdata)
         {
             try
@@ -441,6 +448,8 @@ namespace NDE_Digital_Market.Controllers
 
 
         [HttpGet]
+        [Authorize(Roles = "seller")]
+
         [Route("GetSellerProductsByCompanyCode")]
         public async Task<IActionResult> GetSellerProductsByCompanyCode(string userID, Int32? status = null)
         {
@@ -512,8 +521,9 @@ namespace NDE_Digital_Market.Controllers
 
 
 
-
+        
         [HttpGet("GetPortalReceivedByUserId")]
+        [Authorize(Roles = "seller")]
         public async Task<ActionResult> GetPortalReceivedByUserId(int userId)
         {
             try
@@ -558,6 +568,7 @@ namespace NDE_Digital_Market.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "seller")]
         [Route("GetPortalData")]
         public async Task<IActionResult> GetPortalData(int PortalReceivedId)
         {

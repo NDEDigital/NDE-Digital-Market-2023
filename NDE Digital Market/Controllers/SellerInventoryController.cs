@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NDE_Digital_Market.DTOs;
 using NDE_Digital_Market.SharedServices;
 using System.Data;
@@ -15,7 +16,9 @@ namespace NDE_Digital_Market.Controllers
         }
 
 
+
         [HttpGet]
+        [Authorize(Roles = "seller")]
         [Route("GetSellerInventoryDataBySellerId/{UserId}")]
         public async Task<IActionResult> GetSellerInventoryDataBySellerId(int UserId)
         {
