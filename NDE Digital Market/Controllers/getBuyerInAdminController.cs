@@ -8,6 +8,7 @@ using System.Data.SqlClient;
 namespace NDE_Digital_Market.Controllers
 {
     [ApiController]
+    [Authorize]
     public class getBuyerInAdminController : ControllerBase
     {
         private readonly string _healthCareConnection;

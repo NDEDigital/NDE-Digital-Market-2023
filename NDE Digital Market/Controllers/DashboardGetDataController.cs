@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace NDE_Digital_Market.Controllers
 {
     [ApiController]
-    [Authorize]
+    [Authorize(Roles = "seller,admin")]
     public class DashboardGetDataController : ControllerBase
     {
         private readonly string _healthCareConnection;

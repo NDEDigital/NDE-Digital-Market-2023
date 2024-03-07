@@ -41,7 +41,8 @@ namespace NDE_Digital_Market.Controllers
             return BadRequest(new { message = "Company already exists!" });
         }
 
-        [HttpGet("GetCompaniesBasedOnStatus") , Authorize(Roles ="seller,admin")]
+        [HttpGet("GetCompaniesBasedOnStatus")]
+        [Authorize(Roles = "seller,admin")]
         public async Task<IActionResult> GetCompaniesAsync(int status)
         {
             var res = await _CompanyRegistration.GetCompaniesAsync(status);
@@ -49,6 +50,7 @@ namespace NDE_Digital_Market.Controllers
         }
 
         [HttpPut("UpdateCompany")]
+        [Authorize(Roles = "seller,admin")]
         public async Task<IActionResult> UpdateCompany(CompanyDto companyDto)
         {
             //CompanyModel companyModel = JsonConvert.DeserializeObject<CompanyModel>(data);

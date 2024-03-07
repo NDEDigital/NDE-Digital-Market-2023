@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using NDE_Digital_Market.DTOs;
 using NDE_Digital_Market.SharedServices;
@@ -9,6 +10,7 @@ using System.Threading.Tasks;
 namespace NDE_Digital_Market.Controllers
 {
     [ApiController]
+    [Authorize]
     public class PermissionToDashboardController : ControllerBase
     {
         private readonly string _healthCareConnection;

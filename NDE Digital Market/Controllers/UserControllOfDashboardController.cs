@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NDE_Digital_Market.SharedServices;
 using System.Data.SqlClient;
 
-    [ApiController]
+[ApiController]
+[Authorize]
 public class UserControllOfDashboardController : ControllerBase
 {
     private readonly string _healthCareConnection;
