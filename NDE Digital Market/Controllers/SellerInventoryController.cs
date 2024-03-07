@@ -1,11 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NDE_Digital_Market.DTOs;
 using NDE_Digital_Market.SharedServices;
 using System.Data;
 using System.Data.SqlClient;
 namespace NDE_Digital_Market.Controllers
 {
-    public class SellerInventoryController : Controller
+    [ApiController]
+    [Authorize]
+    public class SellerInventoryController : ControllerBase
     {
         private readonly string _healthCareConnection;
         public SellerInventoryController(IConfiguration configuration)

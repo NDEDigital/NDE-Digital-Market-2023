@@ -4,11 +4,13 @@ using NDE_Digital_Market.Model;
 using NDE_Digital_Market.DTOs;
 using System.Data.SqlClient;
 using System.Data;
+using Microsoft.AspNetCore.Authorization;
 
 namespace NDE_Digital_Market.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Authorize]
     public class ProductQuantityController : Controller
     {
 

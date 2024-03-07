@@ -551,7 +551,7 @@ namespace NDE_Digital_Market.Controllers
 
         // =================================================== getSingleUserInfo ===================================
         [HttpGet]
-        [Route("getSingleUserInfo"), Authorize(Roles = "seller")]
+        [Route("getSingleUserInfo"), Authorize]
         public IActionResult getSingleUser(int? userId)
         {
             UserDetailsDTO user = new UserDetailsDTO();
@@ -633,7 +633,7 @@ namespace NDE_Digital_Market.Controllers
 
 
         [HttpPut]
-        [Route("updatePass")]
+        [Route("updatePass"),Authorize]
         public IActionResult UpdatePasss(UpdatePasswordModel user)
         {
             try
@@ -689,7 +689,7 @@ namespace NDE_Digital_Market.Controllers
 
         //========================tushar=========================
         [HttpPut]
-        [Route("UpdateUserProfile")]
+        [Route("UpdateUserProfile"),Authorize]
         public async Task<IActionResult> UpdateUserProfileAsync([FromBody] UserModel userModel)
         {
             try
