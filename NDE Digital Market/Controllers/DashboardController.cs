@@ -21,7 +21,7 @@ namespace NDE_Digital_Market.Controllers
 
 
 
-        [HttpGet]
+        [HttpGet, Authorize(Roles = "seller")]
         [Route("sellerDashboard/{UserId}")]
         public List<DashboardDto> CompanySellerDetails(string UserId)
         {
