@@ -1275,6 +1275,7 @@ namespace NDE_Digital_Market.Controllers
 
 
         [HttpGet("getOrderDetailsForBuyerBasedOnOrderNo")]
+        [Authorize(Roles ="buyer")]
         public async Task<IActionResult> getOrderDetailsForBuyerBasedOnOrderNoAsync(string OrderNo)
         {
             OrderDetailsMasterForBuyerDto Master = null;
