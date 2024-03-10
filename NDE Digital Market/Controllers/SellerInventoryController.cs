@@ -20,7 +20,7 @@ namespace NDE_Digital_Market.Controllers
 
 
         [HttpGet]
-        [Authorize(Roles = "seller")]
+
         [Route("GetSellerInventoryDataBySellerId/{UserId}")]
         public async Task<IActionResult> GetSellerInventoryDataBySellerId(int UserId)
         {

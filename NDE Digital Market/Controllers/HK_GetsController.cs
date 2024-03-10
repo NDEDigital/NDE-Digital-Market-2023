@@ -5,11 +5,13 @@ using NDE_Digital_Market.Model;
 using System.Data.SqlClient;
 using NDE_Digital_Market.SharedServices;
 using System.Data;
+using Microsoft.AspNetCore.Authorization;
 
 namespace NDE_Digital_Market.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+
     public class HK_GetsController : ControllerBase
     {
 

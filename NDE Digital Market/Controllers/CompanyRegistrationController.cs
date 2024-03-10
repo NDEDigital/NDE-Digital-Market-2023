@@ -47,8 +47,7 @@ namespace NDE_Digital_Market.Controllers
 
         [HttpGet("GetCompaniesBasedOnStatus")]
 
-        
-        [Authorize(Roles = "seller")]
+
         [Authorize(Roles = "seller,admin")]
         public async Task<IActionResult> GetCompaniesAsync(int status)
         {

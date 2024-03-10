@@ -108,7 +108,7 @@ namespace NDE_Digital_Market.Controllers
         //    return Ok(new { message = "Sellers ", reviewsAndRatings , ratingsArray, totalCount });
         //}
         [HttpGet]
-        [Route("getReviewRatingsDataForDetailsPage")]
+        [Route("getReviewRatingsDataForDetailsPage"),AllowAnonymous]
         public async Task<IActionResult> getReviewRatingsData(int ProductId)
         {
             int totalRating = 5;

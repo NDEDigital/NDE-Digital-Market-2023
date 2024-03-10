@@ -22,7 +22,7 @@ namespace NDE_Digital_Market.Controllers
         }
 
         [HttpGet]
-        //[Authorize(Roles = "seller")]
+
         [Route("CompanySellerDetails/{userId}/{IsActive}")] //gets company seller list without companyAdmin
         public List<CompanySellerList> CompanySellerDetails(int userId,bool IsActive)
         {

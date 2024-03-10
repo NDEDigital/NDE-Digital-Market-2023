@@ -20,8 +20,9 @@ namespace NDE_Digital_Market.Controllers
         }
 
         [HttpGet]
-        [Authorize (Roles ="seller")]
+   
         [Route("getBuyerInAdmin/{IsBuyer}")]
+        [Authorize(Roles = "seller,admin")]
         public List<sellerStatus> CompanySellerDetails( bool IsBuyer, bool IsActive)
         {
             List<sellerStatus> bidList = new List<sellerStatus>();
