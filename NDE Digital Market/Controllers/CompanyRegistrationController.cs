@@ -5,10 +5,8 @@ using NDE_Digital_Market.DTOs;
 using NDE_Digital_Market.Services.CompanyRegistrationServices;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Authorization;
-<<<<<<< HEAD
+
 using System.Data;
-=======
->>>>>>> 894fb2877fc0e8381f82a4e7d0cf87f936c6e323
 
 namespace NDE_Digital_Market.Controllers
 {
@@ -48,12 +46,10 @@ namespace NDE_Digital_Market.Controllers
         }
 
         [HttpGet("GetCompaniesBasedOnStatus")]
-<<<<<<< HEAD
+
         
         [Authorize(Roles = "seller")]
-=======
         [Authorize(Roles = "seller,admin")]
->>>>>>> 894fb2877fc0e8381f82a4e7d0cf87f936c6e323
         public async Task<IActionResult> GetCompaniesAsync(int status)
         {
             var res = await _CompanyRegistration.GetCompaniesAsync(status);
