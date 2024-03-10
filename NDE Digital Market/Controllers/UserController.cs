@@ -275,16 +275,16 @@ namespace NDE_Digital_Market.Controllers
                     var cookieOptions = new CookieOptions
                     {
                         HttpOnly = true,
-                        //SameSite = SameSiteMode.None,
-                        //Secure = false,
+                        SameSite = SameSiteMode.None,
+                        Secure = true,
                         Expires = DateTime.UtcNow.AddMinutes(10)
 
                     };
                     var cookieOptions2 = new CookieOptions
                     {
                         HttpOnly = true,
-                        //SameSite = SameSiteMode.None,
-                        //Secure = false,
+                        SameSite = SameSiteMode.None,
+                        Secure = true,
                         Expires = DateTime.UtcNow.AddDays(1)
 
                     };
@@ -430,15 +430,15 @@ namespace NDE_Digital_Market.Controllers
             {
                 HttpOnly = true,
                 Expires= DateTime.UtcNow.AddMinutes(10),
-                //SameSite = SameSiteMode.None,
-                //Secure = false,
+                SameSite = SameSiteMode.None,
+                Secure = true,
 
             };           
             var cookieOptions2 = new CookieOptions
             {
                 HttpOnly = true,
-                //SameSite = SameSiteMode.None,
-                //Secure = false,
+                SameSite = SameSiteMode.Strict,
+                Secure = true,
                 Expires = DateTime.UtcNow.AddDays(1)
 
             };
