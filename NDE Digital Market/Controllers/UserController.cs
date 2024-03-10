@@ -275,17 +275,24 @@ namespace NDE_Digital_Market.Controllers
                     var cookieOptions = new CookieOptions
                     {
                         HttpOnly = true,
-                        Expires = DateTime.UtcNow.AddMinutes(1)
+                        //SameSite = SameSiteMode.None,
+                        //Secure = false,
+                        Expires = DateTime.UtcNow.AddMinutes(10)
 
-                    }; var cookieOptions2 = new CookieOptions
+                    };
+                    var cookieOptions2 = new CookieOptions
                     {
                         HttpOnly = true,
+                        //SameSite = SameSiteMode.None,
+                        //Secure = false,
                         Expires = DateTime.UtcNow.AddDays(1)
 
                     };
 
+
                     Response.Cookies.Delete("accessToken");
                     Response.Cookies.Delete("refreshToken");
+
                     Response.Cookies.Append("accessToken", token, cookieOptions);
                     Response.Cookies.Append("refreshToken", newRefreshToken, cookieOptions2);
 
@@ -295,10 +302,10 @@ namespace NDE_Digital_Market.Controllers
                     }
                     if (!isActive)
                     {
-                        return BadRequest(new { message = "Please waiting for admin approval", userId, role, token, newRefreshToken, IsSellerAdmin });
+                        return BadRequest(new { message = "Please waiting for admin approval", userId, role, IsSellerAdmin });
                     }
 
-                    return Ok(new { message = "Login successful", userId, role, token, newRefreshToken, IsSellerAdmin,companyCode });
+                    return Ok(new { message = "Login successful", userId, role, IsSellerAdmin,companyCode });
                 }
                 else
                 {
@@ -422,12 +429,17 @@ namespace NDE_Digital_Market.Controllers
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
-                Expires= DateTime.UtcNow.AddMinutes(1)
+                Expires= DateTime.UtcNow.AddMinutes(10),
+                //SameSite = SameSiteMode.None,
+                //Secure = false,
 
-            };            var cookieOptions2 = new CookieOptions
+            };           
+            var cookieOptions2 = new CookieOptions
             {
                 HttpOnly = true,
-                Expires= DateTime.UtcNow.AddDays(1)
+                //SameSite = SameSiteMode.None,
+                //Secure = false,
+                Expires = DateTime.UtcNow.AddDays(1)
 
             };
             Response.Cookies.Delete("accessToken");
@@ -477,7 +489,7 @@ namespace NDE_Digital_Market.Controllers
 
             var token = new JwtSecurityToken(
                 claims: claims,
-               expires: DateTime.UtcNow.AddMinutes(1),
+               expires: DateTime.UtcNow.AddMinutes(10),
                 signingCredentials: creds);
 
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
