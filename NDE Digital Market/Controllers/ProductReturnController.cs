@@ -25,6 +25,7 @@ namespace NDE_Digital_Market.Controllers
 
         //[HttpPost, Authorize(Roles = "buyer")]
         [HttpPost]
+        
         [Route("InsertReturnedData")]
         public async Task<IActionResult> InsertProductReturn([FromForm] ProductReturnDto returnData)
         {
