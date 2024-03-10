@@ -23,7 +23,7 @@ namespace NDE_Digital_Market.Controllers
         }
 
         [HttpGet]
-  
+        [Authorize(Roles = "admin")]
         [Route("getSellerActive&Inactive/{IsSeller}")]
         public List<sellerStatus> CompanySellerDetails(string CompanyCode, bool IsSeller, bool IsActive)
         {
