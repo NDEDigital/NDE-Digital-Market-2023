@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 namespace NDE_Digital_Market.Controllers
 {
     [ApiController]
-    [Authorize(Roles = "seller")]
+    //[Authorize(Roles = "seller")]
     public class SellerActive_InactiveController : ControllerBase
     {
         private readonly string _healthCareConnection;
@@ -23,7 +23,7 @@ namespace NDE_Digital_Market.Controllers
         }
 
         [HttpGet]
-
+  
         [Route("getSellerActive&Inactive/{IsSeller}")]
         public List<sellerStatus> CompanySellerDetails(string CompanyCode, bool IsSeller, bool IsActive)
         {

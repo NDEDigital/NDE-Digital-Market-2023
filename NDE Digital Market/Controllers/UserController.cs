@@ -275,7 +275,7 @@ namespace NDE_Digital_Market.Controllers
                     var cookieOptions = new CookieOptions
                     {
                         HttpOnly = true,
-                        Expires = DateTime.UtcNow.AddMinutes(10)
+                        Expires = DateTime.UtcNow.AddMinutes(1)
 
                     }; var cookieOptions2 = new CookieOptions
                     {
@@ -283,6 +283,9 @@ namespace NDE_Digital_Market.Controllers
                         Expires = DateTime.UtcNow.AddDays(1)
 
                     };
+
+                    Response.Cookies.Delete("accessToken");
+                    Response.Cookies.Delete("refreshToken");
                     Response.Cookies.Append("accessToken", token, cookieOptions);
                     Response.Cookies.Append("refreshToken", newRefreshToken, cookieOptions2);
 
@@ -310,13 +313,13 @@ namespace NDE_Digital_Market.Controllers
         }
 
 
-        [HttpPost]
+        [HttpGet]
         [Route("GenerateRefreshToken")]
-        public async Task<IActionResult> GenerateRefreshToken([FromForm] string token)
+        public async Task<IActionResult> GenerateRefreshToken()
         {
             var handler = new JwtSecurityTokenHandler();
             JwtSecurityToken jwtToken;
-
+            string token = HttpContext.Request.Cookies["refreshToken"];
             try
             {
                 jwtToken = handler.ReadToken(token) as JwtSecurityToken;
@@ -344,17 +347,17 @@ namespace NDE_Digital_Market.Controllers
 
             var userIdClaim = jwtToken.Claims.FirstOrDefault(c =>  c.Type == ClaimTypes.NameIdentifier);
             var encryptedUserId = userIdClaim != null ? userIdClaim.Value : null;
-            string userId;
-            if (encryptedUserId != null)
-            {
-                userId = CommonServices.DecryptPassword(encryptedUserId).ToString();
-            }
-            else
-            {
-                return BadRequest("The token does not contain the expected claim.");
-            }
+            string userId = encryptedUserId;
+            //if (encryptedUserId != null)
+            //{
+            //    userId = CommonServices.DecryptPassword(encryptedUserId).ToString();
+            //}
+            //else
+            //{
+            //    return BadRequest("The token does not contain the expected claim.");
+            //}
 
-         
+
 
             DateTime? timeStamp = null;
             bool? isBuyer = null;
@@ -419,7 +422,7 @@ namespace NDE_Digital_Market.Controllers
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
-                Expires= DateTime.UtcNow.AddMinutes(10)
+                Expires= DateTime.UtcNow.AddMinutes(1)
 
             };            var cookieOptions2 = new CookieOptions
             {
@@ -427,6 +430,8 @@ namespace NDE_Digital_Market.Controllers
                 Expires= DateTime.UtcNow.AddDays(1)
 
             };
+            Response.Cookies.Delete("accessToken");
+            Response.Cookies.Delete("refreshToken");
             Response.Cookies.Append("accessToken", newAccessToken, cookieOptions);
             Response.Cookies.Append("refreshToken", newRefreshToken, cookieOptions2);
             return Ok(new
@@ -472,7 +477,7 @@ namespace NDE_Digital_Market.Controllers
 
             var token = new JwtSecurityToken(
                 claims: claims,
-               expires: DateTime.UtcNow.AddMinutes(10),
+               expires: DateTime.UtcNow.AddMinutes(1),
                 signingCredentials: creds);
 
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);

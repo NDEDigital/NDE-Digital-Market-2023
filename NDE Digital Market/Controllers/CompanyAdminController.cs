@@ -10,7 +10,7 @@ using System.Data.SqlClient;
 namespace NDE_Digital_Market.Controllers
 {
     [ApiController]
-    [Authorize(Roles = "seller")]
+  
     public class CompanyAdminController : ControllerBase
     {
         private readonly string _healthCareConnection;
@@ -22,7 +22,7 @@ namespace NDE_Digital_Market.Controllers
         }
 
         [HttpGet]
-
+        
         [Route("CompanySellerDetails/{userId}/{IsActive}")] //gets company seller list without companyAdmin
         public List<CompanySellerList> CompanySellerDetails(int userId,bool IsActive)
         {
@@ -106,8 +106,8 @@ namespace NDE_Digital_Market.Controllers
             }
         }
         [HttpPut]
-       // [Authorize(Roles = "seller")]
-
+        // [Authorize(Roles = "seller")]
+       
         [Route("CompanySellerDetailsUpdateUserStatus/{userId}/{IsActive}")]
         public IActionResult UpdateUserStatus(int userId, bool IsActive)
         {
