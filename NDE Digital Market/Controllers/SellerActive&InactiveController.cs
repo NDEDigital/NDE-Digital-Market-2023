@@ -5,12 +5,13 @@ using NDE_Digital_Market.DTOs;
 using NDE_Digital_Market.SharedServices;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 
 namespace NDE_Digital_Market.Controllers
 {
     [ApiController]
-    [Authorize]
+    [Authorize(Roles = "seller")]
     public class SellerActive_InactiveController : ControllerBase
     {
         private readonly string _healthCareConnection;
@@ -22,6 +23,7 @@ namespace NDE_Digital_Market.Controllers
         }
 
         [HttpGet]
+
         [Route("getSellerActive&Inactive/{IsSeller}")]
         public List<sellerStatus> CompanySellerDetails(string CompanyCode, bool IsSeller, bool IsActive)
         {
@@ -126,6 +128,7 @@ namespace NDE_Digital_Market.Controllers
         }
 
         [HttpPut]
+       
         [Route("updateSellerActive&Inactive")]
         public async Task<IActionResult> UpdateSellerProductStatusAsync(string userIds,bool isActive)
         {

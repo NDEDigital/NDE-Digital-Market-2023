@@ -11,7 +11,7 @@ namespace NDE_Digital_Market.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+
     public class HK_GetsController : ControllerBase
     {
 
@@ -73,8 +73,6 @@ namespace NDE_Digital_Market.Controllers
 
 
         [HttpGet]
-
-        [Authorize(Roles = "admin")]
         [Route("GetUnitList")]
         public async Task<List<UnitModel>> GetUnitListAsync()
         {

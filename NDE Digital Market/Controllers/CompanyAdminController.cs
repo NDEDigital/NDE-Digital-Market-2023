@@ -22,6 +22,7 @@ namespace NDE_Digital_Market.Controllers
         }
 
         [HttpGet]
+
         [Route("CompanySellerDetails/{userId}/{IsActive}")] //gets company seller list without companyAdmin
         public List<CompanySellerList> CompanySellerDetails(int userId,bool IsActive)
         {
@@ -105,6 +106,8 @@ namespace NDE_Digital_Market.Controllers
             }
         }
         [HttpPut]
+       // [Authorize(Roles = "seller")]
+
         [Route("CompanySellerDetailsUpdateUserStatus/{userId}/{IsActive}")]
         public IActionResult UpdateUserStatus(int userId, bool IsActive)
         {

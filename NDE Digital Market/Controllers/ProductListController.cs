@@ -347,6 +347,7 @@ namespace NDE_Digital_Market.Controllers
         // ==============================productName by productGroupId===================
 
         [HttpGet]
+        [Authorize(Roles = "seller")]
         [Route("GetProductNameByProductGroupId")]
         public async Task<List<ProductNameByGroup>> GetProductNameByProductGroupId(int ProductGroupId)
         {

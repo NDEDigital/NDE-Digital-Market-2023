@@ -19,8 +19,10 @@ namespace NDE_Digital_Market.Controllers
             _healthCareConnection = commonServices.HealthCareConnection;
         }
 
-        [HttpGet, Authorize(Roles = "admin")]
+        [HttpGet]
+   
         [Route("getBuyerInAdmin/{IsBuyer}")]
+        [Authorize(Roles = "seller,admin")]
         public List<sellerStatus> CompanySellerDetails( bool IsBuyer, bool IsActive)
         {
             List<sellerStatus> bidList = new List<sellerStatus>();
