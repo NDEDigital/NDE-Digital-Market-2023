@@ -5,12 +5,14 @@ using NDE_Digital_Market.Model;
 using System.Data;
 using System.Data.SqlClient;
 using NDE_Digital_Market.SharedServices;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace NDE_Digital_Market.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ProductSearchController : ControllerBase
     {
         private readonly IConfiguration _configuration;

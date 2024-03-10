@@ -12,6 +12,7 @@ using NDE_Digital_Market.DTOs;
 namespace NDE_Digital_Market.Controllers
 {
     [ApiController]
+    [Authorize]
     public class ProductsController : ControllerBase
     {
         private readonly IConfiguration _configuration;

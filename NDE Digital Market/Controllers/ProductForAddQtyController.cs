@@ -10,6 +10,7 @@ namespace NDE_Digital_Market.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Authorize]
     public class ProductQuantityController : Controller
     {
 

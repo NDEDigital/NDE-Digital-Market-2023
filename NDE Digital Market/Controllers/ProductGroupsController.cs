@@ -6,11 +6,13 @@ using System.Data;
 using System.Data.SqlClient;
 using NDE_Digital_Market.SharedServices;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Authorization;
 
 namespace NDE_Digital_Market.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ProductGroupsController : ControllerBase
     {
         private readonly IConfiguration _configuration;

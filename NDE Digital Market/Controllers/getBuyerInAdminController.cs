@@ -7,11 +7,13 @@ using System.Data.SqlClient;
 
 namespace NDE_Digital_Market.Controllers
 {
-    public class getBuyerInAdmin : Controller
+    [ApiController]
+    [Authorize]
+    public class getBuyerInAdminController : ControllerBase
     {
         private readonly string _healthCareConnection;
 
-        public getBuyerInAdmin(IConfiguration config)
+        public getBuyerInAdminController(IConfiguration config)
         {
             CommonServices commonServices = new CommonServices(config);
             _healthCareConnection = commonServices.HealthCareConnection;

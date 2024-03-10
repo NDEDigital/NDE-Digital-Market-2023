@@ -9,7 +9,9 @@ using System.Data.SqlClient;
 
 namespace NDE_Digital_Market.Controllers
 {
-    public class CompanyAdminController : Controller
+    [ApiController]
+    [Authorize(Roles = "seller")]
+    public class CompanyAdminController : ControllerBase
     {
         private readonly string _healthCareConnection;
 

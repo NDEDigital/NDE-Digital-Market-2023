@@ -11,6 +11,7 @@ namespace NDE_Digital_Market.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ProductListController : ControllerBase
     {
 

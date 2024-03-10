@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Mvc;
 using NDE_Digital_Market.SharedServices;
 using System.Data.SqlClient;
 
-public class UserControllOfDashboard : ControllerBase
+[ApiController]
+[Authorize]
+public class UserControllOfDashboardController : ControllerBase
 {
     private readonly string _healthCareConnection;
 
-    public UserControllOfDashboard(IConfiguration config)
+    public UserControllOfDashboardController(IConfiguration config)
     {
         CommonServices commonServices = new CommonServices(config);
         _healthCareConnection = commonServices.HealthCareConnection;

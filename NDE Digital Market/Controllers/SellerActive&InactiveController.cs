@@ -10,11 +10,13 @@ using System.Data.SqlClient;
 
 namespace NDE_Digital_Market.Controllers
 {
-    public class SellerActive_Inactive : Controller
+    [ApiController]
+    [Authorize]
+    public class SellerActive_InactiveController : ControllerBase
     {
         private readonly string _healthCareConnection;
 
-        public SellerActive_Inactive(IConfiguration config)
+        public SellerActive_InactiveController(IConfiguration config)
         {
             CommonServices commonServices = new CommonServices(config);
             _healthCareConnection = commonServices.HealthCareConnection;
