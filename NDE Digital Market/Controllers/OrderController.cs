@@ -168,6 +168,7 @@ namespace NDE_Digital_Market.Controllers
         //admin order getdata
 
         [HttpGet("GetOrderMasterData")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> GetOrderMasterData(string? status)
         {
             var products = new List<OrderDataBaseOnStatusDto>();
@@ -227,6 +228,7 @@ namespace NDE_Digital_Market.Controllers
 
 
         [HttpGet("GetOrderDetailData")]
+        [Authorize(Roles ="admin")]
         public async Task<IActionResult> GetOrderDetailData(int? OrderMasterId, string? status = null)
         {
             var orderDetails = new List<OrderDetailStatusDto>();
@@ -330,6 +332,7 @@ namespace NDE_Digital_Market.Controllers
 
 
         [HttpPut("AdminOrderUpdateStatus")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> UpdateOrderStatusAsync(String orderMasterId, String? detailsCancelledId, string status)
         {
             SqlTransaction transaction = null;
@@ -983,6 +986,7 @@ namespace NDE_Digital_Market.Controllers
 
 
         [HttpGet("getAllOrderForBuyer")]
+        [Authorize(Roles = "buyer")]
         public async Task<IActionResult> getAllOrderForBuyerAsync(string userid, string? status)
         {
             List<OrderMasterDataForBuyerDto> MasterList = new List<OrderMasterDataForBuyerDto>();

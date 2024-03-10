@@ -248,7 +248,7 @@ namespace NDE_Digital_Market.Controllers
         // ====================== new GET Product ==========================
 
 
-
+        [Authorize(Roles ="admin")]
         [HttpGet("GetSellerProductForAdminApproval")]
         public async Task<IActionResult> GetSellerProductForAdminApproval(string status)
         {
@@ -341,6 +341,7 @@ namespace NDE_Digital_Market.Controllers
 
 
         //================== SellerProductPriceAndOffer status Update by Tushar ==================
+        [Authorize(Roles = "admin")]
         [HttpPut("SellerProductStatusUpdate")]
         public async Task<IActionResult> UpdateSellerProductStatusAsync(List<ProductStatusDto> productStatusList)
         {

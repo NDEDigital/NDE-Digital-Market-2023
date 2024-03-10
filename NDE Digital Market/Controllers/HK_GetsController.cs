@@ -73,6 +73,8 @@ namespace NDE_Digital_Market.Controllers
 
 
         [HttpGet]
+
+        [Authorize(Roles = "admin")]
         [Route("GetUnitList")]
         public async Task<List<UnitModel>> GetUnitListAsync()
         {
