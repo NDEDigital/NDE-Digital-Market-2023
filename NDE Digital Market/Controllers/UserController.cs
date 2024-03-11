@@ -224,8 +224,8 @@ namespace NDE_Digital_Market.Controllers
                 message = "User created successfully wait for admin approval",
                 encryptedUserCode,
                 role,
-                token,  // Include the token in the response object
-                newRefreshToken
+                //token,  // Include the token in the response object
+                //newRefreshToken
             });
             //}
         }
@@ -285,7 +285,7 @@ namespace NDE_Digital_Market.Controllers
                         HttpOnly = true,
                         SameSite = SameSiteMode.None,
                         Secure = true,
-                        Expires = DateTime.UtcNow.AddDays(1)
+                        Expires = DateTime.UtcNow.AddDays(3)
 
                     };
 
@@ -325,6 +325,7 @@ namespace NDE_Digital_Market.Controllers
         public async Task<IActionResult> GenerateRefreshToken()
         {
             var handler = new JwtSecurityTokenHandler();
+            bool tokenRefreshed = true;
             JwtSecurityToken jwtToken;
             string token = HttpContext.Request.Cookies["refreshToken"];
             try
@@ -334,7 +335,12 @@ namespace NDE_Digital_Market.Controllers
             }
             catch (ArgumentException)
             {
-                return Unauthorized("Token is not in a valid JWT format.");
+                tokenRefreshed = false;
+                return Ok(new
+                {
+                    message = "Token is not in a valid JWT format.",
+                    tokenRefreshed
+                });
             }
 
             var issueDate = jwtToken.ValidFrom;
@@ -342,12 +348,14 @@ namespace NDE_Digital_Market.Controllers
 
             if (DateTime.UtcNow > expireDate)
             {
+               
                 // Return a forbidden (403) response
-                //  return Unauthorized();
-                return Forbid();
+                return Unauthorized();
+               // return Forbid();
                 //return Ok(new
                 //{
                 //    message = "reFreshToken Expired",
+                //    tokenRefreshed
 
                 //});
             }
@@ -429,18 +437,17 @@ namespace NDE_Digital_Market.Controllers
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
-                Expires= DateTime.UtcNow.AddMinutes(10),
+                Expires = DateTime.UtcNow.AddMinutes(10),
                 SameSite = SameSiteMode.None,
                 Secure = true,
 
-            };           
+            };
             var cookieOptions2 = new CookieOptions
             {
                 HttpOnly = true,
                 SameSite = SameSiteMode.Strict,
                 Secure = true,
-                Expires = DateTime.UtcNow.AddDays(1)
-
+                Expires = DateTime.UtcNow.AddDays(3)
             };
             Response.Cookies.Delete("accessToken");
             Response.Cookies.Delete("refreshToken");
@@ -450,7 +457,7 @@ namespace NDE_Digital_Market.Controllers
             {
                 
                 accessToken = "newAccessToken",
-                refreshToken = "newRefreshToken"
+                refreshToken = "newRefreshToken", tokenRefreshed,
             });
         }
 
@@ -489,7 +496,7 @@ namespace NDE_Digital_Market.Controllers
 
             var token = new JwtSecurityToken(
                 claims: claims,
-               expires: DateTime.UtcNow.AddMinutes(10),
+               expires: DateTime.UtcNow.AddMinutes(1),
                 signingCredentials: creds);
 
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
@@ -514,7 +521,7 @@ namespace NDE_Digital_Market.Controllers
                 claims: claims,
                 notBefore: DateTime.UtcNow,
  
-                expires: DateTime.UtcNow.AddDays(1),
+                expires: DateTime.UtcNow.AddMinutes(1),
  
                 signingCredentials: creds
                 );
