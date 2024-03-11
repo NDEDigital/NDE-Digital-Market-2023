@@ -350,8 +350,8 @@ namespace NDE_Digital_Market.Controllers
             {
                
                 // Return a forbidden (403) response
-                return Unauthorized();
-               // return Forbid();
+              //  return Unauthorized();
+                return Forbid();
                 //return Ok(new
                 //{
                 //    message = "reFreshToken Expired",
@@ -496,7 +496,7 @@ namespace NDE_Digital_Market.Controllers
 
             var token = new JwtSecurityToken(
                 claims: claims,
-               expires: DateTime.UtcNow.AddMinutes(1),
+               expires: DateTime.UtcNow.AddMinutes(10),
                 signingCredentials: creds);
 
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
@@ -521,7 +521,7 @@ namespace NDE_Digital_Market.Controllers
                 claims: claims,
                 notBefore: DateTime.UtcNow,
  
-                expires: DateTime.UtcNow.AddMinutes(1),
+                expires: DateTime.UtcNow.AddDays(3),
  
                 signingCredentials: creds
                 );
