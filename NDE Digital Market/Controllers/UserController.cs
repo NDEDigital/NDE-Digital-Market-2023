@@ -259,8 +259,18 @@ namespace NDE_Digital_Market.Controllers
                     string companyCode = (companyCodeObject != DBNull.Value) ? companyCodeObject.ToString() : null;
 
                     bool IsSellerAdmin = false;
-                    string adminId = reader["CompanyAdminId"]?.ToString();
-                    if (adminId.Length > 0)
+                    object adminIdObject = reader["CompanyAdminId"];
+                    int adminId;
+
+                    if (adminIdObject != DBNull.Value)
+                    {
+                        adminId = (int)adminIdObject;
+                    }
+                    else
+                    {
+                        adminId = 0;
+                    }
+                        if (userId == adminId)
                     {
                         IsSellerAdmin = true;
                     }
