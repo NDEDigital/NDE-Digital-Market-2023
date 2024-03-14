@@ -999,7 +999,7 @@ namespace NDE_Digital_Market.Controllers
 
                 if (status != null)
                 {
-                    query = @"select OM.OrderMasterId, OM.OrderNo, OM.OrderDate, OM.TotalPrice, OD.OrderDetailId, OD.ProductId, PL.ProductName, 
+                    query = @"select OM.OrderMasterId, OM.OrderNo, OM.OrderDate, OM.TotalPrice, OD.OrderDetailId, OD.ProductId, PL.ProductName, OD.CompanyCode,
                                   PL.ImagePath, OD.Qty, OD.Price, OD.Status  from OrderMaster OM
                                   join OrderDetails OD on OM.OrderMasterId = OD.OrderMasterId
                                   join ProductList PL on PL.ProductId = OD.ProductId
@@ -1007,7 +1007,7 @@ namespace NDE_Digital_Market.Controllers
                 }
                 else
                 {
-                    query = @"select OM.OrderMasterId, OM.OrderNo, OM.OrderDate, OM.TotalPrice, OD.OrderDetailId, OD.ProductId, PL.ProductName, 
+                    query = @"select OM.OrderMasterId, OM.OrderNo, OM.OrderDate, OM.TotalPrice, OD.OrderDetailId, OD.ProductId, PL.ProductName, OD.CompanyCode,
                                   PL.ImagePath, OD.Qty, OD.Price, OD.Status  from OrderMaster OM
                                   join OrderDetails OD on OM.OrderMasterId = OD.OrderMasterId
                                   join ProductList PL on PL.ProductId = OD.ProductId
@@ -1056,6 +1056,7 @@ namespace NDE_Digital_Market.Controllers
                                     Detail.Qty = reader.IsDBNull("Qty") ? (int?)null : Convert.ToInt32(reader["Qty"]);
                                     Detail.Price = reader.IsDBNull(reader.GetOrdinal("Price")) ? (decimal?)null : (decimal?)reader.GetDecimal(reader.GetOrdinal("Price")) * Detail.Qty;
                                     Detail.Status = reader.IsDBNull("Status") ? null : reader["Status"].ToString();
+                                    Detail.CompanyCode = reader.IsDBNull("CompanyCode") ? null : reader["CompanyCode"].ToString();
                                 }
                                 Master.OrderDetailsListForBuyer.Add(Detail);
 
