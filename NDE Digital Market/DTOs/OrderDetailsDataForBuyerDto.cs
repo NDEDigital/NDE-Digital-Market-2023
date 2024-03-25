@@ -9,5 +9,6 @@
         public int? Qty { get; set; }
         public decimal? Price { get; set; }
         public string? Status { get; set; }
+        public string? CompanyCode { get; set; }
     }
 }
