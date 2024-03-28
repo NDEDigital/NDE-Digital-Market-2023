@@ -356,14 +356,11 @@ namespace NDE_Digital_Market.Controllers
             try
             {
                 await con.OpenAsync();
-                string query = @"SELECT p.ProductName, g.ProductGroupName, p.ProductGroupId, p.ProductId, U.Name 
-                 FROM ProductList p 
-                 INNER JOIN ProductGroups g ON p.ProductGroupId = g.ProductGroupID 
-				 left JOIN Units U ON  U.UnitId = p.UnitId
-                 WHERE p.ProductGroupId = @ProductGroupId;";
+                string query = "ProductNameDropDown";
 
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 {
+                    cmd.CommandType = CommandType.StoredProcedure;
                     // Add the parameter and its value to the command
                     cmd.Parameters.AddWithValue("@ProductGroupId", ProductGroupId);
 
