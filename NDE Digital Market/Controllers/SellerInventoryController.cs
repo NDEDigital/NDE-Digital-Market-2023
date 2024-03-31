@@ -7,7 +7,7 @@ using System.Data.SqlClient;
 namespace NDE_Digital_Market.Controllers
 {
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class SellerInventoryController : ControllerBase
     {
         private readonly string _healthCareConnection;

@@ -8,7 +8,7 @@ using System.Data.SqlClient;
 namespace NDE_Digital_Market.Controllers
 {
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class getBuyerInAdminController : ControllerBase
     {
         private readonly string _healthCareConnection;
@@ -22,7 +22,7 @@ namespace NDE_Digital_Market.Controllers
         [HttpGet]
    
         [Route("getBuyerInAdmin/{IsBuyer}")]
-        [Authorize(Roles = "seller,admin")]
+        //[Authorize(Roles = "seller,admin")]
         public List<sellerStatus> CompanySellerDetails( bool IsBuyer, bool IsActive)
         {
             List<sellerStatus> bidList = new List<sellerStatus>();

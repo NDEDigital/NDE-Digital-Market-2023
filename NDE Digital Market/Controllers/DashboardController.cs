@@ -8,7 +8,7 @@ using System.Security.Cryptography;
 namespace NDE_Digital_Market.Controllers
 {
     [ApiController]
-    [Authorize(Roles ="seller")]
+    //[Authorize(Roles ="seller")]
     public class DashboardController : ControllerBase
     {
         private readonly string _healthCareConnection;
@@ -23,7 +23,7 @@ namespace NDE_Digital_Market.Controllers
 
 
         [HttpGet]
-        [Authorize (Roles ="seller")]
+        //[Authorize (Roles ="seller")]
         [Route("sellerDashboard/{UserId}")]
         public List<DashboardDto> CompanySellerDetails(string UserId)
         {

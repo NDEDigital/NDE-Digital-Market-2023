@@ -12,7 +12,7 @@ namespace NDE_Digital_Market.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class ProductGroupsController : ControllerBase
     {
         private readonly IConfiguration _configuration;
@@ -225,7 +225,7 @@ namespace NDE_Digital_Market.Controllers
 
 
         [HttpGet]
-        [Authorize(Roles = "admin")]
+        //[Authorize(Roles = "admin")]
         [Route("GetProductGroupsList")]
         public async Task<List<ProductGroupsModel>> GetProductGroupsListAsync()
         {
@@ -281,7 +281,7 @@ namespace NDE_Digital_Market.Controllers
 
         [Route("GetProductGroupsListByStatus")]
 
-        [Authorize(Roles = "admin")]
+        //[Authorize(Roles = "admin")]
         public async Task<List<ProductGroupByStatusDTO>> GetProductGroupsListByStatus(Int32? status = null)
         {
             List<ProductGroupByStatusDTO> lst = new List<ProductGroupByStatusDTO>();
@@ -349,7 +349,7 @@ namespace NDE_Digital_Market.Controllers
         //========================tushar=========================
 
         [HttpPut("MakeGroupActiveOrInactive")]
-        [Authorize(Roles = "admin")]
+        //[Authorize(Roles = "admin")]
         public async Task<IActionResult> MakeGroupActiveOrInactiveAsync(string groupIds, bool? IsActive)
         {
             try

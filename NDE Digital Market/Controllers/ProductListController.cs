@@ -11,7 +11,7 @@ namespace NDE_Digital_Market.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class ProductListController : ControllerBase
     {
 
@@ -347,7 +347,7 @@ namespace NDE_Digital_Market.Controllers
         // ==============================productName by productGroupId===================
 
         [HttpGet]
-        [Authorize(Roles = "seller")]
+        ////[Authorize(Roles = "seller")]
         [Route("GetProductNameByProductGroupId")]
         public async Task<List<ProductNameByGroup>> GetProductNameByProductGroupId(int ProductGroupId)
         {
@@ -356,7 +356,7 @@ namespace NDE_Digital_Market.Controllers
             try
             {
                 await con.OpenAsync();
-                string query = "ProductNameDropDown";
+                string query = @"ProductNameDropDown";
 
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 {
@@ -373,7 +373,7 @@ namespace NDE_Digital_Market.Controllers
                             modelObj.ProductId = Convert.ToInt32(reader["ProductId"]);
                             modelObj.ProductGroupName = reader["ProductGroupName"].ToString();
                             modelObj.ProductName = reader["ProductName"].ToString();
-                            modelObj.UnitName = reader["Name"].ToString();
+                            modelObj.UnitName = reader["UnitName"].ToString();
 
                             lst.Add(modelObj);
                         }

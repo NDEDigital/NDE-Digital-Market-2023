@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace NDE_Digital_Market.Controllers
 {
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class PermissionToDashboardController : ControllerBase
     {
         private readonly string _healthCareConnection;
@@ -22,7 +22,7 @@ namespace NDE_Digital_Market.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "seller")]
+        //[Authorize(Roles = "seller")]
         [Route("GiveAcessDashboard/{UserId}/{MenuId}")]
         public async Task<IActionResult> InsertPermissionToDashboard(int UserId, int MenuId)
         {
@@ -59,7 +59,7 @@ namespace NDE_Digital_Market.Controllers
             }
         }
       [HttpGet]
-        [Authorize(Roles = "seller")]
+        //[Authorize(Roles = "seller")]
 [Route("GetPermissionData/{UserId}")]
 public async Task<IActionResult> GetPermissionData(int UserId)
 {

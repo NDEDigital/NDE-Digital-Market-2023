@@ -12,7 +12,7 @@ using NDE_Digital_Market.DTOs;
 namespace NDE_Digital_Market.Controllers
 {
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class ProductsController : ControllerBase
     {
         private readonly IConfiguration _configuration;
@@ -31,7 +31,8 @@ namespace NDE_Digital_Market.Controllers
         //===================================== Create User ================================
 
 
-        [HttpPut, Authorize(Roles = "seller")]
+        [HttpPut]
+        //[Authorize(Roles = "seller")]
         [Route("UpdateProduct")]
 
         public IActionResult UpdateProduct([FromForm] GoodsQuantityModel product)
@@ -248,7 +249,7 @@ namespace NDE_Digital_Market.Controllers
         // ====================== new GET Product ==========================
 
 
-        [Authorize(Roles ="admin")]
+        //[Authorize(Roles ="admin")]
         [HttpGet("GetSellerProductForAdminApproval")]
         public async Task<IActionResult> GetSellerProductForAdminApproval(string status)
         {
@@ -310,7 +311,8 @@ namespace NDE_Digital_Market.Controllers
 
             // ======================= DELETE Product ==================
 
-        [HttpDelete, Authorize(Roles = "seller")]
+        [HttpDelete]
+        //[Authorize(Roles = "seller")]
         [Route("DeleteProduct")]
         public IActionResult DeleteProcuct(string sellerCode, int ProductId)
         {
@@ -341,7 +343,7 @@ namespace NDE_Digital_Market.Controllers
 
 
         //================== SellerProductPriceAndOffer status Update by Tushar ==================
-        [Authorize(Roles = "admin")]
+        //[Authorize(Roles = "admin")]
         [HttpPut("SellerProductStatusUpdate")]
         public async Task<IActionResult> UpdateSellerProductStatusAsync(List<ProductStatusDto> productStatusList)
         {

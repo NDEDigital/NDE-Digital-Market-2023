@@ -106,7 +106,7 @@ namespace NDE_Digital_Market.Controllers
             }
         }
         [HttpPut]
-        // [Authorize(Roles = "seller")]
+        // //[Authorize(Roles = "seller")]
        
         [Route("CompanySellerDetailsUpdateUserStatus/{userId}/{IsActive}")]
         public IActionResult UpdateUserStatus(int userId, bool IsActive)
