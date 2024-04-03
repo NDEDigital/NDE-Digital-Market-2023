@@ -13,7 +13,7 @@ namespace NDE_Digital_Market.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly SqlConnection con;
-        public  UnitController(IConfiguration configuration)
+        public UnitController(IConfiguration configuration)
         {
             CommonServices commonServices = new CommonServices(configuration);
             _configuration = configuration;
@@ -91,12 +91,12 @@ namespace NDE_Digital_Market.Controllers
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 {
                     cmd.Parameters.AddWithValue("@Name", unit.Name);
-                    cmd.Parameters.AddWithValue("@Description", unit.Description ?? (object)DBNull.Value); 
-                    cmd.Parameters.AddWithValue("@IsActive",true);
+                    cmd.Parameters.AddWithValue("@Description", unit.Description ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@IsActive", true);
                     cmd.Parameters.AddWithValue("@IsConversion", true);
-                    cmd.Parameters.AddWithValue("@AddedBy", unit.AddedBy); 
-                    cmd.Parameters.AddWithValue("@AddedPC", unit.AddedPC); 
-                    cmd.Parameters.AddWithValue("@DateAdded", DateTime.UtcNow); 
+                    cmd.Parameters.AddWithValue("@AddedBy", unit.AddedBy);
+                    cmd.Parameters.AddWithValue("@AddedPC", unit.AddedPC);
+                    cmd.Parameters.AddWithValue("@DateAdded", DateTime.UtcNow);
 
                     await cmd.ExecuteNonQueryAsync();
                 }
@@ -143,12 +143,12 @@ namespace NDE_Digital_Market.Controllers
                 {
                     cmd.Parameters.AddWithValue("@UnitId", unit.UnitId);
                     cmd.Parameters.AddWithValue("@Name", unit.Name);
-                    cmd.Parameters.AddWithValue("@Description", unit.Description ?? (object)DBNull.Value); 
-                   // cmd.Parameters.AddWithValue("@IsActive", unit.IsActive);
+                    cmd.Parameters.AddWithValue("@Description", unit.Description ?? (object)DBNull.Value);
+                    // cmd.Parameters.AddWithValue("@IsActive", unit.IsActive);
                     cmd.Parameters.AddWithValue("@IsConversion", unit.IsConversion);
-                    cmd.Parameters.AddWithValue("@UpdatedBy", unit.UpdatedBy); 
-                    cmd.Parameters.AddWithValue("@UpdatedPC", unit.UpdatedPC); 
-                    cmd.Parameters.AddWithValue("@DateUpdated", DateTime.UtcNow); 
+                    cmd.Parameters.AddWithValue("@UpdatedBy", unit.UpdatedBy);
+                    cmd.Parameters.AddWithValue("@UpdatedPC", unit.UpdatedPC);
+                    cmd.Parameters.AddWithValue("@DateUpdated", DateTime.UtcNow);
 
                     int rowsAffected = await cmd.ExecuteNonQueryAsync();
                     if (rowsAffected > 0)
@@ -177,9 +177,9 @@ namespace NDE_Digital_Market.Controllers
         }
         [HttpPut]
         [Route("UpdateUnitByID")]
-        public async Task<IActionResult> UpdateUnitByUnitID( string unitID,bool isActive)
+        public async Task<IActionResult> UpdateUnitByUnitID(string unitID, bool isActive)
         {
-            if (unitID == null )
+            if (unitID == null)
             {
                 return BadRequest(new { message = "Invalid unit data." });
             }
