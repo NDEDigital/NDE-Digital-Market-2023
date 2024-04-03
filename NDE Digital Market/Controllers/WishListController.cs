@@ -59,5 +59,41 @@ namespace NDE_Digital_Market.Controllers
             }
         }
 
+        [HttpDelete("DeleteWishList/{UserId}/{ProductId}/{CompanyCode}")]
+        public async Task<IActionResult> DeleteWishList(int UserId, string ProductId, string CompanyCode)
+        {
+            try
+            {
+                using (SqlConnection con = new SqlConnection(_healthCareConnection))
+                {
+                    string query = @"DELETE FROM WishList WHERE UserId=@UserId AND ProductId=@ProductId AND CompanyCode=@CompanyCode;";
+
+                    await con.OpenAsync();
+
+                    using (SqlCommand cmd = new SqlCommand(query, con))
+                    {
+                        cmd.Parameters.AddWithValue("@UserId", UserId);
+                        cmd.Parameters.AddWithValue("@ProductId", ProductId);
+                        cmd.Parameters.AddWithValue("@CompanyCode", CompanyCode);
+
+                        var deletedRowCount = await cmd.ExecuteNonQueryAsync();
+
+                        return Ok(new
+                        {
+                            Message = "Item deleted successfully",
+                            RowsAffected = deletedRowCount
+                        });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                return StatusCode(500, $"Error: {ex.Message}");
+            }
+        }
+
+
+
     }
 }
