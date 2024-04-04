@@ -289,7 +289,8 @@ namespace NDE_Digital_Market.Controllers
 
 
 
-        [HttpPost("GetDatailsData"),Authorize(Roles = "admin")]
+        [HttpPost("GetDatailsData")]
+        [Authorize(Roles = "admin")]
         public IActionResult GetDatailsData([FromForm] int OrderMasterId)
         {
             SqlConnection con = new SqlConnection(_prominentConnection);
@@ -624,7 +625,8 @@ namespace NDE_Digital_Market.Controllers
 
 
 
-        [HttpPost,Authorize(Roles = "admin")]
+        [HttpPost]
+        [Authorize(Roles = "admin")]
         [Route("getReturnDataForAdmin/{pageNumber}/{pageSize}")]
 
         public IActionResult getReturnDataForAdmin([FromForm] string status, int pageNumber, int pageSize, [FromForm] string searchby, [FromForm] string searchValue, [FromForm] string? fromDate = null, [FromForm] string? toDate = null)
@@ -770,7 +772,8 @@ namespace NDE_Digital_Market.Controllers
 
         //------------ get return data for SELLER --------
 
-        [HttpPost, Authorize(Roles = "seller")]
+        [HttpPost]
+        [Authorize(Roles = "seller")]
         [Route("GetReturnData/{pageNumber}/{pageSize}")]
         public IActionResult getReturnData([FromForm] string status, int pageNumber, int pageSize)
         {

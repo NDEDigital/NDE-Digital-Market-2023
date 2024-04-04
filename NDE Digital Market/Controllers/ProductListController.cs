@@ -347,7 +347,7 @@ namespace NDE_Digital_Market.Controllers
         // ==============================productName by productGroupId===================
 
         [HttpGet]
-        [Authorize(Roles = "seller")]
+        //[Authorize(Roles = "seller")]
         [Route("GetProductNameByProductGroupId")]
         public async Task<List<ProductNameByGroup>> GetProductNameByProductGroupId(int ProductGroupId)
         {
@@ -356,14 +356,11 @@ namespace NDE_Digital_Market.Controllers
             try
             {
                 await con.OpenAsync();
-                string query = @"SELECT p.ProductName, g.ProductGroupName, p.ProductGroupId, p.ProductId, U.Name 
-                 FROM ProductList p 
-                 INNER JOIN ProductGroups g ON p.ProductGroupId = g.ProductGroupID 
-				 left JOIN Units U ON  U.UnitId = p.UnitId
-                 WHERE p.ProductGroupId = @ProductGroupId;";
+                string query = @"ProductNameDropDown";
 
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 {
+                    cmd.CommandType = CommandType.StoredProcedure;
                     // Add the parameter and its value to the command
                     cmd.Parameters.AddWithValue("@ProductGroupId", ProductGroupId);
 
@@ -376,7 +373,7 @@ namespace NDE_Digital_Market.Controllers
                             modelObj.ProductId = Convert.ToInt32(reader["ProductId"]);
                             modelObj.ProductGroupName = reader["ProductGroupName"].ToString();
                             modelObj.ProductName = reader["ProductName"].ToString();
-                            modelObj.UnitName = reader["Name"].ToString();
+                            modelObj.UnitName = reader["UnitName"].ToString();
 
                             lst.Add(modelObj);
                         }
