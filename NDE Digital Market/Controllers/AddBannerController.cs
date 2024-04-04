@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace NDE_Digital_Market.Controllers
@@ -25,6 +26,70 @@ namespace NDE_Digital_Market.Controllers
             string connectionString = configuration.GetConnectionString("HealthCare");
             con = new SqlConnection(connectionString);
         }
+
+
+        [HttpGet]
+        [Route("GetBanners")]
+        public async Task<IActionResult> GetBanners()
+        {
+            try
+            {
+                await con.OpenAsync();
+                string query = "SELECT * FROM AdBanner";
+
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    {
+                        List<AddBanner> banners = new List<AddBanner>();
+
+                        while (await reader.ReadAsync())
+                        {
+                            AddBanner banner = new AddBanner
+                            {
+                                BannerID = Convert.ToInt32(reader["BannerID"]),
+                                UserId = reader["UserId"] != DBNull.Value ? Convert.ToInt32(reader["UserId"]) : (int?)null,
+                                IsActive = Convert.ToBoolean(reader["IsActive"]),
+                                AddedDate = reader["AddedDate"] != DBNull.Value ? Convert.ToDateTime(reader["AddedDate"]) : (DateTime?)null,
+                                AddedBy = reader["AddedBy"].ToString(),
+                                UpdatedDate = reader["UpdatedDate"] != DBNull.Value ? Convert.ToDateTime(reader["UpdatedDate"]) : (DateTime?)null,
+                                UpdatedBy = reader["UpdatedBy"].ToString(),
+                                AddedPC = reader["AddedPC"].ToString(),
+                                UpdatedPC = reader["UpdatedPC"].ToString(),
+                                CompanyCode = reader["CompanyCode"] != DBNull.Value ? reader["CompanyCode"].ToString() : null,
+                                BannerDescription = reader["BannerDescription"].ToString(),
+                                BannerImage = reader["BannerImage"].ToString(),
+                                StartDate = reader["StartDate"] != DBNull.Value ? Convert.ToDateTime(reader["StartDate"]) : (DateTime?)null,
+                                EndDate = reader["EndDate"] != DBNull.Value ? Convert.ToDateTime(reader["EndDate"]) : (DateTime?)null,
+                                IsPayment = reader["IsPayment"] != DBNull.Value ? Convert.ToBoolean(reader["IsPayment"]) : false,
+                                PaymentRemarks = reader["PaymentRemarks"] != DBNull.Value ? reader["PaymentRemarks"].ToString() : null
+                            };
+
+                            banners.Add(banner);
+                        }
+
+                        return Ok(banners);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Error retrieving banners" });
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                {
+                    await con.CloseAsync();
+                }
+            }
+        }
+
+
+
+
+
         [HttpGet]
         [Route("GetBanner/{id}")]
         public async Task<IActionResult> GetBanner(int id)
@@ -80,8 +145,8 @@ namespace NDE_Digital_Market.Controllers
             try
             {
                 await con.OpenAsync();
-                string query = @"INSERT INTO AdBanner (UserId, IsActive, AddedDate, AddedBy, UpdatedDate, UpdatedBy, AddedPC, UpdatedPC, CompanyCode, BannerDescription, BannerImage, StartDate, EndDate)
-                             VALUES (@UserId, @IsActive, @AddedDate, @AddedBy, @UpdatedDate, @UpdatedBy, @AddedPC, @UpdatedPC, @CompanyCode, @BannerDescription, @BannerImage, @StartDate, @EndDate);";
+                string query = @"INSERT INTO AdBanner (UserId, IsActive, AddedDate, AddedBy, UpdatedDate, UpdatedBy, AddedPC, UpdatedPC, CompanyCode, BannerDescription, BannerImage, StartDate, EndDate, IsPayment, PaymentRemarks)
+                             VALUES (@UserId, @IsActive, @AddedDate, @AddedBy, @UpdatedDate, @UpdatedBy, @AddedPC, @UpdatedPC, @CompanyCode, @BannerDescription, @BannerImage, @StartDate, @EndDate, @IsPayment, @PaymentRemarks);";
 
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 {
@@ -98,6 +163,11 @@ namespace NDE_Digital_Market.Controllers
                     cmd.Parameters.AddWithValue("@BannerImage", banner.BannerImage);
                     cmd.Parameters.AddWithValue("@StartDate", banner.StartDate ?? (object)DBNull.Value);
                     cmd.Parameters.AddWithValue("@EndDate", banner.EndDate ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@IsPayment", banner.IsPayment);
+                    cmd.Parameters.AddWithValue("@PaymentRemarks", banner.PaymentRemarks);
+
+
+
 
                     await cmd.ExecuteNonQueryAsync();
                 }
@@ -149,6 +219,8 @@ namespace NDE_Digital_Market.Controllers
                     cmd.Parameters.AddWithValue("@BannerImage", updatedBanner.BannerImage);
                     cmd.Parameters.AddWithValue("@StartDate", updatedBanner.StartDate ?? (object)DBNull.Value);
                     cmd.Parameters.AddWithValue("@EndDate", updatedBanner.EndDate ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@IsPayment", updatedBanner.IsPayment);
+                    cmd.Parameters.AddWithValue("@PaymentRemarks", updatedBanner.PaymentRemarks);
                     cmd.Parameters.AddWithValue("@BannerID", id);
 
                     int rowsAffected = await cmd.ExecuteNonQueryAsync();
@@ -176,5 +248,58 @@ namespace NDE_Digital_Market.Controllers
             }
         }
 
+
+
+        [HttpDelete]
+        [Route("DeleteBanner/{id}")]
+        public async Task<IActionResult> DeleteBanner(int id)
+        {
+            try
+            {
+                await con.OpenAsync();
+
+                // Check if the banner exists
+                string checkQuery = "SELECT COUNT(*) FROM AdBanner WHERE BannerID = @BannerID";
+                using (SqlCommand checkCmd = new SqlCommand(checkQuery, con))
+                {
+                    checkCmd.Parameters.AddWithValue("@BannerID", id);
+                    int bannerCount = (int)await checkCmd.ExecuteScalarAsync();
+
+                    if (bannerCount == 0)
+                    {
+                        return NotFound(new { message = "Banner not found" });
+                    }
+                }
+
+                // Delete the banner
+                string deleteQuery = "DELETE FROM AdBanner WHERE BannerID = @BannerID";
+                using (SqlCommand cmd = new SqlCommand(deleteQuery, con))
+                {
+                    cmd.Parameters.AddWithValue("@BannerID", id);
+                    int rowsAffected = await cmd.ExecuteNonQueryAsync();
+
+                    if (rowsAffected > 0)
+                    {
+                        return Ok(new { message = "Banner deleted successfully" });
+                    }
+                    else
+                    {
+                        return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Error deleting the banner" });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Error deleting the banner" });
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                {
+                    await con.CloseAsync();
+                }
+            }
+        }
     }
 }

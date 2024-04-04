@@ -16,5 +16,8 @@
         public string BannerImage { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
+
+        public bool IsPayment { get; set; }
+        public string PaymentRemarks { get; set; }
     }
 }
