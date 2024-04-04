@@ -490,6 +490,7 @@ namespace NDE_Digital_Market.Controllers
                             while (await reader.ReadAsync())
                             {
                                 RecommendedProductListModel modelObj = new RecommendedProductListModel();
+                                modelObj.ProductId = Convert.ToInt32(reader["ProductId"]);
                                 modelObj.ProductName = reader["ProductName"].ToString();
                                 modelObj.ImagePath = reader["ImagePath"].ToString();
                                 modelObj.CompanyCode = reader["CompanyCode"].ToString();
