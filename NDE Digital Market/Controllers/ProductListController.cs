@@ -11,7 +11,7 @@ namespace NDE_Digital_Market.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class ProductListController : ControllerBase
     {
 
@@ -347,7 +347,7 @@ namespace NDE_Digital_Market.Controllers
         // ==============================productName by productGroupId===================
 
         [HttpGet]
-        ////[Authorize(Roles = "seller")]
+        //[Authorize(Roles = "seller")]
         [Route("GetProductNameByProductGroupId")]
         public async Task<List<ProductNameByGroup>> GetProductNameByProductGroupId(int ProductGroupId)
         {

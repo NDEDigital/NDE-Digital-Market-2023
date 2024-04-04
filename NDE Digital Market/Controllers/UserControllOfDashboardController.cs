@@ -4,7 +4,7 @@ using NDE_Digital_Market.SharedServices;
 using System.Data.SqlClient;
 
 [ApiController]
-//[Authorize]
+[Authorize]
 public class UserControllOfDashboardController : ControllerBase
 {
     private readonly string _healthCareConnection;
@@ -16,7 +16,7 @@ public class UserControllOfDashboardController : ControllerBase
     }
 
     [HttpDelete("deleteMenuItems/{UserId}")]
-    //[Authorize (Roles ="seller")]
+    [Authorize (Roles ="seller")]
     public async Task<IActionResult> DeleteMenuItems(int UserId, [FromBody] List<int> menuIdsToDelete)
     {
         try

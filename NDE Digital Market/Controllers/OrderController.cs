@@ -15,7 +15,7 @@ namespace NDE_Digital_Market.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class OrderController : Controller
     {
         private readonly string _connectionSteel;
@@ -168,7 +168,7 @@ namespace NDE_Digital_Market.Controllers
         //admin order getdata
 
         [HttpGet("GetOrderMasterData")]
-        //[Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> GetOrderMasterData(string? status)
         {
             var products = new List<OrderDataBaseOnStatusDto>();
@@ -228,7 +228,7 @@ namespace NDE_Digital_Market.Controllers
 
 
         [HttpGet("GetOrderDetailData")]
-        //[Authorize(Roles ="admin")]
+        [Authorize(Roles ="admin")]
         public async Task<IActionResult> GetOrderDetailData(int? OrderMasterId, string? status = null)
         {
             var orderDetails = new List<OrderDetailStatusDto>();
@@ -290,7 +290,7 @@ namespace NDE_Digital_Market.Controllers
 
 
         [HttpPost("GetDatailsData")]
-        //[Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin")]
         public IActionResult GetDatailsData([FromForm] int OrderMasterId)
         {
             SqlConnection con = new SqlConnection(_prominentConnection);
@@ -333,7 +333,7 @@ namespace NDE_Digital_Market.Controllers
 
 
         [HttpPut("AdminOrderUpdateStatus")]
-        //[Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> UpdateOrderStatusAsync(String orderMasterId, String? detailsCancelledId, string status)
         {
             SqlTransaction transaction = null;
@@ -455,7 +455,7 @@ namespace NDE_Digital_Market.Controllers
         }
 
         [HttpPut("UpdateSellerOrderDetailsStatus")]
-        //[Authorize(Roles ="seller")]
+        [Authorize(Roles ="seller")]
         public async Task<IActionResult> SellerOrderDetailsStatusChangedAsync(updateOrderClass updateOrder)
         {
 
@@ -626,7 +626,7 @@ namespace NDE_Digital_Market.Controllers
 
 
         [HttpPost]
-        //[Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin")]
         [Route("getReturnDataForAdmin/{pageNumber}/{pageSize}")]
 
         public IActionResult getReturnDataForAdmin([FromForm] string status, int pageNumber, int pageSize, [FromForm] string searchby, [FromForm] string searchValue, [FromForm] string? fromDate = null, [FromForm] string? toDate = null)
@@ -773,7 +773,7 @@ namespace NDE_Digital_Market.Controllers
         //------------ get return data for SELLER --------
 
         [HttpPost]
-        //[Authorize(Roles = "seller")]
+        [Authorize(Roles = "seller")]
         [Route("GetReturnData/{pageNumber}/{pageSize}")]
         public IActionResult getReturnData([FromForm] string status, int pageNumber, int pageSize)
         {
@@ -860,7 +860,7 @@ namespace NDE_Digital_Market.Controllers
 
         //================================== Added By Tushar ==============================
         [HttpGet("GetSellerOrderBasedOnUserID")]
-        //[Authorize(Roles = "seller")]
+        [Authorize(Roles = "seller")]
         public async Task<IActionResult> GetSellerOrderBasedOnUserCodeAsync(string userid, string? status)
         {
             try
@@ -991,7 +991,7 @@ namespace NDE_Digital_Market.Controllers
 
 
         [HttpGet("getAllOrderForBuyer")]
-        //[Authorize(Roles = "buyer")]
+        [Authorize(Roles = "buyer")]
         public async Task<IActionResult> getAllOrderForBuyerAsync(string userid, string? status)
         {
             List<OrderMasterDataForBuyerDto> MasterList = new List<OrderMasterDataForBuyerDto>();
@@ -1279,7 +1279,7 @@ namespace NDE_Digital_Market.Controllers
 
 
         [HttpGet("getOrderDetailsForBuyerBasedOnOrderNo")]
-        //[Authorize(Roles ="buyer")]
+        [Authorize(Roles ="buyer")]
         public async Task<IActionResult> getOrderDetailsForBuyerBasedOnOrderNoAsync(string OrderNo)
         {
             OrderDetailsMasterForBuyerDto Master = null;
@@ -1465,7 +1465,7 @@ namespace NDE_Digital_Market.Controllers
 
 
         [HttpGet("getAllOrderForSeller")]
-        //[Authorize(Roles ="seller")]
+        [Authorize(Roles ="seller")]
         public async Task<IActionResult> getAllOrderForSellerAsync( string CompanyCode, string? status)
         {
             List<OrderMasterDataForSellerDto> MasterList = new List<OrderMasterDataForSellerDto>();

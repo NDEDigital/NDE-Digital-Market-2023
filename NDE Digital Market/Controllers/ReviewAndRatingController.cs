@@ -14,7 +14,7 @@ namespace NDE_Digital_Market.Controllers
 
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class ReviewAndRatingController : ControllerBase
     {
         private readonly string foldername;

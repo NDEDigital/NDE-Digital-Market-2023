@@ -107,7 +107,7 @@ namespace NDE_Digital_Market.Controllers
         }
      
         [HttpGet]
-        //[Authorize(Roles = "seller")]
+        [Authorize(Roles = "seller")]
         [Route("GetDataForDropdown")]
         public async Task<ActionResult<List<NavModel>>> getForDropDown()
         {
