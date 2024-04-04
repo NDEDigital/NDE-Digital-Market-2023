@@ -494,6 +494,7 @@ namespace NDE_Digital_Market.Controllers
                                 modelObj.ProductName = reader["ProductName"].ToString();
                                 modelObj.ImagePath = reader["ImagePath"].ToString();
                                 modelObj.CompanyCode = reader["CompanyCode"].ToString();
+                                modelObj.CompanyName = reader["CompanyName"].ToString();
                                 modelObj.AvailableQty = Convert.ToDecimal(reader["AvailableQty"]);
                                 modelObj.TotalPrice = Convert.ToDecimal(reader["TotalPrice"]);
 
