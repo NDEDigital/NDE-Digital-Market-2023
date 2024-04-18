@@ -464,5 +464,54 @@ namespace NDE_Digital_Market.Controllers
 
 
 
+
+
+        [HttpGet]
+        [Route("GetRecommendedProductList/{CompanyCode}/{ProductId}")]
+        public async Task<IActionResult> GetRecommendedProductList(string CompanyCode, int ProductId)
+        {
+
+            try
+            {
+                List<RecommendedProductListModel> List = new List<RecommendedProductListModel>();
+                using (SqlConnection con = new SqlConnection(_healthCareConnection))
+                {
+                    await con.OpenAsync();
+                    string query = @"GetrecommendedProductList";
+
+                    using (SqlCommand cmd = new SqlCommand(query, con))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.AddWithValue("@ProductId", ProductId);
+                        cmd.Parameters.AddWithValue("@CompanyCode", CompanyCode);
+                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                        {
+
+                            while (await reader.ReadAsync())
+                            {
+                                RecommendedProductListModel modelObj = new RecommendedProductListModel();
+                                modelObj.ProductId = Convert.ToInt32(reader["ProductId"]);
+                                modelObj.ProductName = reader["ProductName"].ToString();
+                                modelObj.ImagePath = reader["ImagePath"].ToString();
+                                modelObj.CompanyCode = reader["CompanyCode"].ToString();
+                                modelObj.CompanyName = reader["CompanyName"].ToString();
+                                modelObj.AvailableQty = Convert.ToDecimal(reader["AvailableQty"]);
+                                modelObj.TotalPrice = Convert.ToDecimal(reader["TotalPrice"]);
+
+                                List.Add(modelObj);
+
+                            }
+                        }
+                    }
+                    return Ok(List);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
     }
 }
