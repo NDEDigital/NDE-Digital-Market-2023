@@ -227,79 +227,79 @@ namespace NDE_Digital_Market.Controllers
                 using (SqlConnection con = new SqlConnection(_healthCareConnection))
                 {
                     await con.OpenAsync();
-                    string query = @"DECLARE @ProductIdPa INT = @ProductId, /* Set the desired ProductId value */
-                                    @CompanyCodePa varchar(50) =@CompanyCode /* Set the desired CompanyCode value */;
+                        string query = @"DECLARE @ProductIdPa INT = @ProductId, /* Set the desired ProductId value */
+                                        @CompanyCodePa varchar(50) =@CompanyCode /* Set the desired CompanyCode value */;
 
-                                WITH ProductReceived AS (
-                                    SELECT
-                                        ProductId,
-                                        COALESCE(SUM(ReceivedQty), 0) AS ReceivedQty,
-                                        CompanyCode
-                                    FROM
-                                        PortalReceivedDetails
+                                    WITH ProductReceived AS (
+                                        SELECT
+                                            ProductId,
+                                            COALESCE(SUM(ReceivedQty), 0) AS ReceivedQty,
+                                            CompanyCode
+                                        FROM
+                                            PortalReceivedDetails
+                                        GROUP BY
+                                            ProductId,
+                                            CompanyCode
+                                    ),
+                                    ProductSold AS (
+                                        SELECT
+                                            ProductId,
+                                            COALESCE(SUM(SaleQty), 0) AS SaleQty
+                                        FROM
+                                            SellerSalesDetail
+                                        GROUP BY
+                                            ProductId
+                                    )
+                                    SELECT 
+                                        CR.CompanyCode,
+                                        CR.CompanyName,
+                                        SPL.ProductId,
+                                        PL.ProductName,
+                                        PL.ProductGroupID,
+                                        PG.ProductGroupName,
+                                        PL.Specification,
+                                        PL.UnitId,
+                                        U.Name as Unit,
+                                        SPL.Price,
+                                        SPL.DiscountAmount,
+                                        SPL.DiscountPct,
+                                        SPL.EffectivateDate,
+                                        SPL.EndDate,
+                                        SPL.ImagePath,
+                                        SPL.TotalPrice,
+                                        SPL.UserId As SellerId,
+                                        COALESCE(SUM(PRD.ReceivedQty), 0) - COALESCE(SUM(SSD.SaleQty), 0) AS AvailableQty
+                                    FROM SellerProductPriceAndOffer SPL
+                                    LEFT JOIN ProductList PL ON SPL.ProductId = PL.ProductId
+                                    LEFT JOIN Units U ON PL.UnitId = U.UnitId
+                                    LEFT JOIN UserRegistration UR ON SPL.UserId = UR.UserId
+                                    LEFT JOIN ProductReceived PRD ON SPL.ProductId = PRD.ProductId AND PRD.CompanyCode = SPL.CompanyCode
+                                    LEFT JOIN ProductSold SSD ON PRD.ProductId = SSD.ProductId
+                                    LEFT JOIN CompanyRegistration CR ON UR.CompanyCode = CR.CompanyCode
+                                    LEFT JOIN ProductGroups PG ON PL.ProductGroupID = PG.ProductGroupID
+                                    WHERE SPL.Status = 'Approved' AND UR.IsSeller = 1 
+                                        AND PL.IsActive = 1 AND CR.IsActive = 1 AND SPL.IsActive = 1
+                                        AND (@ProductIdPa IS NULL OR SPL.ProductId = @ProductIdPa)
+                                        AND SPL.CompanyCode = @CompanyCodePa
+                                        AND (SELECT COALESCE(SUM(ReceivedQty), 0) FROM PortalReceivedDetails WHERE ProductId = SPL.ProductId AND CompanyCode = SPL.CompanyCode) > 0
                                     GROUP BY
-                                        ProductId,
-                                        CompanyCode
-                                ),
-                                ProductSold AS (
-                                    SELECT
-                                        ProductId,
-                                        COALESCE(SUM(SaleQty), 0) AS SaleQty
-                                    FROM
-                                        SellerSalesDetail
-                                    GROUP BY
-                                        ProductId
-                                )
-                                SELECT 
-                                    CR.CompanyCode,
-                                    CR.CompanyName,
-                                    SPL.ProductId,
-                                    PL.ProductName,
-                                    PL.ProductGroupID,
-                                    PG.ProductGroupName,
-                                    PL.Specification,
-                                    PL.UnitId,
-                                    U.Name as Unit,
-                                    SPL.Price,
-                                    SPL.DiscountAmount,
-                                    SPL.DiscountPct,
-                                    SPL.EffectivateDate,
-                                    SPL.EndDate,
-                                    SPL.ImagePath,
-                                    SPL.TotalPrice,
-                                    SPL.UserId As SellerId,
-                                    COALESCE(SUM(PRD.ReceivedQty), 0) - COALESCE(SUM(SSD.SaleQty), 0) AS AvailableQty
-                                FROM SellerProductPriceAndOffer SPL
-                                LEFT JOIN ProductList PL ON SPL.ProductId = PL.ProductId
-                                LEFT JOIN Units U ON PL.UnitId = U.UnitId
-                                LEFT JOIN UserRegistration UR ON SPL.UserId = UR.UserId
-                                LEFT JOIN ProductReceived PRD ON SPL.ProductId = PRD.ProductId AND PRD.CompanyCode = SPL.CompanyCode
-                                LEFT JOIN ProductSold SSD ON PRD.ProductId = SSD.ProductId
-                                LEFT JOIN CompanyRegistration CR ON UR.CompanyCode = CR.CompanyCode
-                                LEFT JOIN ProductGroups PG ON PL.ProductGroupID = PG.ProductGroupID
-                                WHERE SPL.Status = 'Approved' AND UR.IsSeller = 1 
-                                    AND PL.IsActive = 1 AND CR.IsActive = 1 AND SPL.IsActive = 1
-                                    AND (@ProductIdPa IS NULL OR SPL.ProductId = @ProductIdPa)
-                                    AND SPL.CompanyCode = @CompanyCodePa
-                                    AND (SELECT COALESCE(SUM(ReceivedQty), 0) FROM PortalReceivedDetails WHERE ProductId = SPL.ProductId AND CompanyCode = SPL.CompanyCode) > 0
-                                GROUP BY
-                                    CR.CompanyCode,
-                                    CR.CompanyName,
-                                    SPL.ProductId,
-                                    PL.ProductName,
-                                    PL.ProductGroupID,
-                                    PG.ProductGroupName,
-                                    PL.Specification,
-                                    PL.UnitId,
-                                    U.Name,
-                                    SPL.Price,
-                                    SPL.DiscountAmount,
-                                    SPL.DiscountPct,
-                                    SPL.EffectivateDate,
-                                    SPL.EndDate,
-                                    SPL.ImagePath,
-                                    SPL.TotalPrice,
-                                    SPL.UserId;
+                                        CR.CompanyCode,
+                                        CR.CompanyName,
+                                        SPL.ProductId,
+                                        PL.ProductName,
+                                        PL.ProductGroupID,
+                                        PG.ProductGroupName,
+                                        PL.Specification,
+                                        PL.UnitId,
+                                        U.Name,
+                                        SPL.Price,
+                                        SPL.DiscountAmount,
+                                        SPL.DiscountPct,
+                                        SPL.EffectivateDate,
+                                        SPL.EndDate,
+                                        SPL.ImagePath,
+                                        SPL.TotalPrice,
+                                        SPL.UserId;
                                 ";
 
                     using (SqlCommand cmd = new SqlCommand(query, con))
