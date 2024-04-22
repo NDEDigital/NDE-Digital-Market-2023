@@ -472,8 +472,32 @@ namespace NDE_Digital_Market.Controllers
 
                         List<int> DetailsIds = updateOrder.orderdetailsIds.Split(',').Select(int.Parse).ToList();
                         orderdetailsIdString = string.Join(",", DetailsIds);
-                        string masterStatusChangeQuery = "UPDATE OrderDetails SET Status = @value  WHERE OrderDetailId IN (" + orderdetailsIdString + ") ;";
 
+                        for(int i = 0; i < DetailsIds.Count; i++)
+                        {
+
+                            await con.OpenAsync();
+                            SqlCommand cmdcheck = new SqlCommand("CheckAvailableQuantity", con);
+                            cmdcheck.CommandType = CommandType.StoredProcedure;
+                            //cmd1.Parameters.AddWithValue("@orderMasterId", orderMasterId);
+                            cmdcheck.Parameters.AddWithValue("@OrderDetailId", DetailsIds[i]);
+
+                            SqlDataReader reader = cmdcheck.ExecuteReader();
+                            bool result = false;
+                            if (reader.Read())
+                            {
+                                result = Convert.ToBoolean(reader["Result"]);
+
+                            }
+                            await con.CloseAsync();
+                            if (!result)
+                            {
+                                return BadRequest(new { message = "You don't have enough quantity." });
+                            }
+
+                        }
+
+                        string masterStatusChangeQuery = "UPDATE OrderDetails SET Status = @value  WHERE OrderDetailId IN (" + orderdetailsIdString + ") ;";
 
 
                         await con.OpenAsync();
