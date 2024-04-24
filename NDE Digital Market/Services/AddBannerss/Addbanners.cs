@@ -21,13 +21,17 @@ namespace NDE_Digital_Market.Services.AddBanner
             string res = await _AddBanner_DAL.AddBanners(bannerDto);
             return res;
         }
-        public async Task<List<ImageBanner>> GetAddBanner(bool? status)
+        public async Task<List<ImageBanner>> GetAddBannerForAdmin(bool? status)
         {
-            var Banner = await _AddBanner_DAL.GetAddBanner(status);
+            var Banner = await _AddBanner_DAL.GetAddBannerForAdmin(status);
+            return Banner;
+        }
+        public async Task<List<ImageBanner>> GetAddBannerForSeller(string ComapnayCode)
+        {
+            var Banner = await _AddBanner_DAL.GetAddBannerForSeller(ComapnayCode);
             return Banner;
         }
 
-     
 
 
         //public async Task<List<BannerDto>> GetBanners()
