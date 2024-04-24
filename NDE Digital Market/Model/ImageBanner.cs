@@ -1,0 +1,17 @@
+﻿namespace NDE_Digital_Market.Model
+{
+    public class ImageBanner
+    {
+        //public int? UserId { get; set; }
+        public int BannerID { get; set; }
+        public string? BannerDescription { get; set; }
+        //public IFormFile? BannerImageFile { get; set; }
+
+   
+        public string? BannerImage { get; set; }
+
+        public string? CompanyCode { get; set; }
+
+
+    }
+}

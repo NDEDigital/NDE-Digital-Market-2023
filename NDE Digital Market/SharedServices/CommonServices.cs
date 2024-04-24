@@ -15,6 +15,7 @@ namespace NDE_Digital_Market.SharedServices
         //public static string FilesPath { get; } = @"F:\Projects\Health Care\healthcare-frontend\src\assets\images\";
 
         public string FilesPath { get; set; }
+        public string Filespath1 { get; set; }
         public string HealthCareConnection { get; set; }
         private readonly IConfiguration _configuration;
         private readonly SqlConnection con;
@@ -23,6 +24,7 @@ namespace NDE_Digital_Market.SharedServices
         {
             _configuration = configuration;
             FilesPath = _configuration["FilesPaths:filepath"];
+            //Filespath1 = _configuration["Filespaths:filepath" ];
             HealthCareConnection = configuration.GetConnectionString("HealthCare");
         }
 
