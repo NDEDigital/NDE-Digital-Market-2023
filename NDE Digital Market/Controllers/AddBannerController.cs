@@ -114,12 +114,23 @@ namespace NDE_Digital_Market.Controllers
             if (deleted)
             {
                 // Return a success response
-                return Ok("Banner deleted successfully.");
+            
+                // If needed, you can return the inserted ItemID
+                return Ok(new
+                {
+                    Message = "Banner deleted successfully.",
+
+                });
             }
             else
             {
-                // Return an error response
-                return BadRequest("Failed to delete banner.");
+
+        
+                return BadRequest(new
+                {
+                    Message = "Failed to delete banner.",
+
+                });
             }
         }
 

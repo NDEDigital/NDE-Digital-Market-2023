@@ -66,7 +66,7 @@ using NDE_Digital_Market.SharedServices;namespace NDE_Digital_Market.Data_Acce
         public async Task<List<ImageBanner>> GetAddBanner()
         {
             List<ImageBanner> banners = new List<ImageBanner>();
-            SqlCommand command = new SqlCommand("SELECT BannerID, BannerDescription, BannerImage, CompanyCode FROM AdBanner", _connection);
+            SqlCommand command = new SqlCommand("SELECT BannerID, BannerDescription, BannerImage, CompanyCode, AddedDate FROM AdBanner", _connection);
             command.CommandType = CommandType.Text;
             await _connection.OpenAsync();
             SqlDataReader reader = await command.ExecuteReaderAsync();
@@ -80,6 +80,13 @@ using NDE_Digital_Market.SharedServices;namespace NDE_Digital_Market.Data_Acce
                 banner.BannerDescription = reader["BannerDescription"].ToString();
                 banner.BannerImage = reader["BannerImage"].ToString();
                 banner.CompanyCode = reader["CompanyCode"].ToString();
+
+                if (!(reader["AddedDate"] is DBNull))
+                {
+                    banner.AddedDate = reader.GetDateTime(4);
+                }
+
+
 
 
                 banners.Add(banner);

@@ -18,8 +18,8 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: MyAllowSpecificOrigins,
         policy =>
         {
-            //policy.WithOrigins("http://192.168.2.206:91", "http://localhost:4200")
-            policy.WithOrigins("http://182.163.119.194:8776")
+            policy.WithOrigins("http://192.168.2.206:91", "http://localhost:4200")
+            //policy.WithOrigins("http://182.163.119.194:8776")
             .AllowAnyHeader()
             .AllowAnyMethod()
              .AllowCredentials(); // Allow sending credentials (cookies)
