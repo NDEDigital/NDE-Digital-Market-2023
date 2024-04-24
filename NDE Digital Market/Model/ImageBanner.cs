@@ -6,8 +6,8 @@
         public int BannerID { get; set; }
         public string? BannerDescription { get; set; }
         //public IFormFile? BannerImageFile { get; set; }
+        public DateTime? AddedDate { get; set; }
 
-   
         public string? BannerImage { get; set; }
 
         public string? CompanyName { get; set; }

@@ -63,12 +63,20 @@ namespace NDE_Digital_Market.Controllers
 
 
 
-        [HttpGet("GetAddBanner")]
-        public async Task<ActionResult<List<ImageBanner>>> GetAddBanner(bool? status)
+        [HttpGet("GetAddBannerForAdmin")]
+        public async Task<ActionResult<List<ImageBanner>>> GetAddBannerForAdmin(bool? status)
         {
-            var banner = await _AddBanner.GetAddBanner(status);
+            var banner = await _AddBanner.GetAddBannerForAdmin(status);
             return banner;
         }
+
+        [HttpGet("GetAddBannerForSeller")]
+        public async Task<ActionResult<List<ImageBanner>>> GetAddBannerForSeller(string ComapnayCode)
+        {
+            var banner = await _AddBanner.GetAddBannerForSeller(ComapnayCode);
+            return banner;
+        }
+
 
 
 
@@ -135,12 +143,23 @@ namespace NDE_Digital_Market.Controllers
             if (deleted)
             {
                 // Return a success response
-                return Ok("Banner deleted successfully.");
+            
+                // If needed, you can return the inserted ItemID
+                return Ok(new
+                {
+                    Message = "Banner deleted successfully.",
+
+                });
             }
             else
             {
-                // Return an error response
-                return BadRequest("Failed to delete banner.");
+
+        
+                return BadRequest(new
+                {
+                    Message = "Failed to delete banner.",
+
+                });
             }
         }
 
