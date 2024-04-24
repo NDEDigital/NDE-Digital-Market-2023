@@ -1,10 +1,68 @@
-﻿using System;using System.Data;using System.Data.SqlClient;using System.Threading.Tasks;using Microsoft.Extensions.Configuration;using NDE_Digital_Market.DTOs;using NDE_Digital_Market.Model;
-using NDE_Digital_Market.SharedServices;namespace NDE_Digital_Market.Data_Access_Layer{	public class AddBanner_DAL	{		private readonly IConfiguration _configuration;		private readonly SqlConnection _connection;		private readonly string _folderName;		private readonly string _fileName = "banner";		public AddBanner_DAL(IConfiguration configuration)		{			_configuration = configuration;			var commonServices = new CommonServices(_configuration);			_connection = new SqlConnection(commonServices.HealthCareConnection);			//_folderName = commonServices.FilesPath;			_folderName = commonServices.FilesPath + "banner";		}		public async Task<string> AddBanners(BannerDto banner)		{
+﻿using System;
+using System.Data;
+using System.Data.SqlClient;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using NDE_Digital_Market.DTOs;
+using NDE_Digital_Market.Model;
+using NDE_Digital_Market.SharedServices;
+
+namespace NDE_Digital_Market.Data_Access_Layer
+{
+	public class AddBanner_DAL
+	{
+		private readonly IConfiguration _configuration;
+		private readonly SqlConnection _connection;
+		private readonly string _folderName;
+		private readonly string _fileName = "banner";
+
+		public AddBanner_DAL(IConfiguration configuration)
+		{
+			_configuration = configuration;
+			var commonServices = new CommonServices(_configuration);
+			_connection = new SqlConnection(commonServices.HealthCareConnection);
+			//_folderName = commonServices.FilesPath;
+
+			_folderName = commonServices.FilesPath + "banner";
+		}
+
+		public async Task<string> AddBanners(BannerDto banner)
+		{
 
 
             string bannerImage = CommonServices.UploadFiles(_folderName, _fileName, banner.BannerImageFile);
 
-            string query = @"INSERT INTO AdBanner (UserId, IsActive, AddedDate, AddedBy, UpdatedDate, UpdatedBy, AddedPC, UpdatedPC, CompanyCode, BannerDescription, BannerImage, StartDate, EndDate, IsPayment, PaymentRemarks)							 VALUES (@UserId, @IsActive, @AddedDate, @AddedBy, @UpdatedDate, @UpdatedBy, @AddedPC, @UpdatedPC, @CompanyCode, @BannerDescription, @BannerImage, @StartDate, @EndDate, @IsPayment, @PaymentRemarks);";			using (SqlCommand cmd = new SqlCommand(query, _connection))			{				 cmd.CommandType = CommandType.Text;				cmd.Parameters.AddWithValue("@UserId", banner.UserId ?? (object)DBNull.Value);				cmd.Parameters.AddWithValue("@IsActive", banner.IsActive ?? (object)DBNull.Value);				cmd.Parameters.AddWithValue("@AddedDate", DateTime.Now);				cmd.Parameters.AddWithValue("@AddedBy", banner.AddedBy ?? (object)DBNull.Value);				cmd.Parameters.AddWithValue("@UpdatedDate", banner.UpdatedDate ?? (object)DBNull.Value);				cmd.Parameters.AddWithValue("@UpdatedBy", banner.UpdatedBy ?? (object)DBNull.Value);				cmd.Parameters.AddWithValue("@AddedPC", banner.AddedPC ?? (object)DBNull.Value);				cmd.Parameters.AddWithValue("@UpdatedPC", banner.UpdatedPC ?? (object)DBNull.Value);				cmd.Parameters.AddWithValue("@CompanyCode", banner.CompanyCode ?? (object)DBNull.Value);				cmd.Parameters.AddWithValue("@BannerDescription", banner.BannerDescription ?? (object)DBNull.Value);				cmd.Parameters.AddWithValue("@BannerImage", bannerImage ?? (object)DBNull.Value);				cmd.Parameters.AddWithValue("@StartDate", banner.StartDate ?? (object)DBNull.Value);				cmd.Parameters.AddWithValue("@EndDate", banner.EndDate ?? (object)DBNull.Value);				cmd.Parameters.AddWithValue("@IsPayment", banner.IsPayment ?? (object)DBNull.Value);				cmd.Parameters.AddWithValue("@PaymentRemarks", banner.PaymentRemarks ?? (object)DBNull.Value);				await _connection.OpenAsync();				await cmd.ExecuteNonQueryAsync();				await _connection.CloseAsync();			}			return "Banner Added successful!";		}
+            string query = @"INSERT INTO AdBanner (UserId, IsActive, AddedDate, AddedBy, UpdatedDate, UpdatedBy, AddedPC, UpdatedPC, CompanyCode, BannerDescription, BannerImage, StartDate, EndDate, IsPayment, PaymentRemarks)
+							 VALUES (@UserId, @IsActive, @AddedDate, @AddedBy, @UpdatedDate, @UpdatedBy, @AddedPC, @UpdatedPC, @CompanyCode, @BannerDescription, @BannerImage, @StartDate, @EndDate, @IsPayment, @PaymentRemarks);";
+
+			using (SqlCommand cmd = new SqlCommand(query, _connection))
+			{
+				 cmd.CommandType = CommandType.Text;
+				cmd.Parameters.AddWithValue("@UserId", banner.UserId ?? (object)DBNull.Value);
+				cmd.Parameters.AddWithValue("@IsActive", banner.IsActive ?? (object)DBNull.Value);
+				cmd.Parameters.AddWithValue("@AddedDate", DateTime.Now);
+				cmd.Parameters.AddWithValue("@AddedBy", banner.AddedBy ?? (object)DBNull.Value);
+				cmd.Parameters.AddWithValue("@UpdatedDate", banner.UpdatedDate ?? (object)DBNull.Value);
+				cmd.Parameters.AddWithValue("@UpdatedBy", banner.UpdatedBy ?? (object)DBNull.Value);
+				cmd.Parameters.AddWithValue("@AddedPC", banner.AddedPC ?? (object)DBNull.Value);
+				cmd.Parameters.AddWithValue("@UpdatedPC", banner.UpdatedPC ?? (object)DBNull.Value);
+				cmd.Parameters.AddWithValue("@CompanyCode", banner.CompanyCode ?? (object)DBNull.Value);
+				cmd.Parameters.AddWithValue("@BannerDescription", banner.BannerDescription ?? (object)DBNull.Value);
+				cmd.Parameters.AddWithValue("@BannerImage", bannerImage ?? (object)DBNull.Value);
+
+				cmd.Parameters.AddWithValue("@StartDate", banner.StartDate ?? (object)DBNull.Value);
+				cmd.Parameters.AddWithValue("@EndDate", banner.EndDate ?? (object)DBNull.Value);
+				cmd.Parameters.AddWithValue("@IsPayment", banner.IsPayment ?? (object)DBNull.Value);
+				cmd.Parameters.AddWithValue("@PaymentRemarks", banner.PaymentRemarks ?? (object)DBNull.Value);
+
+
+				await _connection.OpenAsync();
+				await cmd.ExecuteNonQueryAsync();
+				await _connection.CloseAsync();
+			}
+
+			return "Banner Added successful!";
+		}
 
         //public async Task<List<BannerDto>> GetBanners()
         //{
@@ -301,4 +359,5 @@ using NDE_Digital_Market.SharedServices;namespace NDE_Digital_Market.Data_Acce
 
 
 
-    }}
+    }
+}
