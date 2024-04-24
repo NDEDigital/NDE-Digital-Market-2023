@@ -285,16 +285,16 @@ namespace NDE_Digital_Market.Controllers
                     var cookieOptions = new CookieOptions
                     {
                         HttpOnly = true,
-                        SameSite = SameSiteMode.None,
-                        Secure = true,
+                        SameSite = SameSiteMode.Strict,
+                        Secure = false,
                         Expires = DateTime.UtcNow.AddMinutes(10)
 
                     };
                     var cookieOptions2 = new CookieOptions
                     {
                         HttpOnly = true,
-                        SameSite = SameSiteMode.None,
-                        Secure = true,
+                        SameSite = SameSiteMode.Strict,
+                        Secure = false,
                         Expires = DateTime.UtcNow.AddDays(3)
 
                     };
@@ -585,7 +585,8 @@ namespace NDE_Digital_Market.Controllers
 
         // =================================================== getSingleUserInfo ===================================
         [HttpGet]
-        [Route("getSingleUserInfo"), Authorize]
+        [Route("getSingleUserInfo")]
+        [Authorize]
         public IActionResult getSingleUser(int? userId)
         {
             UserDetailsDTO user = new UserDetailsDTO();
@@ -667,7 +668,8 @@ namespace NDE_Digital_Market.Controllers
 
 
         [HttpPut]
-        [Route("updatePass"),Authorize]
+        [Route("updatePass")]
+        [Authorize]
         public IActionResult UpdatePasss(UpdatePasswordModel user)
         {
             try
@@ -723,7 +725,8 @@ namespace NDE_Digital_Market.Controllers
 
         //========================tushar=========================
         [HttpPut]
-        [Route("UpdateUserProfile"),Authorize]
+        [Route("UpdateUserProfile")]
+        [Authorize]
         public async Task<IActionResult> UpdateUserProfileAsync([FromBody] UserModel userModel)
         {
             try

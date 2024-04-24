@@ -289,7 +289,8 @@ namespace NDE_Digital_Market.Controllers
 
 
 
-        [HttpPost("GetDatailsData"),Authorize(Roles = "admin")]
+        [HttpPost("GetDatailsData")]
+        [Authorize(Roles = "admin")]
         public IActionResult GetDatailsData([FromForm] int OrderMasterId)
         {
             SqlConnection con = new SqlConnection(_prominentConnection);
@@ -471,8 +472,32 @@ namespace NDE_Digital_Market.Controllers
 
                         List<int> DetailsIds = updateOrder.orderdetailsIds.Split(',').Select(int.Parse).ToList();
                         orderdetailsIdString = string.Join(",", DetailsIds);
-                        string masterStatusChangeQuery = "UPDATE OrderDetails SET Status = @value  WHERE OrderDetailId IN (" + orderdetailsIdString + ") ;";
 
+                        for(int i = 0; i < DetailsIds.Count; i++)
+                        {
+
+                            await con.OpenAsync();
+                            SqlCommand cmdcheck = new SqlCommand("CheckAvailableQuantity", con);
+                            cmdcheck.CommandType = CommandType.StoredProcedure;
+                            //cmd1.Parameters.AddWithValue("@orderMasterId", orderMasterId);
+                            cmdcheck.Parameters.AddWithValue("@OrderDetailId", DetailsIds[i]);
+
+                            SqlDataReader reader = cmdcheck.ExecuteReader();
+                            bool result = false;
+                            if (reader.Read())
+                            {
+                                result = Convert.ToBoolean(reader["Result"]);
+
+                            }
+                            await con.CloseAsync();
+                            if (!result)
+                            {
+                                return BadRequest(new { message = "You don't have enough quantity." });
+                            }
+
+                        }
+
+                        string masterStatusChangeQuery = "UPDATE OrderDetails SET Status = @value  WHERE OrderDetailId IN (" + orderdetailsIdString + ") ;";
 
 
                         await con.OpenAsync();
@@ -624,7 +649,8 @@ namespace NDE_Digital_Market.Controllers
 
 
 
-        [HttpPost,Authorize(Roles = "admin")]
+        [HttpPost]
+        [Authorize(Roles = "admin")]
         [Route("getReturnDataForAdmin/{pageNumber}/{pageSize}")]
 
         public IActionResult getReturnDataForAdmin([FromForm] string status, int pageNumber, int pageSize, [FromForm] string searchby, [FromForm] string searchValue, [FromForm] string? fromDate = null, [FromForm] string? toDate = null)
@@ -770,7 +796,8 @@ namespace NDE_Digital_Market.Controllers
 
         //------------ get return data for SELLER --------
 
-        [HttpPost, Authorize(Roles = "seller")]
+        [HttpPost]
+        [Authorize(Roles = "seller")]
         [Route("GetReturnData/{pageNumber}/{pageSize}")]
         public IActionResult getReturnData([FromForm] string status, int pageNumber, int pageSize)
         {

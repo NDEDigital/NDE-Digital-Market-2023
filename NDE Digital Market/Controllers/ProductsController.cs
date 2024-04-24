@@ -31,7 +31,8 @@ namespace NDE_Digital_Market.Controllers
         //===================================== Create User ================================
 
 
-        [HttpPut, Authorize(Roles = "seller")]
+        [HttpPut]
+        [Authorize(Roles = "seller")]
         [Route("UpdateProduct")]
 
         public IActionResult UpdateProduct([FromForm] GoodsQuantityModel product)
@@ -310,7 +311,8 @@ namespace NDE_Digital_Market.Controllers
 
             // ======================= DELETE Product ==================
 
-        [HttpDelete, Authorize(Roles = "seller")]
+        [HttpDelete]
+        [Authorize(Roles = "seller")]
         [Route("DeleteProduct")]
         public IActionResult DeleteProcuct(string sellerCode, int ProductId)
         {
