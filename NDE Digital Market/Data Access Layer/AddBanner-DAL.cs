@@ -63,10 +63,32 @@ using NDE_Digital_Market.SharedServices;namespace NDE_Digital_Market.Data_Acce
 
 
 
-        public async Task<List<ImageBanner>> GetAddBanner()
+        public async Task<List<ImageBanner>> GetAddBanner(bool? status)
         {
+            string query = string.Empty;
+            if (status is null)
+            {
+                query = @"    SELECT AB.BannerID, AB.BannerDescription, AB.BannerImage, CR.CompanyName
+                              FROM AdBanner AB
+                              join CompanyRegistration CR on CR.CompanyCode = Ab.CompanyCode
+                              where AB.IsBannerStatus is null;";
+            }
+            else if (status == true)
+            {
+                query = @"    SELECT AB.BannerID, AB.BannerDescription, AB.BannerImage, CR.CompanyName
+                              FROM AdBanner AB
+                              join CompanyRegistration CR on CR.CompanyCode = Ab.CompanyCode
+                              where AB.IsBannerStatus = 'true';";
+            }
+            else if(status == false)
+            {
+                query = @"    SELECT AB.BannerID, AB.BannerDescription, AB.BannerImage, CR.CompanyName
+                              FROM AdBanner AB
+                              join CompanyRegistration CR on CR.CompanyCode = Ab.CompanyCode
+                              where AB.IsBannerStatus = 'false';";
+            }
             List<ImageBanner> banners = new List<ImageBanner>();
-            SqlCommand command = new SqlCommand("SELECT BannerID, BannerDescription, BannerImage, CompanyCode FROM AdBanner", _connection);
+            SqlCommand command = new SqlCommand(query, _connection);
             command.CommandType = CommandType.Text;
             await _connection.OpenAsync();
             SqlDataReader reader = await command.ExecuteReaderAsync();
@@ -79,7 +101,7 @@ using NDE_Digital_Market.SharedServices;namespace NDE_Digital_Market.Data_Acce
                 banner.BannerID = reader.GetInt32(0);
                 banner.BannerDescription = reader["BannerDescription"].ToString();
                 banner.BannerImage = reader["BannerImage"].ToString();
-                banner.CompanyCode = reader["CompanyCode"].ToString();
+                banner.CompanyName = reader["CompanyName"].ToString();
 
 
                 banners.Add(banner);
