@@ -10,7 +10,7 @@ namespace NDE_Digital_Market.Services.AddBanner
     {
         Task<string> AddBanners(BannerDto bannerDto);
 
-        Task<List<ImageBanner>> GetAddBanner();
+        Task<List<ImageBanner>> GetAddBanner(bool? status);
 
         //Task<List<BannerDto>> GetBanners();
 

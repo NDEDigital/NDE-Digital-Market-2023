@@ -21,9 +21,9 @@ namespace NDE_Digital_Market.Services.AddBanner
             string res = await _AddBanner_DAL.AddBanners(bannerDto);
             return res;
         }
-        public async Task<List<ImageBanner>> GetAddBanner()
+        public async Task<List<ImageBanner>> GetAddBanner(bool? status)
         {
-            var Banner = await _AddBanner_DAL.GetAddBanner();
+            var Banner = await _AddBanner_DAL.GetAddBanner(status);
             return Banner;
         }
 

@@ -82,9 +82,9 @@ namespace NDE_Digital_Market.Controllers
 
 
         [HttpGet("GetAddBanner")]
-        public async Task<ActionResult<List<ImageBanner>>> GetAddBanner()
+        public async Task<ActionResult<List<ImageBanner>>> GetAddBanner(bool? status)
         {
-            var banner = await _AddBanner.GetAddBanner();
+            var banner = await _AddBanner.GetAddBanner(status);
             return banner;
         }
 
