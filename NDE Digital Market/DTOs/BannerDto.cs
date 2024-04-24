@@ -18,6 +18,7 @@
         public DateTime? EndDate { get; set; }
         public bool? IsPayment { get; set; }
         public string? PaymentRemarks { get; set; }
+        public bool? IsBannerStatus { get; set; }
 
     }
 }
