@@ -95,6 +95,12 @@ namespace NDE_Digital_Market.Controllers
             return banner;
         }
 
+        [HttpGet("GetBannerForShowingInHomePage")]
+        public async Task<ActionResult<List<ImageBanner>>> GetBannerForShowingInHomePage()
+        {
+            var banner = await _AddBanner.GetBannerForShowingInHomePage();
+            return banner;
+        }
 
 
 

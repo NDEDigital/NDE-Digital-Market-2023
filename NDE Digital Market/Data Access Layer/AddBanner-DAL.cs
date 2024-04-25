@@ -203,7 +203,32 @@ namespace NDE_Digital_Market.Data_Access_Layer
             return banners;
         }
 
+        public async Task<List<ImageBanner>> GetBannerForShowingInHomePage()
+        {
+            string query = @"SELECT BannerImage 
+                            FROM AdBanner 
+                            WHERE IsBannerStatus = 1 
+                              AND IsActive = 1 
+                              AND EndDate < GETDATE();";
 
+            List<ImageBanner> banners = new List<ImageBanner>();
+            SqlCommand command = new SqlCommand(query, _connection);
+            command.CommandType = CommandType.Text;
+            await _connection.OpenAsync();
+            SqlDataReader reader = await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                ImageBanner banner = new ImageBanner();
+                //banner.UserId = reader.GetInt32(0);
+
+                banner.BannerImage = reader["BannerImage"].ToString();
+
+                banners.Add(banner);
+            }
+            _connection.Close();
+            return banners;
+        }
 
         //public async Task<ImageBanner> GetBannerById(int bannerId)
         //{
