@@ -123,7 +123,7 @@ namespace NDE_Digital_Market.Data_Access_Layer
 
         public async Task<List<ImageBanner>> GetAddBannerForSeller(string CompanyCode)
         {
-            string query = @"    SELECT AB.BannerID, AB.BannerDescription, AB.BannerImage, CR.CompanyName, AB.AddedDate
+            string query = @"    SELECT AB.BannerID, AB.BannerDescription, AB.BannerImage, CR.CompanyName, AB.AddedDate , AB.IsBannerStatus, AB. IsActive
                                   FROM AdBanner AB
                                   join CompanyRegistration CR on CR.CompanyCode = Ab.CompanyCode
                                   where AB.CompanyCode = @CompanyCode;";
@@ -144,6 +144,9 @@ namespace NDE_Digital_Market.Data_Access_Layer
                 banner.BannerDescription = reader["BannerDescription"].ToString();
                 banner.BannerImage = reader["BannerImage"].ToString();
                 banner.CompanyName = reader["CompanyName"].ToString();
+
+                banner.IsBannerStatus = reader.IsDBNull(reader.GetOrdinal("IsBannerStatus")) ? (bool?)null : reader.GetBoolean(reader.GetOrdinal("IsBannerStatus"));
+                banner.IsActive = reader.GetBoolean(reader.GetOrdinal("IsActive"));
 
                 if (!(reader["AddedDate"] is DBNull))
                 {
