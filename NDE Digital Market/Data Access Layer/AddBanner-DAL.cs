@@ -161,21 +161,21 @@ namespace NDE_Digital_Market.Data_Access_Layer
             string query = string.Empty;
             if (status is null)
             {
-                query = @"    SELECT AB.BannerID, AB.BannerDescription, AB.BannerImage, CR.CompanyName
-                              FROM AdBanner AB
-                              join CompanyRegistration CR on CR.CompanyCode = Ab.CompanyCode
-                              where AB.IsBannerStatus is null;";
+                query = @"SELECT AB.BannerID, AB.BannerDescription, AB.BannerImage, CR.CompanyName, AB.StartDate, AB.EndDate, AB.AddedDate
+                        FROM AdBanner AB
+                        join CompanyRegistration CR on CR.CompanyCode = Ab.CompanyCode
+                        where AB.IsBannerStatus is null;";
             }
             else if (status == true)
             {
-                query = @"    SELECT AB.BannerID, AB.BannerDescription, AB.BannerImage, CR.CompanyName
+                query = @"    SELECT AB.BannerID, AB.BannerDescription, AB.BannerImage, CR.CompanyName, AB.StartDate, AB.EndDate, AB.AddedDate
                               FROM AdBanner AB
                               join CompanyRegistration CR on CR.CompanyCode = Ab.CompanyCode
                               where AB.IsBannerStatus = 'true';";
             }
             else if (status == false)
             {
-                query = @"    SELECT AB.BannerID, AB.BannerDescription, AB.BannerImage, CR.CompanyName
+                query = @"    SELECT AB.BannerID, AB.BannerDescription, AB.BannerImage, CR.CompanyName, AB.StartDate, AB.EndDate, AB.AddedDate
                               FROM AdBanner AB
                               join CompanyRegistration CR on CR.CompanyCode = Ab.CompanyCode
                               where AB.IsBannerStatus = 'false';";
@@ -196,6 +196,36 @@ namespace NDE_Digital_Market.Data_Access_Layer
                 banner.BannerImage = reader["BannerImage"].ToString();
                 banner.CompanyName = reader["CompanyName"].ToString();
 
+                //banner.StartDate =Convert.ToDateTime(reader["StartDate"]);
+                //banner.EndDate =Convert.ToDateTime(reader["EndDate"]);
+
+                if (!reader.IsDBNull(reader.GetOrdinal("AddedDate")))
+                {
+                    banner.AddedDate = Convert.ToDateTime(reader["AddedDate"]);
+                }
+                else
+                {
+                    // Handle the case when StartDate is DBNull
+                    banner.AddedDate = null;
+                }
+                if (!reader.IsDBNull(reader.GetOrdinal("StartDate")))
+                {
+                    banner.StartDate = Convert.ToDateTime(reader["StartDate"]);
+                }
+                else
+                {
+                    // Handle the case when StartDate is DBNull
+                    banner.StartDate = null;
+                }
+                if (!reader.IsDBNull(reader.GetOrdinal("EndDate")))
+                {
+                    banner.EndDate = Convert.ToDateTime(reader["EndDate"]);
+                }
+                else
+                {
+                    // Handle the case when StartDate is DBNull
+                    banner.EndDate = null;
+                }
 
                 banners.Add(banner);
             }
@@ -203,7 +233,32 @@ namespace NDE_Digital_Market.Data_Access_Layer
             return banners;
         }
 
+        public async Task<List<ImageBanner>> GetBannerForShowingInHomePage()
+        {
+            string query = @"SELECT BannerImage 
+                            FROM AdBanner 
+                            WHERE IsBannerStatus = 1 
+                              AND IsActive = 1 
+                              AND EndDate < GETDATE();";
 
+            List<ImageBanner> banners = new List<ImageBanner>();
+            SqlCommand command = new SqlCommand(query, _connection);
+            command.CommandType = CommandType.Text;
+            await _connection.OpenAsync();
+            SqlDataReader reader = await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                ImageBanner banner = new ImageBanner();
+                //banner.UserId = reader.GetInt32(0);
+
+                banner.BannerImage = reader["BannerImage"].ToString();
+
+                banners.Add(banner);
+            }
+            _connection.Close();
+            return banners;
+        }
 
         //public async Task<ImageBanner> GetBannerById(int bannerId)
         //{
