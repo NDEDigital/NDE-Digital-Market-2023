@@ -96,10 +96,12 @@ namespace NDE_Digital_Market.Controllers
         {
             if (banner == null || banner.BannerID <= 0)
             {
-                return BadRequest("Invalid banner data.");
+                return BadRequest(new
+                {
+                    Message = "Invalid banner data."
+                });
             }
 
-            // Corrected SQL query with 'SET'
             string query = @"UPDATE AdBanner 
                      SET IsActive = @IsActive,
                          UpdatedDate = @UpdatedDate,
@@ -112,6 +114,8 @@ namespace NDE_Digital_Market.Controllers
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
+                await connection.OpenAsync();
+
                 using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
                     cmd.Parameters.AddWithValue("@BannerID", banner.BannerID);
@@ -123,13 +127,25 @@ namespace NDE_Digital_Market.Controllers
                     cmd.Parameters.AddWithValue("@EndDate", banner.EndDate ?? (object)DBNull.Value);
                     cmd.Parameters.AddWithValue("@IsBannerStatus", banner.IsBannerStatus ?? (object)DBNull.Value);
 
-                    await connection.OpenAsync();
-                    await cmd.ExecuteNonQueryAsync();
+                    var result = await cmd.ExecuteNonQueryAsync();
+                    if (result > 0)  
+                    {
+                        return Ok(new
+                        {
+                            Message = "Banner updated successfully."
+                        });
+                    }
+                    else
+                    {
+                        return BadRequest(new
+                        {
+                            Message = "Failed to update banner."
+                        });
+                    }
                 }
             }
-
-            return Ok("Banner updated successfully.");
         }
+
 
 
 
