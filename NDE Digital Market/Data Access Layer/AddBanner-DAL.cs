@@ -161,32 +161,11 @@ namespace NDE_Digital_Market.Data_Access_Layer
 
         public async Task<List<ImageBanner>> GetAddBannerForAdmin(bool? status)
         {
-            string query = string.Empty;
-            if (status is null)
-            {
-                query = @"SELECT AB.BannerID, AB.BannerDescription, AB.BannerImage, CR.CompanyName, AB.StartDate, AB.EndDate, AB.AddedDate
-                        FROM AdBanner AB
-                        join CompanyRegistration CR on CR.CompanyCode = Ab.CompanyCode
-                        where AB.IsBannerStatus is null;";
-            }
-            else if (status == true)
-            {
-                query = @"    SELECT AB.BannerID, AB.BannerDescription, AB.BannerImage, CR.CompanyName, AB.StartDate, AB.EndDate, AB.AddedDate
-                              FROM AdBanner AB
-                              join CompanyRegistration CR on CR.CompanyCode = Ab.CompanyCode
-                              where AB.IsBannerStatus = 'true' AND StartDate <= GETDATE()
-							  and EndDate >= GETDATE();";
-            }
-            else if (status == false)
-            {
-                query = @"    SELECT AB.BannerID, AB.BannerDescription, AB.BannerImage, CR.CompanyName, AB.StartDate, AB.EndDate, AB.AddedDate
-                              FROM AdBanner AB
-                              join CompanyRegistration CR on CR.CompanyCode = Ab.CompanyCode
-                              where AB.IsBannerStatus = 'false';";
-            }
+            string query = @"GetAddBannerForAdmin";
             List<ImageBanner> banners = new List<ImageBanner>();
             SqlCommand command = new SqlCommand(query, _connection);
-            command.CommandType = CommandType.Text;
+            command.Parameters.AddWithValue("@Status", status);
+            command.CommandType = CommandType.StoredProcedure;
             await _connection.OpenAsync();
             SqlDataReader reader = await command.ExecuteReaderAsync();
 
