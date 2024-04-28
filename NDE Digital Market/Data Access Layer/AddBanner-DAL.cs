@@ -174,7 +174,8 @@ namespace NDE_Digital_Market.Data_Access_Layer
                 query = @"    SELECT AB.BannerID, AB.BannerDescription, AB.BannerImage, CR.CompanyName, AB.StartDate, AB.EndDate, AB.AddedDate
                               FROM AdBanner AB
                               join CompanyRegistration CR on CR.CompanyCode = Ab.CompanyCode
-                              where AB.IsBannerStatus = 'true';";
+                              where AB.IsBannerStatus = 'true' AND StartDate <= GETDATE()
+							  and EndDate >= GETDATE();";
             }
             else if (status == false)
             {
