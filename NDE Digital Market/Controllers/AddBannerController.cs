@@ -109,6 +109,15 @@ namespace NDE_Digital_Market.Controllers
 
 
 
+        //[HttpPut("UpdateBanners")]
+        //public async Task<IActionResult> UpdateBanners([FromForm] ImageBanner banner)
+        //{
+        //    var upd = await _AddBanner. UpdateBanners(banner);
+        //    return Ok(new { message = upd });
+        //}
+
+
+
 
 
 

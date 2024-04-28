@@ -19,8 +19,9 @@ namespace NDE_Digital_Market.Services.AddBanner
 
         Task<string> UpdateBanner(BannerDto Banner);
 
-
+        //Task<int> UpdateBanners(ImageBanner banner);
 
         Task<bool> DeleteBanner(int bannerId);
+        
     }
 }

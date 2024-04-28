@@ -410,5 +410,26 @@ namespace NDE_Digital_Market.Data_Access_Layer
 
 
 
+        //public async Task<int> UpdateBanners(ImageBanner banner)
+        //{
+        //    string query = @"UPDATE AdBanner 
+        //             SET BannerDescription = @BannerDescription, 
+        //                 BannerImage = @BannerImage 
+        //             WHERE BannerID = @BannerID";
+
+        //    SqlCommand command = new SqlCommand(query, _connection);
+        //    command.CommandType = CommandType.Text;
+        //    command.Parameters.AddWithValue("@BannerID", banner.BannerID);
+        //    command.Parameters.AddWithValue("@BannerDescription", (object)banner.BannerDescription ?? DBNull.Value);
+        //    command.Parameters.AddWithValue("@BannerImage", (object)banner.BannerImage ?? DBNull.Value);
+
+        //    await _connection.OpenAsync();
+        //    int rowsAffected = await command.ExecuteNonQueryAsync();
+        //    _connection.Close();
+
+        //    return rowsAffected;
+        //}
+
+
     }
 }

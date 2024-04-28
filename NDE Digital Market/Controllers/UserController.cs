@@ -455,7 +455,7 @@ namespace NDE_Digital_Market.Controllers
             var cookieOptions2 = new CookieOptions
             {
                 HttpOnly = true,
-                SameSite = SameSiteMode.Strict,
+                SameSite = SameSiteMode.None,
                 Secure = true,
                 Expires = DateTime.UtcNow.AddDays(3)
             };
