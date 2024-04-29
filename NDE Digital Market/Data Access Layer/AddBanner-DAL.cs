@@ -144,8 +144,10 @@ namespace NDE_Digital_Market.Data_Access_Layer
                 banner.BannerDescription = reader["BannerDescription"].ToString();
                 banner.BannerImage = reader["BannerImage"].ToString();
                 banner.CompanyName = reader["CompanyName"].ToString();
+
                 banner.IsBannerStatus = reader.IsDBNull(reader.GetOrdinal("IsBannerStatus")) ? (bool?)null : reader.GetBoolean(reader.GetOrdinal("IsBannerStatus"));
                 banner.IsActive = reader.GetBoolean(reader.GetOrdinal("IsActive"));
+
                 if (!(reader["AddedDate"] is DBNull))
                 {
                     banner.AddedDate = reader.GetDateTime(4);
