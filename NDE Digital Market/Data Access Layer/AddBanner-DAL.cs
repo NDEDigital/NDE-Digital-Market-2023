@@ -363,49 +363,110 @@ namespace NDE_Digital_Market.Data_Access_Layer
         //    }
         //}
 
-        public async Task<string> UpdateBanner(BannerDto banner)
-        {
-            string bannerImage = CommonServices.UploadFiles(_folderName, _fileName, banner.BannerImageFile);
+        //public async Task<string> UpdateBanner(BannerDto banner)
+        //{
+        //    string bannerImage = CommonServices.UploadFiles(_folderName, _fileName, banner.BannerImageFile);
 
-            string query = @"UPDATE AdBanner 
-                     SET UserId = @UserId,
-                         IsActive = @IsActive,
+        //    string query = @"UPDATE AdBanner 
+        //             SET UserId = @UserId,
+        //                 IsActive = @IsActive,
+        //                 UpdatedDate = @UpdatedDate,
+        //                 UpdatedBy = @UpdatedBy,
+        //                 UpdatedPC = @UpdatedPC,
+        //                 CompanyCode = @CompanyCode,
+        //                 BannerDescription = @BannerDescription,
+        //                 BannerImage = @BannerImage,
+        //                 StartDate = @StartDate,
+        //                 EndDate = @EndDate,
+        //                 IsPayment = @IsPayment,
+        //                 PaymentRemarks = @PaymentRemarks
+        //             WHERE BannerID = @BannerID;";
+
+        //    using (SqlCommand cmd = new SqlCommand(query, _connection))
+        //    {
+        //        cmd.CommandType = CommandType.Text;
+        //        cmd.Parameters.AddWithValue("@BannerID", banner.BannerID );
+        //        cmd.Parameters.AddWithValue("@UserId", banner.UserId ?? (object)DBNull.Value);
+        //        cmd.Parameters.AddWithValue("@IsActive", banner.IsActive ?? (object)DBNull.Value);
+        //        cmd.Parameters.AddWithValue("@UpdatedDate", DateTime.Now);
+        //        cmd.Parameters.AddWithValue("@UpdatedBy", banner.UpdatedBy ?? (object)DBNull.Value);
+        //        cmd.Parameters.AddWithValue("@UpdatedPC", banner.UpdatedPC ?? (object)DBNull.Value);
+        //        cmd.Parameters.AddWithValue("@CompanyCode", banner.CompanyCode ?? (object)DBNull.Value);
+        //        cmd.Parameters.AddWithValue("@BannerDescription", banner.BannerDescription ?? (object)DBNull.Value);
+        //        cmd.Parameters.AddWithValue("@BannerImage", bannerImage ?? (object)DBNull.Value);
+        //        cmd.Parameters.AddWithValue("@StartDate", banner.StartDate ?? (object)DBNull.Value);
+        //        cmd.Parameters.AddWithValue("@EndDate", banner.EndDate ?? (object)DBNull.Value);
+        //        cmd.Parameters.AddWithValue("@IsPayment", banner.IsPayment ?? (object)DBNull.Value);
+        //        cmd.Parameters.AddWithValue("@PaymentRemarks", banner.PaymentRemarks ?? (object)DBNull.Value);
+
+        //        await _connection.OpenAsync();
+        //        await cmd.ExecuteNonQueryAsync();
+        //        await _connection.CloseAsync();
+        //    }
+
+        //    return "Banner Updated successfully!";
+        //}
+
+
+
+
+        public async Task<string> UpdateBanner(BannerDto banner)
+{
+    // Check if a new banner image file is provided
+    string bannerImage = banner.BannerImageFile != null ?
+        CommonServices.UploadFiles(_folderName, _fileName, banner.BannerImageFile) :
+        null;
+
+    string query = @"UPDATE AdBanner 
+                     SET UserId = COALESCE(@UserId, UserId),
+                         IsActive = COALESCE(@IsActive, IsActive),
                          UpdatedDate = @UpdatedDate,
-                         UpdatedBy = @UpdatedBy,
-                         UpdatedPC = @UpdatedPC,
-                         CompanyCode = @CompanyCode,
-                         BannerDescription = @BannerDescription,
-                         BannerImage = @BannerImage,
-                         StartDate = @StartDate,
-                         EndDate = @EndDate,
-                         IsPayment = @IsPayment,
-                         PaymentRemarks = @PaymentRemarks
+                         UpdatedBy = COALESCE(@UpdatedBy, UpdatedBy),
+                         UpdatedPC = COALESCE(@UpdatedPC, UpdatedPC),
+                         CompanyCode = COALESCE(@CompanyCode, CompanyCode),
+                         BannerDescription = COALESCE(@BannerDescription, BannerDescription),
+                         BannerImage = COALESCE(@BannerImage, BannerImage),
+                         StartDate = COALESCE(@StartDate, StartDate),
+                         EndDate = COALESCE(@EndDate, EndDate),
+                         IsPayment = COALESCE(@IsPayment, IsPayment),
+                         PaymentRemarks = COALESCE(@PaymentRemarks, PaymentRemarks)
                      WHERE BannerID = @BannerID;";
 
-            using (SqlCommand cmd = new SqlCommand(query, _connection))
-            {
-                cmd.CommandType = CommandType.Text;
-                cmd.Parameters.AddWithValue("@BannerID", banner.BannerID );
-                cmd.Parameters.AddWithValue("@UserId", banner.UserId ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@IsActive", banner.IsActive ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@UpdatedDate", DateTime.Now);
-                cmd.Parameters.AddWithValue("@UpdatedBy", banner.UpdatedBy ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@UpdatedPC", banner.UpdatedPC ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@CompanyCode", banner.CompanyCode ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@BannerDescription", banner.BannerDescription ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@BannerImage", bannerImage ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@StartDate", banner.StartDate ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@EndDate", banner.EndDate ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@IsPayment", banner.IsPayment ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@PaymentRemarks", banner.PaymentRemarks ?? (object)DBNull.Value);
+    using (SqlCommand cmd = new SqlCommand(query, _connection))
+    {
+        cmd.CommandType = CommandType.Text;
+        cmd.Parameters.AddWithValue("@BannerID", banner.BannerID);
+        cmd.Parameters.AddWithValue("@UserId", banner.UserId ?? (object)DBNull.Value);
+        cmd.Parameters.AddWithValue("@IsActive", banner.IsActive ?? (object)DBNull.Value);
+        cmd.Parameters.AddWithValue("@UpdatedDate", DateTime.Now);
+        cmd.Parameters.AddWithValue("@UpdatedBy", banner.UpdatedBy ?? (object)DBNull.Value);
+        cmd.Parameters.AddWithValue("@UpdatedPC", banner.UpdatedPC ?? (object)DBNull.Value);
+        cmd.Parameters.AddWithValue("@CompanyCode", banner.CompanyCode ?? (object)DBNull.Value);
+        cmd.Parameters.AddWithValue("@BannerDescription", banner.BannerDescription ?? (object)DBNull.Value);
+        cmd.Parameters.AddWithValue("@BannerImage", bannerImage ?? (object)DBNull.Value);
+        cmd.Parameters.AddWithValue("@StartDate", banner.StartDate ?? (object)DBNull.Value);
+        cmd.Parameters.AddWithValue("@EndDate", banner.EndDate ?? (object)DBNull.Value);
+        cmd.Parameters.AddWithValue("@IsPayment", banner.IsPayment ?? (object)DBNull.Value);
+        cmd.Parameters.AddWithValue("@PaymentRemarks", banner.PaymentRemarks ?? (object)DBNull.Value);
 
-                await _connection.OpenAsync();
-                await cmd.ExecuteNonQueryAsync();
-                await _connection.CloseAsync();
-            }
+        await _connection.OpenAsync();
+        await cmd.ExecuteNonQueryAsync();
+        await _connection.CloseAsync();
+    }
 
-            return "Banner Updated successfully!";
-        }
+    return "Banner Updated successfully!";
+}
+
+
+
+
+
+
+
+
+
+
+
 
 
 
