@@ -20,6 +20,7 @@ namespace NDE_Digital_Market.Controllers
             con = new SqlConnection(commonServices.HealthCareConnection);
 
         }
+
         [HttpGet]
         [Route("GetUnitList")]
         public async Task<List<UnitModel>> GetUnitListAsync(bool? isActive)
