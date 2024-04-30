@@ -55,8 +55,8 @@ namespace NDE_Digital_Market.Controllers
                             {
                                 modelObj.BrandId = Convert.ToInt32(reader["BrandId"]);
                                 modelObj.BrandName = reader["BrandName"].ToString();
-                                modelObj.Description = reader["Description"].ToString();
-                                modelObj.ShortName = reader["ShortName"].ToString();
+                                modelObj.Description = reader["Description"].ToString() ?? "";
+                                modelObj.ShortName = reader["ShortName"].ToString() ?? "";
                                 modelObj.IsActive = Convert.ToBoolean(reader["IsActive"]);
                             }
 
@@ -132,22 +132,56 @@ namespace NDE_Digital_Market.Controllers
 
             try
             {
+                string query = "UPDATE Brands SET ";
+                List<string> setClauses = new List<string>();
+
+                if (model.BrandName != null)
+                {
+                    setClauses.Add("BrandName = @BrandName");
+                }
+
+                if (model.ShortName != null)
+                {
+                    setClauses.Add("ShortName = @short");
+                }
+
+                if (model.Description != null)
+                {
+                    setClauses.Add("Description = @Description");
+                }
+
+                // Add other parameters here...
+
+                setClauses.Add("UpdatedBy = @UpdatedBy");
+                setClauses.Add("UpdatedPC = @UpdatedPC");
+                setClauses.Add("UpdatedDate = @DateUpdated");
+
+                query += string.Join(", ", setClauses);
+                query += " WHERE BrandId = @BrandId;";
+
                 await con.OpenAsync();
-                string query = @"UPDATE Brands 
-                         SET BrandName = @BrandName,
-                             ShortName = @short,
-                             Description = @Description, 
-                             UpdatedBy = @UpdatedBy,
-                             UpdatedPC = @UpdatedPC, 
-                             UpdatedDate = @DateUpdated
-                         WHERE BrandId = @BrandId;";
 
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 {
                     cmd.Parameters.AddWithValue("@BrandId", model.BrandId);
-                    cmd.Parameters.AddWithValue("@BrandName", model.BrandName);
-                    cmd.Parameters.AddWithValue("@short", model.ShortName);
-                    cmd.Parameters.AddWithValue("@Description", model.Description);
+
+                    if (model.BrandName != null)
+                    {
+                        cmd.Parameters.AddWithValue("@BrandName", model.BrandName);
+                    }
+
+                    if (model.ShortName != null)
+                    {
+                        cmd.Parameters.AddWithValue("@short", model.ShortName);
+                    }
+
+                    if (model.Description != null)
+                    {
+                        cmd.Parameters.AddWithValue("@Description", model.Description);
+                    }
+
+                    // Add other parameters here...
+
                     cmd.Parameters.AddWithValue("@UpdatedBy", model.UpdatedBy);
                     cmd.Parameters.AddWithValue("@UpdatedPC", model.UpdatedPC);
                     cmd.Parameters.AddWithValue("@DateUpdated", DateTime.UtcNow);
