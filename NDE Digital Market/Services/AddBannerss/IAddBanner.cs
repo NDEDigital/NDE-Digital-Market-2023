@@ -12,6 +12,7 @@ namespace NDE_Digital_Market.Services.AddBanner
 
         Task<List<ImageBanner>> GetAddBannerForSeller(string ComapnayCode);
         Task<List<ImageBanner>> GetAddBannerForAdmin(bool? status);
+        Task<List<ImageBanner>> GetBannerForShowingInHomePage();
 
         //Task<List<BannerDto>> GetBanners();
 

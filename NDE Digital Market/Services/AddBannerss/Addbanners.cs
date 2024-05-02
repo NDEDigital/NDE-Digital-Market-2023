@@ -32,6 +32,12 @@ namespace NDE_Digital_Market.Services.AddBanner
             return Banner;
         }
 
+        public async Task<List<ImageBanner>> GetBannerForShowingInHomePage()
+        {
+            var Banner = await _AddBanner_DAL.GetBannerForShowingInHomePage();
+            return Banner;
+        }
+
 
 
         //public async Task<List<BannerDto>> GetBanners()

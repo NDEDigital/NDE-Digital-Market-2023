@@ -285,16 +285,16 @@ namespace NDE_Digital_Market.Controllers
                     var cookieOptions = new CookieOptions
                     {
                         HttpOnly = true,
-                        SameSite = SameSiteMode.Strict,
-                        Secure = false,
+                        SameSite = SameSiteMode.None,
+                        Secure = true,
                         Expires = DateTime.UtcNow.AddMinutes(10)
 
                     };
                     var cookieOptions2 = new CookieOptions
                     {
                         HttpOnly = true,
-                        SameSite = SameSiteMode.Strict,
-                        Secure = false,
+                        SameSite = SameSiteMode.None,
+                        Secure = true,
                         Expires = DateTime.UtcNow.AddDays(3)
 
                     };
