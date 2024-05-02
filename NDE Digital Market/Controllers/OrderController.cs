@@ -90,11 +90,30 @@ namespace NDE_Digital_Market.Controllers
                     {
                         throw new Exception((detailsResult as BadRequestObjectResult).Value.ToString());
                     }
+
                 }
                 else
                 {
                     return BadRequest(new { message = "Order Master data isn't Inserted Successfully." });
                 }
+
+
+                for(int i = 0; i < orderdata.OrderDetailsList.Count; i++)
+                {
+                    string query = "DELETE FROM AddToCart WHERE CompanyCode = @CompanyCode AND ProductID = @ProductId AND BuyerUserID = @UserId;";
+                    SqlCommand deleteAddTocart = new SqlCommand(query, con, transaction);
+                    deleteAddTocart.CommandType = CommandType.Text;
+                    deleteAddTocart.Parameters.Clear();
+
+                    deleteAddTocart.Parameters.AddWithValue("@CompanyCode", orderdata.OrderDetailsList[i].CompanyCode);
+                    deleteAddTocart.Parameters.AddWithValue("@UserId", orderdata.UserId);
+                    deleteAddTocart.Parameters.AddWithValue("@ProductId", orderdata.OrderDetailsList[i].ProductId);
+
+                    await deleteAddTocart.ExecuteNonQueryAsync();
+                }
+
+
+
                 transaction.Commit();
                 return Ok(new { message = "Order data Inserted Successfully." });
             }
