@@ -91,6 +91,7 @@ namespace NDE_Digital_Market.Controllers
                         throw new Exception((detailsResult as BadRequestObjectResult).Value.ToString());
                     }
                 }
+
                 else
                 {
                     return BadRequest(new { message = "Order Master data isn't Inserted Successfully." });
