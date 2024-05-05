@@ -6,6 +6,7 @@
         public string? ProductName { get; set; }
         public int? ProductGroupID { get; set; }
         public string? Specification { get; set; }
+        public int? BrandId { get; set; }
         public int? UnitId { get; set; }
         public IFormFile? ImageFile { get; set; }
         public string? ExistingImageFileName { get; set; }

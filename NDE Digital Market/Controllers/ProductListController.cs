@@ -112,14 +112,15 @@ namespace NDE_Digital_Market.Controllers
                     //string ProductGroupsCode = systemCode.Split('%')[1];
 
                     //SP END
-                    string query = "INSERT INTO ProductList (ProductId, ProductName, ProductGroupID,Specification,UnitId, ImagePath, ProductSubName, IsActive, AddedDate, AddedBy, AddedPC)" +
-                        "VALUES (@ProductId, @ProductName, @ProductGroupID, @Specification, @UnitId, @ImagePath, @ProductSubName, @IsActive, @AddedDate, @AddedBy, @AddedPC)";
+                    string query = "INSERT INTO ProductList (ProductId, ProductName, ProductGroupID,Specification, BrandId, UnitId, ImagePath, ProductSubName, IsActive, AddedDate, AddedBy, AddedPC)" +
+                        "VALUES (@ProductId, @ProductName, @ProductGroupID, @Specification, @BrandId, @UnitId, @ImagePath, @ProductSubName, @IsActive, @AddedDate, @AddedBy, @AddedPC)";
                     SqlCommand cmd = new SqlCommand(query, con);
                     cmd.CommandType = CommandType.Text;
                     cmd.Parameters.AddWithValue("@ProductId", ProductID);
                     cmd.Parameters.AddWithValue("@ProductName", productListDto.ProductName);
                     cmd.Parameters.AddWithValue("@ProductGroupID", productListDto.ProductGroupID);
                     cmd.Parameters.AddWithValue("@Specification", productListDto.Specification);
+                    cmd.Parameters.AddWithValue("@BrandId", productListDto.BrandId);
                     cmd.Parameters.AddWithValue("@UnitId", productListDto.UnitId);
                     cmd.Parameters.AddWithValue("@ImagePath", ImagePath);
                     cmd.Parameters.AddWithValue("@ProductSubName", productListDto.ProductSubName ?? string.Empty);
@@ -139,7 +140,8 @@ namespace NDE_Digital_Market.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+
+                return BadRequest(new { message = "Product didn't added Successfully." });
             }
 
         }
@@ -176,6 +178,7 @@ namespace NDE_Digital_Market.Controllers
                                     cmd.Parameters.AddWithValue("@ProductName", productListDto.ProductName);
                                     cmd.Parameters.AddWithValue("@ProductGroupID", productListDto.ProductGroupID);
                                     cmd.Parameters.AddWithValue("@Specification", productListDto.Specification);
+                                    cmd.Parameters.AddWithValue("@BrandId", productListDto.BrandId);
                                     cmd.Parameters.AddWithValue("@UnitId", productListDto.UnitId);
 
                                     cmd.Parameters.AddWithValue("@ImagePath", ImagePath);
@@ -198,6 +201,7 @@ namespace NDE_Digital_Market.Controllers
                                 cmdd.Parameters.AddWithValue("@ProductGroupID", productListDto.ProductGroupID);
                                 cmdd.Parameters.AddWithValue("@Specification", productListDto.Specification);
                                 cmdd.Parameters.AddWithValue("@UnitId", productListDto.UnitId);
+                                cmdd.Parameters.AddWithValue("@BrandId", productListDto.BrandId);
                                 cmdd.Parameters.AddWithValue("@ProductSubName", productListDto.ProductSubName ?? string.Empty);
                                 cmdd.Parameters.AddWithValue("@UpdatedBy", productListDto.UpdatedBy ?? string.Empty);
                                 cmdd.Parameters.AddWithValue("@UpdatedDate", DateTime.Now);
@@ -209,7 +213,7 @@ namespace NDE_Digital_Market.Controllers
                             }
 
                             transaction.Commit();
-                            return Ok(new { message = "Product Group updated successfully." });
+                            return Ok(new { message = "Product updated successfully." });
                         }
                         catch (Exception ex)
                         {
@@ -224,12 +228,12 @@ namespace NDE_Digital_Market.Controllers
                 }
                 else
                 {
-                    return NotFound(new { message = "Product Group not found!" });
+                    return NotFound(new { message = "Product not found!" });
                 }
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = $"Error updating product group: {ex.Message}" });
+                return BadRequest(new { message = $"Error updating product: {ex.Message}" });
             }
         }
 
@@ -298,11 +302,21 @@ namespace NDE_Digital_Market.Controllers
                 string query = "";
                 if (status != null)
                 {
-                    query = @"SELECT ProductId,PL.ProductName,PL.ProductGroupID,PG.ProductGroupName,PL.Specification,PL.UnitId,U.Name Unit,PL.IsActive,PL.AddedDate,PL.UpdatedDate,PL.AddedBy,PL.UpdatedBy,PL.AddedPC,PL.UpdatedPC,PL.ImagePath,PL.Status,ProductSubName FROM ProductList PL LEFT JOIN ProductGroups PG ON PL.ProductGroupID=PG.ProductGroupID LEFT JOIN Units U ON PL.UnitId = U.UnitId WHERE PL.IsActive= @IsActive ORDER BY ProductId  DESC;";
+                    query = @"  SELECT PL.ProductId,PL.ProductName,PL.ProductGroupID,PG.ProductGroupName,PL.Specification, PL.BrandId , B.BrandName,
+                                PL.UnitId,U.Name Unit,PL.IsActive,PL.AddedDate,PL.UpdatedDate,PL.AddedBy,PL.UpdatedBy,
+                                PL.AddedPC,PL.UpdatedPC,PL.ImagePath,PL.Status,ProductSubName FROM ProductList PL 
+                                LEFT JOIN ProductGroups PG ON PL.ProductGroupID=PG.ProductGroupID
+								LEFT JOIN Brands B ON PL.BrandId = B.BrandId
+                                LEFT JOIN Units U ON PL.UnitId = U.UnitId WHERE PL.IsActive= @IsActive ORDER BY PL.ProductId  DESC;";
                 }
                 else
                 {
-                    query = @"SELECT ProductId,PL.ProductName,PL.ProductGroupID,PG.ProductGroupName,PL.Specification,PL.UnitId,U.Name Unit,PL.IsActive,PL.AddedDate,PL.UpdatedDate,PL.AddedBy,PL.UpdatedBy,PL.AddedPC,PL.UpdatedPC,PL.ImagePath,PL.Status,ProductSubName FROM ProductList PL LEFT JOIN ProductGroups PG ON PL.ProductGroupID=PG.ProductGroupID LEFT JOIN Units U ON PL.UnitId = U.UnitId WHERE CONVERT(DATE, AddedDate) = CONVERT(DATE, GETDATE()) ORDER BY ProductId  DESC";
+                    query = @"SELECT PL.ProductId,PL.ProductName,PL.ProductGroupID,PG.ProductGroupName,PL.Specification, PL.BrandId , B.BrandName,
+                            PL.UnitId,U.Name Unit,PL.IsActive,PL.AddedDate,PL.UpdatedDate,PL.AddedBy,PL.UpdatedBy,
+                            PL.AddedPC,PL.UpdatedPC,PL.ImagePath,PL.Status,PL.ProductSubName FROM ProductList PL 
+                            LEFT JOIN ProductGroups PG ON PL.ProductGroupID=PG.ProductGroupID
+                            LEFT JOIN Brands B ON PL.BrandId = B.BrandId
+                            LEFT JOIN Units U ON PL.UnitId = U.UnitId WHERE CONVERT(DATE, PL.AddedDate) = CONVERT(DATE, GETDATE()) ORDER BY PL.ProductId  DESC";
                 }
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 {
@@ -318,6 +332,8 @@ namespace NDE_Digital_Market.Controllers
                             modelObj.ProductId = Convert.ToInt32(reader["ProductId"]);
                             modelObj.UnitId = Convert.ToInt32(reader["UnitId"]);
                             modelObj.Unit = reader["Unit"].ToString();
+                            modelObj.BrandId = reader["BrandId"] == DBNull.Value ? 0 : Convert.ToInt32(reader["BrandId"]);
+                            modelObj.BrandName = reader["BrandName"] == DBNull.Value ? String.Empty : reader["BrandName"].ToString();
                             modelObj.ProductGroupID = Convert.ToInt32(reader["ProductGroupID"]);
                             modelObj.ProductGroupName = reader["ProductGroupName"].ToString();
                             modelObj.ProductName = reader["ProductName"].ToString();

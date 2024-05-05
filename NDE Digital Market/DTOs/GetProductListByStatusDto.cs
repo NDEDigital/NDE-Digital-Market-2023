@@ -5,6 +5,8 @@
         public int? ProductId { get; set; }
         public int? UnitId { get; set; }
         public string? Unit { get; set; }
+        public int? BrandId { get; set; }
+        public string? BrandName { get; set; }
         public int? ProductGroupID { get; set; }
         public string? ProductGroupName { get; set; }
         public string? ProductName { get; set; }
