@@ -25,7 +25,14 @@ namespace NDE_Digital_Market.SharedServices
             _configuration = configuration;
             FilesPath = _configuration["FilesPaths:filepath"];
             //Filespath1 = _configuration["Filespaths:filepath" ];
-            HealthCareConnection = configuration.GetConnectionString("HealthCare");
+            HealthCareConnection = _configuration.GetConnectionString("HealthCare");
+
+        }
+
+
+        public string GetConnectionString()
+        {
+            return HealthCareConnection = _configuration.GetConnectionString("HealthCare");
         }
 
         public static string EncryptPassword(string clearText)
