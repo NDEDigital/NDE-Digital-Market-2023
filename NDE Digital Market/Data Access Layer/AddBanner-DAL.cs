@@ -232,12 +232,12 @@ namespace NDE_Digital_Market.Data_Access_Layer
 
         public async Task<List<ImageBanner>> GetBannerForShowingInHomePage()
         {
-            string query = @"  SELECT *
+            string query = @"SELECT *
                             FROM AdBanner 
                             WHERE IsBannerStatus = 1 
                               AND IsActive = 1 
-                              AND StartDate <= GETDATE()
-							  and EndDate >= GETDATE();";
+                              AND StartDate <= DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()), 0)
+							  and EndDate >= DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()), 0);";
 
             List<ImageBanner> banners = new List<ImageBanner>();
             SqlCommand command = new SqlCommand(query, _connection);

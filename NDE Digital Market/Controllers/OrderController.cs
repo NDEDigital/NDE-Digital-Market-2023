@@ -1047,17 +1047,19 @@ namespace NDE_Digital_Market.Controllers
                 if (status != null)
                 {
                     query = @"select OM.OrderMasterId, OM.OrderNo, OM.OrderDate, OM.TotalPrice, OD.OrderDetailId, OD.ProductId, PL.ProductName, OD.CompanyCode,
-                                  PL.ImagePath, OD.Qty, OD.Price, OD.Status  from OrderMaster OM
+                                  SPPO.ImagePath, OD.Qty, OD.Price, OD.Status  from OrderMaster OM
                                   join OrderDetails OD on OM.OrderMasterId = OD.OrderMasterId
                                   join ProductList PL on PL.ProductId = OD.ProductId
+                                  join SellerProductPriceAndOffer  SPPO on OD.ProductId = SPPO.ProductId and OD.CompanyCode = SPPO.CompanyCode
                                   where OM.UserId = @UserId and OD.Status = @Status ORDER BY OM.OrderMasterId DESC;";
                 }
                 else
                 {
                     query = @"select OM.OrderMasterId, OM.OrderNo, OM.OrderDate, OM.TotalPrice, OD.OrderDetailId, OD.ProductId, PL.ProductName, OD.CompanyCode,
-                                  PL.ImagePath, OD.Qty, OD.Price, OD.Status  from OrderMaster OM
+                                  SPPO.ImagePath, OD.Qty, OD.Price, OD.Status  from OrderMaster OM
                                   join OrderDetails OD on OM.OrderMasterId = OD.OrderMasterId
                                   join ProductList PL on PL.ProductId = OD.ProductId
+                                  join SellerProductPriceAndOffer  SPPO on OD.ProductId = SPPO.ProductId and OD.CompanyCode = SPPO.CompanyCode
                                   where OM.UserId = @UserId ORDER BY OM.OrderMasterId DESC;";
                 }
 
