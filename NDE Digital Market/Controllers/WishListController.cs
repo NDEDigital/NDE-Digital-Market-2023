@@ -86,7 +86,7 @@ namespace NDE_Digital_Market.Controllers
             {
                 if (UserId is not 0 || ProductId is not null || CompanyCode is not null)
                 {
-                    return Ok(await _wishlist.InsertWishList(UserId, ProductId, CompanyCode));
+                    return Ok(await _wishlist.DeleteWishList(UserId, ProductId, CompanyCode));
                 }
                 else
                 {
