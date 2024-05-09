@@ -14,6 +14,9 @@ namespace NDE_Digital_Market.Services.AddBanner
         Task<List<ImageBanner>> GetAddBannerForAdmin(bool? status);
         Task<List<ImageBanner>> GetBannerForShowingInHomePage();
 
+
+        Task<List<ImageBanner>> GetAddForShowingInHomePage();
+
         //Task<List<BannerDto>> GetBanners();
 
         //Task<ImageBanner> GetBannerById(int bannerId);

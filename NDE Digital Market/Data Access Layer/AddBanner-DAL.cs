@@ -236,6 +236,7 @@ namespace NDE_Digital_Market.Data_Access_Layer
                             FROM AdBanner 
                             WHERE IsBannerStatus = 1 
                               AND IsActive = 1 
+                              AND IsAds =0
                               AND StartDate <= DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()), 0)
 							  and EndDate >= DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()), 0);";
 
@@ -257,6 +258,44 @@ namespace NDE_Digital_Market.Data_Access_Layer
             _connection.Close();
             return banners;
         }
+
+
+
+
+        public async Task<List<ImageBanner>> GetAddForShowingInHomePage()
+        {
+            string query = @"SELECT *
+                            FROM AdBanner 
+                            WHERE IsBannerStatus = 1 
+                              AND IsActive = 1 
+                              AND IsAds =1
+                              AND StartDate <= DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()), 0)
+							  and EndDate >= DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()), 0);";
+
+            List<ImageBanner> banners = new List<ImageBanner>();
+            SqlCommand command = new SqlCommand(query, _connection);
+            command.CommandType = CommandType.Text;
+            await _connection.OpenAsync();
+            SqlDataReader reader = await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                ImageBanner banner = new ImageBanner();
+                //banner.UserId = reader.GetInt32(0);
+
+                banner.BannerImage = reader["BannerImage"].ToString();
+
+                banners.Add(banner);
+            }
+            _connection.Close();
+            return banners;
+        }
+
+
+
+
+
+
 
         //public async Task<ImageBanner> GetBannerById(int bannerId)
         //{
