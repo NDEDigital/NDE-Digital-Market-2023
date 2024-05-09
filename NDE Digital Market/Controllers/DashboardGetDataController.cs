@@ -35,16 +35,16 @@ namespace NDE_Digital_Market.Controllers
                         DECLARE @Status INT = @Status1;
                         DECLARE @UserId INT = @UserId1;
 
-                        IF @Status = 0
+                         IF @Status = 0
                         BEGIN
-                            SELECT P.UserId, P.MenuId, M.IsActive, M.MenuName 
+                            SELECT P.UserId, P.MenuId, M.IsActive, M.MenuName, M.NavigateUrl
                             FROM Permission P 
                             JOIN MenuList M ON P.MenuId = M.MenuId
                             WHERE P.UserId = @UserId AND M.IsActive = 1;
                         END
                         ELSE IF @Status = 1
                         BEGIN
-                            SELECT MenuId, MenuName
+                            SELECT MenuId, MenuName, NavigateUrl
                             FROM MenuList
                             WHERE IsAdmin != 1 AND IsActive = 1;
                         END
@@ -68,6 +68,8 @@ namespace NDE_Digital_Market.Controllers
                                     {
                                         MenuId = Convert.ToInt32(reader["MenuId"]),
                                         MenuName = reader["MenuName"].ToString(),
+                                        NavigateUrl = reader["NavigateUrl"].ToString(),
+
                                         // Add other properties if needed
                                     };
 
@@ -83,6 +85,8 @@ namespace NDE_Digital_Market.Controllers
                                         UserId = Convert.ToInt32(reader["UserId"]),
                                         MenuId = Convert.ToInt32(reader["MenuId"]),
                                         MenuName = reader["MenuName"].ToString(),
+
+                                        NavigateUrl = reader["NavigateUrl"].ToString(),
                                         // Add other properties if needed
                                     };
 
