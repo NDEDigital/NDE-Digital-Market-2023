@@ -32,15 +32,16 @@ namespace NDE_Digital_Market.Data_Access_Layer
 
             string bannerImage = CommonServices.UploadFiles(_folderName, _fileName, banner.BannerImageFile);
 
-            string query = @"INSERT INTO AdBanner (UserId, IsActive, AddedDate, AddedBy, UpdatedDate, UpdatedBy, AddedPC, UpdatedPC, CompanyCode, BannerDescription, BannerImage, StartDate, EndDate, IsPayment, PaymentRemarks)
-							 VALUES (@UserId, @IsActive, @AddedDate, @AddedBy, @UpdatedDate, @UpdatedBy, @AddedPC, @UpdatedPC, @CompanyCode, @BannerDescription, @BannerImage, @StartDate, @EndDate, @IsPayment, @PaymentRemarks);";
+            string query = @"INSERT INTO AdBanner (UserId, IsActive, IsAds, AddedDate, AddedBy, UpdatedDate, UpdatedBy, AddedPC, UpdatedPC, CompanyCode, BannerDescription, BannerImage, StartDate, EndDate, IsPayment, PaymentRemarks)
+							 VALUES (@UserId, @IsActive, @IsAds, @AddedDate, @AddedBy, @UpdatedDate, @UpdatedBy, @AddedPC, @UpdatedPC, @CompanyCode, @BannerDescription, @BannerImage, @StartDate, @EndDate, @IsPayment, @PaymentRemarks);";
 
 			using (SqlCommand cmd = new SqlCommand(query, _connection))
 			{
 				 cmd.CommandType = CommandType.Text;
 				cmd.Parameters.AddWithValue("@UserId", banner.UserId ?? (object)DBNull.Value);
 				cmd.Parameters.AddWithValue("@IsActive", banner.IsActive ?? (object)DBNull.Value);
-				cmd.Parameters.AddWithValue("@AddedDate", DateTime.Now);
+                cmd.Parameters.AddWithValue("@IsAds", banner.IsAds ??(object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@AddedDate", DateTime.Now);
 				cmd.Parameters.AddWithValue("@AddedBy", banner.AddedBy ?? (object)DBNull.Value);
 				cmd.Parameters.AddWithValue("@UpdatedDate", banner.UpdatedDate ?? (object)DBNull.Value);
 				cmd.Parameters.AddWithValue("@UpdatedBy", banner.UpdatedBy ?? (object)DBNull.Value);
@@ -123,10 +124,12 @@ namespace NDE_Digital_Market.Data_Access_Layer
 
         public async Task<List<ImageBanner>> GetAddBannerForSeller(string CompanyCode)
         {
-            string query = @"    SELECT AB.BannerID, AB.BannerDescription, AB.BannerImage, CR.CompanyName, AB.AddedDate , AB.IsBannerStatus, AB. IsActive
+            string query = @"    SELECT AB.BannerID, AB.BannerDescription, AB.BannerImage, CR.CompanyName, AB.AddedDate , AB.IsBannerStatus, AB. IsActive, AB. IsAds
                                   FROM AdBanner AB
-                                  join CompanyRegistration CR on CR.CompanyCode = Ab.CompanyCode
+                                  Left join CompanyRegistration CR on CR.CompanyCode = Ab.CompanyCode
                                   where AB.CompanyCode = @CompanyCode;";
+            
+            
 
             List<ImageBanner> banners = new List<ImageBanner>();
             SqlCommand command = new SqlCommand(query, _connection);
@@ -144,8 +147,8 @@ namespace NDE_Digital_Market.Data_Access_Layer
                 banner.BannerDescription = reader["BannerDescription"].ToString();
                 banner.BannerImage = reader["BannerImage"].ToString();
                 banner.CompanyName = reader["CompanyName"].ToString();
-
                 banner.IsBannerStatus = reader.IsDBNull(reader.GetOrdinal("IsBannerStatus")) ? (bool?)null : reader.GetBoolean(reader.GetOrdinal("IsBannerStatus"));
+                banner.IsAds = reader.IsDBNull(reader.GetOrdinal("IsAds")) ? (bool?)null : reader.GetBoolean(reader.GetOrdinal("IsAds"));
                 banner.IsActive = reader.GetBoolean(reader.GetOrdinal("IsActive"));
 
                 if (!(reader["AddedDate"] is DBNull))
@@ -179,8 +182,19 @@ namespace NDE_Digital_Market.Data_Access_Layer
                 banner.BannerImage = reader["BannerImage"].ToString();
                 banner.CompanyName = reader["CompanyName"].ToString();
 
+
                 //banner.StartDate =Convert.ToDateTime(reader["StartDate"]);
                 //banner.EndDate =Convert.ToDateTime(reader["EndDate"]);
+
+                if (!reader.IsDBNull(reader.GetOrdinal("IsAds")))
+                {
+                    banner.IsAds = reader.GetBoolean(reader.GetOrdinal("IsAds"));
+                }
+                else
+                {
+                    // Handle the case when IsAds is DBNull
+                    banner.IsAds = null;
+                }
 
                 if (!reader.IsDBNull(reader.GetOrdinal("AddedDate")))
                 {
@@ -513,6 +527,7 @@ namespace NDE_Digital_Market.Data_Access_Layer
             string query = @"UPDATE AdBanner 
          SET UserId = COALESCE(@UserId, UserId),
              IsActive = COALESCE(@IsActive, IsActive),
+             IsAds = COALESCE(@IsAds, IsAds),
              UpdatedDate = @UpdatedDate,
              UpdatedBy = COALESCE(@UpdatedBy, UpdatedBy),
              UpdatedPC = COALESCE(@UpdatedPC, UpdatedPC),
@@ -531,6 +546,7 @@ namespace NDE_Digital_Market.Data_Access_Layer
                 cmd.Parameters.AddWithValue("@BannerID", banner.BannerID);
                 cmd.Parameters.AddWithValue("@UserId", banner.UserId ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@IsActive", banner.IsActive ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@IsAds", banner.IsAds ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@UpdatedDate", DateTime.Now);
                 cmd.Parameters.AddWithValue("@UpdatedBy", banner.UpdatedBy ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@UpdatedPC", banner.UpdatedPC ?? (object)DBNull.Value);

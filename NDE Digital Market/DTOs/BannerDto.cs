@@ -5,6 +5,8 @@
         public int? BannerID { get; set; }
         public int? UserId { get; set; }
         public bool? IsActive { get; set; }
+
+        public bool? IsAds { get; set; }
         public DateTime? AddedDate { get; set; }
         public string? AddedBy { get; set; }
         public DateTime? UpdatedDate { get; set; }
