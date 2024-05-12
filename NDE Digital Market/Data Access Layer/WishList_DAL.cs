@@ -15,12 +15,81 @@ namespace NDE_Digital_Market.Data_Access_Layer
             _healthCareConnection = commonServices.HealthCareConnection;
         }
 
-        public async Task<List<WishListDTO>> GetWishList(int UserId)
-        {
-            List<WishListDTO> lst = new List<WishListDTO>();
+        //public async Task<List<WishListDTO>> GetWishList(int UserId)
+        //{
+        //    List<WishListDTO> lst = new List<WishListDTO>();
 
-            //try
-            //{
+        //    //try
+        //    //{
+        //        using (SqlConnection con = new SqlConnection(_healthCareConnection))
+        //        {
+        //            await con.OpenAsync();
+        //            string query = "getWishListForBuyer";
+
+        //            using (SqlCommand cmd = new SqlCommand(query, con))
+        //            {
+        //                cmd.CommandType = CommandType.StoredProcedure;
+
+        //                cmd.Parameters.AddWithValue("@UserId", UserId);
+        //                using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+        //                {
+        //                    while (await reader.ReadAsync())
+        //                    {
+        //                        WishListDTO modelObj = new WishListDTO();
+        //                        modelObj.UserId = Convert.ToInt32(reader["SellerId"]);
+        //                        modelObj.CompanyCode = reader["CompanyCode"].ToString();
+        //                        modelObj.CompanyName = reader["CompanyName"].ToString();
+        //                        modelObj.ProductGroupName = reader["ProductGroupName"].ToString();
+        //                        modelObj.ProductId = Convert.ToInt32(reader["ProductId"]);
+        //                        modelObj.ProductName = reader["ProductName"].ToString();
+        //                        modelObj.GroupCode = reader["ProductGroupCode"].ToString();
+        //                        modelObj.SellerId = Convert.ToInt32(reader["SellerId"]);
+        //                        modelObj.ProductGroupID = Convert.ToInt32(reader["ProductGroupID"]);
+        //                        modelObj.Specification = reader["Specification"].ToString();
+        //                        modelObj.UnitId = Convert.ToInt32(reader["UnitId"]);
+        //                        modelObj.Unit = reader["Unit"].ToString();
+        //                        modelObj.Price = reader["Price"] != DBNull.Value ? Convert.ToDecimal(reader["Price"]) : 0;
+        //                        modelObj.DiscountAmount = reader["DiscountAmount"] != DBNull.Value ? Convert.ToDecimal(reader["DiscountAmount"]) : 0;
+        //                        modelObj.DiscountPct = reader["DiscountPct"] != DBNull.Value ? Convert.ToDecimal(reader["DiscountPct"]) : 0;
+        //                        modelObj.ImagePath = reader["ImagePath"].ToString();
+        //                        modelObj.TotalPrice = reader["TotalPrice"] != DBNull.Value ? Convert.ToDecimal(reader["TotalPrice"]) : 0;
+
+        //                        modelObj.AvailableQty = Convert.ToInt32(reader["AvailableQty"]);
+        //                        DateTime? endDate = null;
+        //                        if (reader["EndDate"] != DBNull.Value)
+        //                        {
+        //                            endDate = Convert.ToDateTime(reader["EndDate"]);
+        //                            if (endDate <= DateTime.Now)
+        //                            {
+
+        //                                modelObj.TotalPrice = modelObj.Price;
+        //                                modelObj.DiscountAmount = 0;
+        //                                modelObj.DiscountPct = 0;
+        //                            }
+        //                        }
+
+
+        //                        lst.Add(modelObj);
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    //}
+        //    //catch (Exception ex)
+        //    //{
+        //    //    Console.WriteLine($"An error occurred: {ex.Message}");
+        //    //    return null;
+        //    //}
+
+        //    return lst;
+        //}
+
+        public async Task<DataTable> GetWishList(string UserId)
+        {
+            DataTable dataTable = new DataTable();
+
+            try
+            {
                 using (SqlConnection con = new SqlConnection(_healthCareConnection))
                 {
                     await con.OpenAsync();
@@ -29,63 +98,28 @@ namespace NDE_Digital_Market.Data_Access_Layer
                     using (SqlCommand cmd = new SqlCommand(query, con))
                     {
                         cmd.CommandType = CommandType.StoredProcedure;
-
                         cmd.Parameters.AddWithValue("@UserId", UserId);
-                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+
+                        using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
                         {
-                            while (await reader.ReadAsync())
-                            {
-                                WishListDTO modelObj = new WishListDTO();
-                                modelObj.UserId = Convert.ToInt32(reader["SellerId"]);
-                                modelObj.CompanyCode = reader["CompanyCode"].ToString();
-                                modelObj.CompanyName = reader["CompanyName"].ToString();
-                                modelObj.ProductGroupName = reader["ProductGroupName"].ToString();
-                                modelObj.ProductId = Convert.ToInt32(reader["ProductId"]);
-                                modelObj.ProductName = reader["ProductName"].ToString();
-                                modelObj.GroupCode = reader["ProductGroupCode"].ToString();
-                                modelObj.SellerId = Convert.ToInt32(reader["SellerId"]);
-                                modelObj.ProductGroupID = Convert.ToInt32(reader["ProductGroupID"]);
-                                modelObj.Specification = reader["Specification"].ToString();
-                                modelObj.UnitId = Convert.ToInt32(reader["UnitId"]);
-                                modelObj.Unit = reader["Unit"].ToString();
-                                modelObj.Price = reader["Price"] != DBNull.Value ? Convert.ToDecimal(reader["Price"]) : 0;
-                                modelObj.DiscountAmount = reader["DiscountAmount"] != DBNull.Value ? Convert.ToDecimal(reader["DiscountAmount"]) : 0;
-                                modelObj.DiscountPct = reader["DiscountPct"] != DBNull.Value ? Convert.ToDecimal(reader["DiscountPct"]) : 0;
-                                modelObj.ImagePath = reader["ImagePath"].ToString();
-                                modelObj.TotalPrice = reader["TotalPrice"] != DBNull.Value ? Convert.ToDecimal(reader["TotalPrice"]) : 0;
-
-                                modelObj.AvailableQty = Convert.ToInt32(reader["AvailableQty"]);
-                                DateTime? endDate = null;
-                                if (reader["EndDate"] != DBNull.Value)
-                                {
-                                    endDate = Convert.ToDateTime(reader["EndDate"]);
-                                    if (endDate <= DateTime.Now)
-                                    {
-
-                                        modelObj.TotalPrice = modelObj.Price;
-                                        modelObj.DiscountAmount = 0;
-                                        modelObj.DiscountPct = 0;
-                                    }
-                                }
-
-
-                                lst.Add(modelObj);
-                            }
+                            adapter.Fill(dataTable);
                         }
                     }
                 }
-            //}
-            //catch (Exception ex)
-            //{
-            //    Console.WriteLine($"An error occurred: {ex.Message}");
-            //    return null;
-            //}
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred on GetWishList: {ex.Message}");
+                return null;
+            }
 
-            return lst;
+            return dataTable;
         }
 
 
-        public async Task<object> InsertWishList(int UserId, string ProductId, string CompanyCode)
+
+
+        public async Task<object> InsertWishList(string UserId, string ProductId, string CompanyCode)
         {
             try
             {
@@ -141,7 +175,7 @@ namespace NDE_Digital_Market.Data_Access_Layer
         }
 
 
-        public async Task<object> DeleteWishList(int UserId, string ProductId, string CompanyCode)
+        public async Task<object> DeleteWishList(string UserId, string ProductId, string CompanyCode)
         {
             try
             {

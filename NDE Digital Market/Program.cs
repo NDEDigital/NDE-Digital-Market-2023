@@ -9,6 +9,7 @@ using NDE_Digital_Market.Data_Access_Layer;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using NDE_Digital_Market.Services.AddBanner;
 using NDE_Digital_Market.Services.WishListService;
+using NDE_Digital_Market.Services.UserService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,8 +43,11 @@ builder.Services.AddScoped<CompanyRegistration_DAL>();
 builder.Services.AddScoped<IAddBanner, Addbanners>();
 builder.Services.AddScoped<AddBanner_DAL>();
 
-builder.Services.AddScoped<IWishList, WishList>();
+builder.Services.AddScoped<IWishList_Service, WishList_Service>();
 builder.Services.AddScoped<WishList_DAL>();
+
+builder.Services.AddScoped<IUser_Service, User_Service>();
+builder.Services.AddScoped<User_DAL>();
 
 //builder.Services.AddScoped<NDE_Digital_Market.Controllers.UserController>();
 //builder.Services.AddScoped<NDE_Digital_Market.Services.CompanyRegistrationServices.ICompanyRegistration, NDE_Digital_Market.Services.CompanyRegistrationServices.CompanyRegistration>();
