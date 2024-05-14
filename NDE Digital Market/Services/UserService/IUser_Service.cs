@@ -11,12 +11,12 @@ namespace NDE_Digital_Market.Services.UserService
 
         Task<object> LoginUser(UserLoginDTO user);
 
-        //Task<IActionResult> GenerateRefreshToken();
+        Task<object> GenerateRefreshToken(string token);
 
-        //IActionResult getSingleUser(int? userId);
+        Task<GetSingleUserDetailsDTO> getSingleUser(string userId);
 
-        //IActionResult UpdatePasss(UpdatePasswordModel user);
+        Task<object> UpdatePasss(UserPasswordUpdateDTO user);
 
-        //Task<IActionResult> UpdateUserProfileAsync([FromBody] UserModel userModel);
+        Task<object> UpdateUserProfileAsync(UserInfoUpdateDTO userModel);
     }
 }

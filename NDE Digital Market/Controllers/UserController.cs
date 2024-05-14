@@ -103,212 +103,32 @@ namespace NDE_Digital_Market.Controllers
         [Route("GenerateRefreshToken")]
         public async Task<IActionResult> GenerateRefreshToken()
         {
-            var handler = new JwtSecurityTokenHandler();
-            bool tokenRefreshed = true;
-            JwtSecurityToken jwtToken;
+
             string token = HttpContext.Request.Cookies["refreshToken"];
-            try
+            object result = await _user_Service.GenerateRefreshToken(token);
+            dynamic dynamicResult = result; // Convert the result to dynamic
+            if (dynamicResult != null && dynamicResult.tokenRefreshed == true)
             {
-                jwtToken = handler.ReadToken(token) as JwtSecurityToken;
-                if (jwtToken == null) throw new ArgumentException("Invalid token");
+                var newAccessToken = dynamicResult.newAccessToken;
+                var newRefreshToken = dynamicResult.newRefreshToken;
+                var cookieOptions = dynamicResult.cookieOptions;
+                var cookieOptions2 = dynamicResult.cookieOptions2;
+
+
+                Response.Cookies.Delete("accessToken");
+                Response.Cookies.Delete("refreshToken");
+                Response.Cookies.Append("accessToken", newAccessToken, cookieOptions);
+                Response.Cookies.Append("refreshToken", newRefreshToken, cookieOptions2);
+
+                return Ok(new { message = "Token Renew Successfully.",});
             }
-            catch (ArgumentException)
+            else
             {
-                tokenRefreshed = false;
-                return Ok(new
-                {
-                    message = "Token is not in a valid JWT format.",
-                    tokenRefreshed
-                });
-            }
-
-            var issueDate = jwtToken.ValidFrom;
-            var expireDate = jwtToken.ValidTo;
-
-            if (DateTime.UtcNow > expireDate)
-            {
-               
-                // Return a forbidden (403) response
-              //  return Unauthorized();
-                return Forbid();
-                //return Ok(new
-                //{
-                //    message = "reFreshToken Expired",
-                //    tokenRefreshed
-
-                //});
-            }
-
-            var userIdClaim = jwtToken.Claims.FirstOrDefault(c =>  c.Type == ClaimTypes.NameIdentifier);
-            var encryptedUserId = userIdClaim != null ? userIdClaim.Value : null;
-            string userId = encryptedUserId;
-            //if (encryptedUserId != null)
-            //{
-            //    userId = CommonServices.DecryptPassword(encryptedUserId).ToString();
-            //}
-            //else
-            //{
-            //    return BadRequest("The token does not contain the expected claim.");
-            //}
-
-
-
-            DateTime? timeStamp = null;
-            bool? isBuyer = null;
-            bool? isSeller = null;
-            bool? isAdmin = null;
-
-            string query = "SELECT * FROM UserRegistration WHERE UserId = @userId";
-
-            using (SqlCommand cmd = new SqlCommand(query, _healthCareConnection))
-            {
-                cmd.Parameters.AddWithValue("@userId", userId);
-
-                try
-                {
-                  await _healthCareConnection.OpenAsync();
-                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
-                    {
-                        if (reader.Read())
-                        {
-                            timeStamp = reader["TimeStamp"] as DateTime?;
-                            isBuyer = reader.GetBoolean(reader.GetOrdinal("IsBuyer"));
-                            isSeller = reader.GetBoolean(reader.GetOrdinal("IsSeller"));
-                            isAdmin = reader.GetBoolean(reader.GetOrdinal("IsAdmin"));
-
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    return StatusCode(500, "Internal server error: " + ex.Message);
-                }
-            }
-            string role = "";
-            if ((bool)isBuyer)
-            {
-                role = "buyer";
-            }
-            if ((bool)isSeller)
-            {
-                role = "seller";
-            }
-            if ((bool)isAdmin)
-            {
-                role = "admin";
-            }
-
-
-            if (timeStamp == null || timeStamp.Value > issueDate)
-            {
-                timeStamp = DateTime.UtcNow.AddSeconds(1); // Assign any value greater than issueDate
-            }
-
-            // If the timestamp is more recent than the token issue date, it means the token should be considered invalid
-            if (timeStamp > issueDate)
-            {
-                return Unauthorized("Token has been invalidated.");
-            }
-
-            // At this point, the token is considered valid, and we can generate a new access and refresh token
-            string newAccessToken = CreateToken(role); // Replace "RoleFromYourSystem" with actual role retrieval logic
-            string newRefreshToken = CreateRefreshToken(encryptedUserId); // This method should be defined to create a refresh token
-            var cookieOptions = new CookieOptions
-            {
-                HttpOnly = true,
-                Expires = DateTime.UtcNow.AddMinutes(10),
-                SameSite = SameSiteMode.None,
-                Secure = true,
-
-            };
-            var cookieOptions2 = new CookieOptions
-            {
-                HttpOnly = true,
-                SameSite = SameSiteMode.Strict,
-                Secure = true,
-                Expires = DateTime.UtcNow.AddDays(3)
-            };
-            Response.Cookies.Delete("accessToken");
-            Response.Cookies.Delete("refreshToken");
-            Response.Cookies.Append("accessToken", newAccessToken, cookieOptions);
-            Response.Cookies.Append("refreshToken", newRefreshToken, cookieOptions2);
-            return Ok(new
-            {
-                
-                accessToken = "newAccessToken",
-                refreshToken = "newRefreshToken", tokenRefreshed,
-            });
-        }
-
-
-
-        //====================== Token code added by utshow ======================================
-        private void createPasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
-        {
-            using (var hmac = new HMACSHA512())
-            {
-                passwordSalt = hmac.Key;
-                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                return BadRequest(result);
             }
 
         }
-        private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
-        {
-            using (var hmac = new HMACSHA512(passwordSalt))
-            {
-                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-                return computedHash.SequenceEqual(passwordHash);
-            }
-        }
-        private string CreateToken(string role)
-        {
-            List<Claim> claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Role, role)
-            };
 
-            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
-                _configuration.GetSection("AppSettings:Token").Value));
-
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-
-
-            var token = new JwtSecurityToken(
-                claims: claims,
-               expires: DateTime.UtcNow.AddMinutes(10),
-                signingCredentials: creds);
-
-            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-
-            return jwt;
-        }
-        private string CreateRefreshToken(string userId)
-        {
-            List<Claim> claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, userId),
-              
-            };
-
-            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
-                _configuration.GetSection("AppSettings:Token").Value));
-
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-
-
-            var token = new JwtSecurityToken(
-                claims: claims,
-                notBefore: DateTime.UtcNow,
- 
-                expires: DateTime.UtcNow.AddDays(3),
- 
-                signingCredentials: creds
-                );
-
-            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-
-            return jwt;
-        }
 
 
 
@@ -352,55 +172,24 @@ namespace NDE_Digital_Market.Controllers
 
 
 
+
         // =================================================== getSingleUserInfo ===================================
         [HttpGet]
         [Route("getSingleUserInfo")]
         [Authorize]
-        public IActionResult getSingleUser(int? userId)
+        public async Task<IActionResult> getSingleUser(string userId)
         {
-            UserDetailsDTO user = new UserDetailsDTO();
-            //byte[] userCodeBytes = Encoding.UTF8.GetBytes(userCode);
-
-            //string DecryptedUserCode = ConvertBytesToHexString(user.UserCode);
-            SqlCommand cmd = new SqlCommand("SELECT\r\n     UR.UserId,\r\n\tUR.UserCode,   UR.FullName,\r\n    UR.IsAdmin,\r\n    UR.IsBuyer,\r\n    UR.IsSeller,\r\n    UR.PhoneNumber,\r\n    UR.Email,\r\n    UR.Address,\r\n    CR.CompanyName,\r\n   DATEDIFF(YEAR, CR.CompanyFoundationDate, GETDATE()) as YearsInBusiness,\r\n\tCR.BusinessRegistrationNumber,\r\n\tCR.TaxIdentificationNumber,\r\n\tCR.PreferredPaymentMethodID,\r\n\tPM.PMName,\r\n\tCR.BankNameID,\r\n\tPD.PMBankName,\r\n\tCR.AccountNumber,\r\n\tCR.AccountHolderName\r\n\r\n\r\nFROM\r\n    UserRegistration UR\r\nLEFT JOIN\r\n    CompanyRegistration CR ON UR.CompanyCode = CR.CompanyCode\r\nLEFT JOIN\r\n    HK_PaymentMethodMaster PM ON CR.PreferredPaymentMethodID = PM.PMMasterID\r\nLEFT JOIN\r\n    HK_PaymentMethodDetails PD ON CR.BankNameID = PD.PMDetailsID\r\nWHERE\r\n    UR.UserId = @UserId ", _healthCareConnection);
-            cmd.CommandType = CommandType.Text;
-            cmd.Parameters.AddWithValue("@UserId", userId);
-            _healthCareConnection.Open();
-            SqlDataReader reader = cmd.ExecuteReader();
-            if (reader.Read())
+            if(userId is null){
+                return BadRequest(new { message = "Give a Valid UserId" });
+            }
+            object result = _user_Service.getSingleUser(userId);
+            if (result is null)
             {
-                user.UserId = (int)reader["UserId"];
-                user.UserCode = reader["UserCode"].ToString();
-                user.FullName = reader["FullName"].ToString();
-                user.IsAdmin = reader["IsAdmin"] as bool?;
-                user.IsBuyer = reader["IsBuyer"] as bool?;
-                user.IsSeller = reader["IsSeller"] as bool?;
-                user.PhoneNumber = reader["PhoneNumber"].ToString();
-                user.Email = reader["Email"].ToString();
-                user.Address = reader["Address"].ToString();
-                if (user.IsSeller == true)
-                {
-                    user.CompanyName = reader["CompanyName"].ToString();
-                    user.YearsInBusiness = (int)reader["YearsInBusiness"];
-                    user.BusinessRegistrationNumber = reader["BusinessRegistrationNumber"].ToString();
-                    user.TaxIdentificationNumber = reader["TaxIdentificationNumber"].ToString();
-                    user.PreferredPaymentMethodID = reader["PreferredPaymentMethodID"] as int?;
-                    user.PMName = reader["PMName"].ToString();
-                    user.BankNameID = reader["BankNameID"] as int?;
-                    user.PMBankName = reader["PMBankName"].ToString();
-                    user.AccountNumber = reader["AccountNumber"].ToString();
-                    user.AccountHolderName = reader["AccountHolderName"].ToString();
-
-                }
-
-                _healthCareConnection.Close();
-                // Return the user object as a response
-                return Ok(new { message = "GET single data successful", user });
+                return NotFound(new { message = "User Not Found." });
             }
             else
             {
-                _healthCareConnection.Close();
-                return BadRequest(new { message = "Invalid Inforamtion" });
+                return Ok(result);
             }
         }
 
@@ -439,54 +228,18 @@ namespace NDE_Digital_Market.Controllers
         [HttpPut]
         [Route("updatePass")]
         [Authorize]
-        public IActionResult UpdatePasss(UpdatePasswordModel user)
+        public async Task<IActionResult> UpdatePasss(UserPasswordUpdateDTO user)
         {
-            try
+            if (user == null)
             {
-                SqlCommand cmd = new SqlCommand("SELECT * FROM UserRegistration WHERE UserId = @UserId", _healthCareConnection);
-                cmd.Parameters.AddWithValue("@UserId", user.userId);
-
-                createPasswordHash(user.newPassword, out byte[] passwordHash, out byte[] passwordSalt);
-
-                _healthCareConnection.Open();
-                SqlDataReader reader = cmd.ExecuteReader();
-
-                if (reader.HasRows)
-                {
-                    reader.Read();
-                    byte[] storedPasswordHash = (byte[])reader["PasswordHash"];
-                    byte[] storedPasswordSalt = (byte[])reader["PasswordSalt"];
-                    reader.Close();
-
-                    if (!VerifyPasswordHash(user.oldPassword, storedPasswordHash, storedPasswordSalt))
-                    {
-                        return BadRequest(new { message = "Password did not match!" });
-                    }
-
-                    SqlCommand cmd2 = new SqlCommand("UPDATE UserRegistration SET [PasswordHash] = @passwordHash, [PasswordSalt] = @passwordSalt WHERE UserId = @userId", _healthCareConnection);
-                    cmd2.Parameters.AddWithValue("@userId", user.userId);
-                    cmd2.Parameters.AddWithValue("@passwordHash", passwordHash);
-                    cmd2.Parameters.AddWithValue("@passwordSalt", passwordSalt);
-
-                    int rowsAffected = cmd2.ExecuteNonQuery();
-
-                    if (rowsAffected > 0)
-                    {
-                        _healthCareConnection.Close();
-                        return Ok(new { message = "Password updated successfully!", user.userCode });
-                    }
-                }
-
-                _healthCareConnection.Close();
-                return BadRequest(new { message = "Password did not match!" });
+                return BadRequest(new { message = "Give Valid Inputs!" });
             }
-            catch (Exception ex)
+            else
             {
-                // Handle the exception here. You can log the exception or perform any other necessary actions.
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                // You might want to return a specific error response or customize as needed.
-                return StatusCode(500, new { message = "Internal Server Error" });
+                object result = _user_Service.UpdatePasss(user);
+                return Ok(result);
             }
+
         }
 
 
@@ -496,40 +249,14 @@ namespace NDE_Digital_Market.Controllers
         [HttpPut]
         [Route("UpdateUserProfile")]
         [Authorize]
-        public async Task<IActionResult> UpdateUserProfileAsync([FromBody] UserModel userModel)
+        public async Task<IActionResult> UpdateUserProfileAsync([FromBody] UserInfoUpdateDTO userModel)
         {
-            try
+            if(userModel == null)
             {
-                string query = @"UPDATE UserRegistration SET Email = @email, Address = @address WHERE UserId = @userID";
-                if (userModel.Email == null || userModel.Email == "")
-                {
-                    return BadRequest(new { message = $"User Email is not Provided." });
-                }
-                if (userModel.Address == null || userModel.Address == "")
-                {
-                    return BadRequest(new { message = $"User Address is not Provided." });
-                }
-                using (SqlCommand command = new SqlCommand(query, _healthCareConnection))
-                {
-                    command.Parameters.AddWithValue("@email", userModel.Email);
-                    command.Parameters.AddWithValue("@address", userModel.Address);
-                    command.Parameters.AddWithValue("@userID", userModel.UserId);
-
-                    await _healthCareConnection.OpenAsync();
-                    // Execute the command
-                    int Res = await command.ExecuteNonQueryAsync();
-                    if (Res == 0)
-                    {
-                        return BadRequest(new { message = $"User didnot found." });
-                    }
-                    await _healthCareConnection.CloseAsync();
-                }
-                return Ok(new { message = $"User Profile Updated." });
+                return BadRequest(new { message = "Send a Valid User Information!" });
             }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = $"User profile update error: {ex.Message}" });
-            }
+            object res = _user_Service.UpdateUserProfileAsync(userModel);
+            return Ok(res);
         }
 
     }
