@@ -19,7 +19,8 @@ namespace NDE_Digital_Market.SharedServices
         public string HealthCareConnection { get; set; }
         private readonly IConfiguration _configuration;
         private readonly SqlConnection con;
-        private static readonly string EncryptionKey = "MAKV2SPBNI99212";
+        //private static readonly string EncryptionKey = "MAKV2SPBNI99212";
+        private static readonly string EncryptionKey = "your-encryption-key";
 
         public CommonServices(IConfiguration configuration)
         {
@@ -56,12 +57,12 @@ namespace NDE_Digital_Market.SharedServices
 
             using (Aes encryptor = Aes.Create())
             {
-                Rfc2898DeriveBytes pdb = new Rfc2898DeriveBytes(EncryptionKey, new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 });
+                var pdb = new Rfc2898DeriveBytes(EncryptionKey, new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 });
                 encryptor.Key = pdb.GetBytes(32);
                 encryptor.IV = pdb.GetBytes(16);
-                using (MemoryStream ms = new MemoryStream())
+                using (var ms = new MemoryStream())
                 {
-                    using (CryptoStream cs = new CryptoStream(ms, encryptor.CreateEncryptor(), CryptoStreamMode.Write))
+                    using (var cs = new CryptoStream(ms, encryptor.CreateEncryptor(), CryptoStreamMode.Write))
                     {
                         cs.Write(clearBytes, 0, clearBytes.Length);
                         cs.Close();
@@ -77,24 +78,29 @@ namespace NDE_Digital_Market.SharedServices
 
             using (Aes encryptor = Aes.Create())
             {
-                Rfc2898DeriveBytes pdb = new Rfc2898DeriveBytes(EncryptionKey, new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 });
+                var pdb = new Rfc2898DeriveBytes(EncryptionKey, new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 });
                 encryptor.Key = pdb.GetBytes(32);
                 encryptor.IV = pdb.GetBytes(16);
-                using (MemoryStream ms = new MemoryStream())
+                using (var ms = new MemoryStream())
                 {
-                    using (CryptoStream cs = new CryptoStream(ms, encryptor.CreateDecryptor(), CryptoStreamMode.Write))
+                    using (var cs = new CryptoStream(ms, encryptor.CreateDecryptor(), CryptoStreamMode.Write))
                     {
                         cs.Write(cipherBytes, 0, cipherBytes.Length);
                         cs.Close();
                     }
+                    byte[] decryptedBytes = ms.ToArray();
 
                     if (typeof(T) == typeof(string))
                     {
-                        return (T)(object)Encoding.Unicode.GetString(ms.ToArray());
+                        return (T)(object)Encoding.Unicode.GetString(decryptedBytes);
                     }
                     else if (typeof(T) == typeof(int))
                     {
-                        return (T)(object)BitConverter.ToInt32(ms.ToArray(), 0);
+                        if (decryptedBytes.Length != sizeof(int))
+                        {
+                            throw new ArgumentException("Decrypted byte array length does not match expected integer size.");
+                        }
+                        return (T)(object)BitConverter.ToInt32(decryptedBytes, 0);
                     }
                     else
                     {
@@ -103,7 +109,6 @@ namespace NDE_Digital_Market.SharedServices
                 }
             }
         }
-
 
 
 

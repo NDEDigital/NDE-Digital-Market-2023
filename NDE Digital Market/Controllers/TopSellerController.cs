@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NDE_Digital_Market.Model;
+using NDE_Digital_Market.Model.DTO;
+using NDE_Digital_Market.Services.TopSellerService;
 using NDE_Digital_Market.SharedServices;
 using System.Data;
 using System.Data.SqlClient;
@@ -11,52 +13,22 @@ namespace NDE_Digital_Market.Controllers
     [ApiController]
     public class TopSellerController : ControllerBase
     {
-        private readonly string _healthCareConnection;
-        public TopSellerController(IConfiguration config)
+        private readonly ITopSeller_Service _topSeller_Service;
+        public TopSellerController(ITopSeller_Service topSeller_Service)
         {
-            CommonServices commonServices = new CommonServices(config);
-            _healthCareConnection = commonServices.HealthCareConnection;
+            _topSeller_Service = topSeller_Service;
         }
+
         [HttpGet]
         [Route("GetTopSeller")]
-        public async Task<ActionResult<List<TopSellerModel>>> getForDropDown()
+        public async Task<IActionResult> getForDropDown()
         {
-            List<TopSellerModel> lst = new List<TopSellerModel>();
-
-            try
+            List<TopSellerListDTO> result = await _topSeller_Service.getForDropDown();
+            if(result.Count == 0)
             {
-                using (SqlConnection con = new SqlConnection(_healthCareConnection))
-                {
-                    await con.OpenAsync();
-                    string query = "GetTopSellerCompanies";
-
-                    using (SqlCommand cmd = new SqlCommand(query, con))
-                    {
-                        cmd.CommandType = CommandType.StoredProcedure;
-                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
-                        {
-                            while (await reader.ReadAsync())
-                            {
-                                TopSellerModel modelObj = new TopSellerModel
-                                {
-                                    CompanyCode = reader["CompanyCode"].ToString(),
-                                    CompanyName = reader["CompanyName"].ToString(),
-                                    CompanyImage = reader["CompanyImage"].ToString(),
-                                    ProductGroupID = Convert.ToInt32(reader["ProductGroupID"]),
-                                    TotalQty = Convert.ToInt32(reader["TotalQty"]),
-                                    ProductGroupCode= reader["ProductGroupCode"].ToString(),
-                                };
-                                lst.Add(modelObj);
-                            }
-                        }
-                    }
-                }
+                return NotFound(new {message = "No Top Seller Found."});
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred: {ex.Message}");
-            }
-            return lst;
+            return Ok(result);
         }
     }
 }
