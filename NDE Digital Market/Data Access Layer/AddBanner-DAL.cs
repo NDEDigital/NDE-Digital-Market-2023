@@ -32,15 +32,16 @@ namespace NDE_Digital_Market.Data_Access_Layer
 
             string bannerImage = CommonServices.UploadFiles(_folderName, _fileName, banner.BannerImageFile);
 
-            string query = @"INSERT INTO AdBanner (UserId, IsActive, AddedDate, AddedBy, UpdatedDate, UpdatedBy, AddedPC, UpdatedPC, CompanyCode, BannerDescription, BannerImage, StartDate, EndDate, IsPayment, PaymentRemarks)
-							 VALUES (@UserId, @IsActive, @AddedDate, @AddedBy, @UpdatedDate, @UpdatedBy, @AddedPC, @UpdatedPC, @CompanyCode, @BannerDescription, @BannerImage, @StartDate, @EndDate, @IsPayment, @PaymentRemarks);";
+            string query = @"INSERT INTO AdBanner (UserId, IsActive, IsAds, AddedDate, AddedBy, UpdatedDate, UpdatedBy, AddedPC, UpdatedPC, CompanyCode, BannerDescription, BannerImage, StartDate, EndDate, IsPayment, PaymentRemarks)
+							 VALUES (@UserId, @IsActive, @IsAds, @AddedDate, @AddedBy, @UpdatedDate, @UpdatedBy, @AddedPC, @UpdatedPC, @CompanyCode, @BannerDescription, @BannerImage, @StartDate, @EndDate, @IsPayment, @PaymentRemarks);";
 
 			using (SqlCommand cmd = new SqlCommand(query, _connection))
 			{
 				 cmd.CommandType = CommandType.Text;
 				cmd.Parameters.AddWithValue("@UserId", banner.UserId ?? (object)DBNull.Value);
 				cmd.Parameters.AddWithValue("@IsActive", banner.IsActive ?? (object)DBNull.Value);
-				cmd.Parameters.AddWithValue("@AddedDate", DateTime.Now);
+                cmd.Parameters.AddWithValue("@IsAds", banner.IsAds ??(object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@AddedDate", DateTime.Now);
 				cmd.Parameters.AddWithValue("@AddedBy", banner.AddedBy ?? (object)DBNull.Value);
 				cmd.Parameters.AddWithValue("@UpdatedDate", banner.UpdatedDate ?? (object)DBNull.Value);
 				cmd.Parameters.AddWithValue("@UpdatedBy", banner.UpdatedBy ?? (object)DBNull.Value);
@@ -123,10 +124,12 @@ namespace NDE_Digital_Market.Data_Access_Layer
 
         public async Task<List<ImageBanner>> GetAddBannerForSeller(string CompanyCode)
         {
-            string query = @"    SELECT AB.BannerID, AB.BannerDescription, AB.BannerImage, CR.CompanyName, AB.AddedDate , AB.IsBannerStatus, AB. IsActive
+            string query = @"    SELECT AB.BannerID, AB.BannerDescription, AB.BannerImage, CR.CompanyName, AB.AddedDate , AB.IsBannerStatus, AB. IsActive, AB. IsAds
                                   FROM AdBanner AB
-                                  join CompanyRegistration CR on CR.CompanyCode = Ab.CompanyCode
+                                  Left join CompanyRegistration CR on CR.CompanyCode = Ab.CompanyCode
                                   where AB.CompanyCode = @CompanyCode;";
+            
+            
 
             List<ImageBanner> banners = new List<ImageBanner>();
             SqlCommand command = new SqlCommand(query, _connection);
@@ -144,8 +147,8 @@ namespace NDE_Digital_Market.Data_Access_Layer
                 banner.BannerDescription = reader["BannerDescription"].ToString();
                 banner.BannerImage = reader["BannerImage"].ToString();
                 banner.CompanyName = reader["CompanyName"].ToString();
-
                 banner.IsBannerStatus = reader.IsDBNull(reader.GetOrdinal("IsBannerStatus")) ? (bool?)null : reader.GetBoolean(reader.GetOrdinal("IsBannerStatus"));
+                banner.IsAds = reader.IsDBNull(reader.GetOrdinal("IsAds")) ? (bool?)null : reader.GetBoolean(reader.GetOrdinal("IsAds"));
                 banner.IsActive = reader.GetBoolean(reader.GetOrdinal("IsActive"));
 
                 if (!(reader["AddedDate"] is DBNull))
@@ -179,8 +182,19 @@ namespace NDE_Digital_Market.Data_Access_Layer
                 banner.BannerImage = reader["BannerImage"].ToString();
                 banner.CompanyName = reader["CompanyName"].ToString();
 
+
                 //banner.StartDate =Convert.ToDateTime(reader["StartDate"]);
                 //banner.EndDate =Convert.ToDateTime(reader["EndDate"]);
+
+                if (!reader.IsDBNull(reader.GetOrdinal("IsAds")))
+                {
+                    banner.IsAds = reader.GetBoolean(reader.GetOrdinal("IsAds"));
+                }
+                else
+                {
+                    // Handle the case when IsAds is DBNull
+                    banner.IsAds = null;
+                }
 
                 if (!reader.IsDBNull(reader.GetOrdinal("AddedDate")))
                 {
@@ -222,6 +236,7 @@ namespace NDE_Digital_Market.Data_Access_Layer
                             FROM AdBanner 
                             WHERE IsBannerStatus = 1 
                               AND IsActive = 1 
+                              AND IsAds =0
                               AND StartDate <= DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()), 0)
 							  and EndDate >= DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()), 0);";
 
@@ -243,6 +258,44 @@ namespace NDE_Digital_Market.Data_Access_Layer
             _connection.Close();
             return banners;
         }
+
+
+
+
+        public async Task<List<ImageBanner>> GetAddForShowingInHomePage()
+        {
+            string query = @"SELECT *
+                            FROM AdBanner 
+                            WHERE IsBannerStatus = 1 
+                              AND IsActive = 1 
+                              AND IsAds =1
+                              AND StartDate <= DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()), 0)
+							  and EndDate >= DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()), 0);";
+
+            List<ImageBanner> banners = new List<ImageBanner>();
+            SqlCommand command = new SqlCommand(query, _connection);
+            command.CommandType = CommandType.Text;
+            await _connection.OpenAsync();
+            SqlDataReader reader = await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                ImageBanner banner = new ImageBanner();
+                //banner.UserId = reader.GetInt32(0);
+
+                banner.BannerImage = reader["BannerImage"].ToString();
+
+                banners.Add(banner);
+            }
+            _connection.Close();
+            return banners;
+        }
+
+
+
+
+
+
 
         //public async Task<ImageBanner> GetBannerById(int bannerId)
         //{
@@ -401,36 +454,143 @@ namespace NDE_Digital_Market.Data_Access_Layer
         //    }
         //}
 
+        //public async Task<string> UpdateBanner(BannerDto banner)
+        //{
+        //    string bannerImage = CommonServices.UploadFiles(_folderName, _fileName, banner.BannerImageFile);
+
+        //    string query = @"UPDATE AdBanner 
+        //             SET UserId = @UserId,
+        //                 IsActive = @IsActive,
+        //                 UpdatedDate = @UpdatedDate,
+        //                 UpdatedBy = @UpdatedBy,
+        //                 UpdatedPC = @UpdatedPC,
+        //                 CompanyCode = @CompanyCode,
+        //                 BannerDescription = @BannerDescription,
+        //                 BannerImage = @BannerImage,
+        //                 StartDate = @StartDate,
+        //                 EndDate = @EndDate,
+        //                 IsPayment = @IsPayment,
+        //                 PaymentRemarks = @PaymentRemarks
+        //             WHERE BannerID = @BannerID;";
+
+        //    using (SqlCommand cmd = new SqlCommand(query, _connection))
+        //    {
+        //        cmd.CommandType = CommandType.Text;
+        //        cmd.Parameters.AddWithValue("@BannerID", banner.BannerID );
+        //        cmd.Parameters.AddWithValue("@UserId", banner.UserId ?? (object)DBNull.Value);
+        //        cmd.Parameters.AddWithValue("@IsActive", banner.IsActive ?? (object)DBNull.Value);
+        //        cmd.Parameters.AddWithValue("@UpdatedDate", DateTime.Now);
+        //        cmd.Parameters.AddWithValue("@UpdatedBy", banner.UpdatedBy ?? (object)DBNull.Value);
+        //        cmd.Parameters.AddWithValue("@UpdatedPC", banner.UpdatedPC ?? (object)DBNull.Value);
+        //        cmd.Parameters.AddWithValue("@CompanyCode", banner.CompanyCode ?? (object)DBNull.Value);
+        //        cmd.Parameters.AddWithValue("@BannerDescription", banner.BannerDescription ?? (object)DBNull.Value);
+        //        cmd.Parameters.AddWithValue("@BannerImage", bannerImage ?? (object)DBNull.Value);
+        //        cmd.Parameters.AddWithValue("@StartDate", banner.StartDate ?? (object)DBNull.Value);
+        //        cmd.Parameters.AddWithValue("@EndDate", banner.EndDate ?? (object)DBNull.Value);
+        //        cmd.Parameters.AddWithValue("@IsPayment", banner.IsPayment ?? (object)DBNull.Value);
+        //        cmd.Parameters.AddWithValue("@PaymentRemarks", banner.PaymentRemarks ?? (object)DBNull.Value);
+
+        //        await _connection.OpenAsync();
+        //        await cmd.ExecuteNonQueryAsync();
+        //        await _connection.CloseAsync();
+        //    }
+
+        //    return "Banner Updated successfully!";
+        //}
+
+
+
+
+        //        public async Task<string> UpdateBanner(BannerDto banner)
+        //{
+        //    // Check if a new banner image file is provided
+        //    string bannerImage = banner.BannerImageFile != null ?
+        //        CommonServices.UploadFiles(_folderName, _fileName, banner.BannerImageFile) :
+        //        null;
+
+        //    string query = @"UPDATE AdBanner 
+        //                     SET UserId = COALESCE(@UserId, UserId),
+        //                         IsActive = COALESCE(@IsActive, IsActive),
+        //                         UpdatedDate = @UpdatedDate,
+        //                         UpdatedBy = COALESCE(@UpdatedBy, UpdatedBy),
+        //                         UpdatedPC = COALESCE(@UpdatedPC, UpdatedPC),
+        //                         CompanyCode = COALESCE(@CompanyCode, CompanyCode),
+        //                         BannerDescription = COALESCE(@BannerDescription, BannerDescription),
+        //                         BannerImage = COALESCE(@BannerImage, BannerImage),
+        //                         StartDate = COALESCE(@StartDate, StartDate),
+        //                         EndDate = COALESCE(@EndDate, EndDate),
+        //                         IsPayment = COALESCE(@IsPayment, IsPayment),
+        //                         PaymentRemarks = COALESCE(@PaymentRemarks, PaymentRemarks)
+        //                     WHERE BannerID = @BannerID;";
+
+        //    using (SqlCommand cmd = new SqlCommand(query, _connection))
+        //    {
+        //        cmd.CommandType = CommandType.Text;
+        //        cmd.Parameters.AddWithValue("@BannerID", banner.BannerID);
+        //        cmd.Parameters.AddWithValue("@UserId", banner.UserId ?? (object)DBNull.Value);
+        //        cmd.Parameters.AddWithValue("@IsActive", banner.IsActive ?? (object)DBNull.Value);
+        //        cmd.Parameters.AddWithValue("@UpdatedDate", DateTime.Now);
+        //        cmd.Parameters.AddWithValue("@UpdatedBy", banner.UpdatedBy ?? (object)DBNull.Value);
+        //        cmd.Parameters.AddWithValue("@UpdatedPC", banner.UpdatedPC ?? (object)DBNull.Value);
+        //        cmd.Parameters.AddWithValue("@CompanyCode", banner.CompanyCode ?? (object)DBNull.Value);
+        //        cmd.Parameters.AddWithValue("@BannerDescription", banner.BannerDescription ?? (object)DBNull.Value);
+        //        cmd.Parameters.AddWithValue("@BannerImage", bannerImage ?? (object)DBNull.Value);
+        //        cmd.Parameters.AddWithValue("@StartDate", banner.StartDate ?? (object)DBNull.Value);
+        //        cmd.Parameters.AddWithValue("@EndDate", banner.EndDate ?? (object)DBNull.Value);
+        //        cmd.Parameters.AddWithValue("@IsPayment", banner.IsPayment ?? (object)DBNull.Value);
+        //        cmd.Parameters.AddWithValue("@PaymentRemarks", banner.PaymentRemarks ?? (object)DBNull.Value);
+
+        //        await _connection.OpenAsync();
+        //        await cmd.ExecuteNonQueryAsync();
+        //        await _connection.CloseAsync();
+        //    }
+
+        //    return "Banner Updated successfully!";
+        //}
+
+
+
+
+
         public async Task<string> UpdateBanner(BannerDto banner)
         {
-            string bannerImage = CommonServices.UploadFiles(_folderName, _fileName, banner.BannerImageFile);
+            // Check if a new banner image file is provided
+            string bannerImage = banner.BannerImageFile != null ?
+                CommonServices.UploadFiles(_folderName, _fileName, banner.BannerImageFile) :
+                null;
+
+            // Check if a new banner description is provided
+            string bannerDescription = !string.IsNullOrEmpty(banner.BannerDescription) ?
+                banner.BannerDescription : null;
 
             string query = @"UPDATE AdBanner 
-                     SET UserId = @UserId,
-                         IsActive = @IsActive,
-                         UpdatedDate = @UpdatedDate,
-                         UpdatedBy = @UpdatedBy,
-                         UpdatedPC = @UpdatedPC,
-                         CompanyCode = @CompanyCode,
-                         BannerDescription = @BannerDescription,
-                         BannerImage = @BannerImage,
-                         StartDate = @StartDate,
-                         EndDate = @EndDate,
-                         IsPayment = @IsPayment,
-                         PaymentRemarks = @PaymentRemarks
-                     WHERE BannerID = @BannerID;";
+         SET UserId = COALESCE(@UserId, UserId),
+             IsActive = COALESCE(@IsActive, IsActive),
+             IsAds = COALESCE(@IsAds, IsAds),
+             UpdatedDate = @UpdatedDate,
+             UpdatedBy = COALESCE(@UpdatedBy, UpdatedBy),
+             UpdatedPC = COALESCE(@UpdatedPC, UpdatedPC),
+             CompanyCode = COALESCE(@CompanyCode, CompanyCode),
+             BannerDescription = COALESCE(@BannerDescription, BannerDescription),
+             BannerImage = COALESCE(@BannerImage, BannerImage),
+             StartDate = COALESCE(@StartDate, StartDate),
+             EndDate = COALESCE(@EndDate, EndDate),
+             IsPayment = COALESCE(@IsPayment, IsPayment),
+             PaymentRemarks = COALESCE(@PaymentRemarks, PaymentRemarks)
+         WHERE BannerID = @BannerID;";
 
             using (SqlCommand cmd = new SqlCommand(query, _connection))
             {
                 cmd.CommandType = CommandType.Text;
-                cmd.Parameters.AddWithValue("@BannerID", banner.BannerID );
+                cmd.Parameters.AddWithValue("@BannerID", banner.BannerID);
                 cmd.Parameters.AddWithValue("@UserId", banner.UserId ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@IsActive", banner.IsActive ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@IsAds", banner.IsAds ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@UpdatedDate", DateTime.Now);
                 cmd.Parameters.AddWithValue("@UpdatedBy", banner.UpdatedBy ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@UpdatedPC", banner.UpdatedPC ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@CompanyCode", banner.CompanyCode ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@BannerDescription", banner.BannerDescription ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@BannerDescription", bannerDescription ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@BannerImage", bannerImage ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@StartDate", banner.StartDate ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@EndDate", banner.EndDate ?? (object)DBNull.Value);
@@ -446,6 +606,34 @@ namespace NDE_Digital_Market.Data_Access_Layer
         }
 
 
+
+
+
+
+
+
+
+
+
+        //public async Task<int> UpdateBanners(ImageBanner banner)
+        //{
+        //    string query = @"UPDATE AdBanner 
+        //             SET BannerDescription = @BannerDescription, 
+        //                 BannerImage = @BannerImage 
+        //             WHERE BannerID = @BannerID";
+
+        //    SqlCommand command = new SqlCommand(query, _connection);
+        //    command.CommandType = CommandType.Text;
+        //    command.Parameters.AddWithValue("@BannerID", banner.BannerID);
+        //    command.Parameters.AddWithValue("@BannerDescription", (object)banner.BannerDescription ?? DBNull.Value);
+        //    command.Parameters.AddWithValue("@BannerImage", (object)banner.BannerImage ?? DBNull.Value);
+
+        //    await _connection.OpenAsync();
+        //    int rowsAffected = await command.ExecuteNonQueryAsync();
+        //    _connection.Close();
+
+        //    return rowsAffected;
+        //}
 
 
     }

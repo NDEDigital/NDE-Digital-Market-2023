@@ -9,7 +9,7 @@
         public int PermissionId {  get; set; }
         public string MenuName { get; set; }
         public string FullName { get; set; }
-
+        public string?   NavigateUrl {  get; set; }
 
     }
 }

@@ -85,6 +85,14 @@ namespace NDE_Digital_Market.Controllers
         }
 
 
+        [HttpGet(" GetAddForShowingInHomePage")]
+        public async Task<ActionResult<List<ImageBanner>>> GetAddForShowingInHomePage()
+        {
+            var banner = await _AddBanner.GetAddForShowingInHomePage();
+            return banner;
+        }
+
+
 
 
 
@@ -107,8 +115,43 @@ namespace NDE_Digital_Market.Controllers
                     Message = "Invalid banner data."
                 });
             }
+            SqlConnection connection = new SqlConnection(_connectionString);
 
-            string query = @"UPDATE AdBanner 
+            try
+            {
+                
+
+                await connection.OpenAsync();
+
+
+
+
+
+
+
+                if(banner.IsActive == true)
+                {
+                    string checkquery = @"SELECT  Count(BannerID) as count FROM [NDE_Digital_Development].[dbo].[AdBanner]
+                                    where IsAds = 1 and IsActive = 1 and IsBannerStatus = 1 and EndDate >= DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()), 0) and StartDate <= DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()), 0);";
+
+                    SqlCommand checkcmd = new SqlCommand(checkquery, connection);
+                    using (SqlDataReader reader = await checkcmd.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            int res = Convert.ToInt32(reader["count"]);
+                            if (res == 6)
+                            {
+                                return BadRequest(new
+                                {
+                                    Message = "Ads Can't be Approved. Max Size Reached."
+                                });
+                            }
+                        }
+                    }
+
+                }
+                string query = @"UPDATE AdBanner 
                      SET IsActive = @IsActive,
                          UpdatedDate = @UpdatedDate,
                          UpdatedBy = @UpdatedBy,
@@ -118,39 +161,59 @@ namespace NDE_Digital_Market.Controllers
                          IsBannerStatus = @IsBannerStatus
                      WHERE BannerID = @BannerID;";
 
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                await connection.OpenAsync();
 
                 using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
-                    cmd.Parameters.AddWithValue("@BannerID", banner.BannerID);
-                    cmd.Parameters.AddWithValue("@IsActive", banner.IsActive ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@UpdatedDate", DateTime.Now);
-                    cmd.Parameters.AddWithValue("@UpdatedBy", banner.UpdatedBy ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@UpdatedPC", banner.UpdatedPC ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@StartDate", banner.StartDate ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@EndDate", banner.EndDate ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@IsBannerStatus", banner.IsBannerStatus ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@BannerID", banner.BannerID);
+                        cmd.Parameters.AddWithValue("@IsActive", banner.IsActive ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@UpdatedDate", DateTime.Now);
+                        cmd.Parameters.AddWithValue("@UpdatedBy", banner.UpdatedBy ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@UpdatedPC", banner.UpdatedPC ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@StartDate", banner.StartDate ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@EndDate", banner.EndDate ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@IsBannerStatus", banner.IsBannerStatus ?? (object)DBNull.Value);
 
-                    var result = await cmd.ExecuteNonQueryAsync();
-                    if (result > 0)  
-                    {
-                        return Ok(new
+                        var result = await cmd.ExecuteNonQueryAsync();
+                        if (result > 0)
                         {
-                            Message = "Banner updated successfully."
-                        });
-                    }
-                    else
-                    {
-                        return BadRequest(new
+                            return Ok(new
+                            {
+                                Message = "Banner updated successfully."
+                            });
+                        }
+                        else
                         {
-                            Message = "Failed to update banner."
-                        });
-                    }
+                            return BadRequest(new
+                            {
+                                Message = "Failed to update banner."
+                            });
+                        }
                 }
             }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return BadRequest(new
+                {
+                    Message = "Failed to update banner/Ads."
+                });
+            }
+            finally
+            {
+                connection.CloseAsync();
+            }
+
+
         }
+
+        //[HttpPut("UpdateBanners")]
+        //public async Task<IActionResult> UpdateBanners([FromForm] ImageBanner banner)
+        //{
+        //    var upd = await _AddBanner. UpdateBanners(banner);
+        //    return Ok(new { message = upd });
+        //}
+
+
 
 
 
