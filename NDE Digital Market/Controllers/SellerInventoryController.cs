@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NDE_Digital_Market.DTOs;
+using NDE_Digital_Market.Services.SellerInventoryService;
 using NDE_Digital_Market.SharedServices;
 using System.Data;
 using System.Data.SqlClient;
@@ -10,11 +11,10 @@ namespace NDE_Digital_Market.Controllers
     [Authorize]
     public class SellerInventoryController : ControllerBase
     {
-        private readonly string _healthCareConnection;
-        public SellerInventoryController(IConfiguration configuration)
+        private readonly ISellerInventory_Service _sellerInventory_Service;
+        public SellerInventoryController(ISellerInventory_Service sellerInventory_Service)
         {
-            CommonServices commonServices = new CommonServices(configuration);
-            _healthCareConnection = commonServices.HealthCareConnection;
+            _sellerInventory_Service = sellerInventory_Service;
         }
 
 
@@ -22,44 +22,18 @@ namespace NDE_Digital_Market.Controllers
         [HttpGet]
 
         [Route("GetSellerInventoryDataBySellerId/{UserId}")]
-        public async Task<IActionResult> GetSellerInventoryDataBySellerId(int UserId)
+        public async Task<IActionResult> GetSellerInventoryDataBySellerId(string UserId)
         {
-            var sellerInvantoryData = new List<SellerInvantoryDataDto>();
-            try
+            if(UserId == null)
             {
-                using (var connection = new SqlConnection(_healthCareConnection))
-                {
-                    using (var command = new SqlCommand("GetSellerInvantoryDataBySellerId", connection))
-                    {
-                        command.CommandType = CommandType.StoredProcedure;
-                        command.Parameters.Add(new SqlParameter("@UserId", UserId));
-                        await connection.OpenAsync();
-                        using (var reader = await command.ExecuteReaderAsync())
-                        {
-                            while (await reader.ReadAsync())
-                            {
-                                var sellerInvantory = new SellerInvantoryDataDto
-                                {
-                                    ProductName = reader["ProductName"].ToString(),
-                                    ProductGroupName = reader["ProductGroupName"].ToString(),
-                                    Specification = reader["Specification"].ToString(),
-                                    Price = reader["Price"] != DBNull.Value ? Convert.ToDecimal(reader["Price"]) : 0,
-                                    Unit = reader["Unit"].ToString(),
-                                    TotalQty = Convert.ToInt32(reader["TotalQty"]),
-                                    AvailableQty = Convert.ToInt32(reader["AvailableQty"]),
-                                    SaleQty = Convert.ToInt32(reader["SaleQty"])
-                                };
-                                sellerInvantoryData.Add(sellerInvantory);
-                            }
-                        }
-                    }
-                }
-                return Ok(sellerInvantoryData);
+                return BadRequest(new { message = "Give Valid Data." });
             }
-            catch (Exception ex)
+            object res = await _sellerInventory_Service.GetSellerInventoryDataBySellerId(UserId);
+            if (res == null)
             {
-                return StatusCode(500, "An error occurred while retrieving companies: " + ex.Message);
+                return NotFound(new { message = "Unit not Found." });
             }
+            return Ok(res);
         }
 
     }

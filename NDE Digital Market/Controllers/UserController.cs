@@ -80,7 +80,7 @@ namespace NDE_Digital_Market.Controllers
                     Response.Cookies.Append("accessToken", token, cookieOptions);
                     Response.Cookies.Append("refreshToken", newRefreshToken, cookieOptions2);
 
-                    return Ok(new { message = "Login successful", dynamicResult.userId, dynamicResult.role, dynamicResult.IsSellerAdmin, dynamicResult.companyCode });
+                    return Ok(new { message = "Login successful", dynamicResult.UserId, dynamicResult.role, dynamicResult.IsSellerAdmin, dynamicResult.companyCode });
                 }
                 else
                 {

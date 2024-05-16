@@ -14,13 +14,8 @@ namespace NDE_Digital_Market.Controllers
     public class UnitController : ControllerBase
     {
         private readonly IUnit_Service _unit_Service;
-        private readonly IConfiguration _configuration;
-        private readonly SqlConnection con;
-        public UnitController(IConfiguration configuration, IUnit_Service unit_Service)
+        public UnitController( IUnit_Service unit_Service)
         {
-            CommonServices commonServices = new CommonServices(configuration);
-            _configuration = configuration;
-            con = new SqlConnection(commonServices.HealthCareConnection);
             _unit_Service = unit_Service;
         }
 

@@ -6,27 +6,6 @@ using System.Data;
 using System.Data.SqlClient;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using NDE_Digital_Market.Model;
-using NDE_Digital_Market.DTOs;
-using System.Data.SqlClient;
-using System.Data;
-using System.Data.Common;
-using System.Security.Cryptography;
-using System.Text;
-using NDE_Digital_Market.SharedServices;
-using Microsoft.AspNetCore.Rewrite;
-using Org.BouncyCastle.Asn1.Ocsp;
-using System.Security.Claims;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using NDE_Digital_Market.SharedServices;
-using System.Linq;
-using Microsoft.AspNetCore.Authorization;
-using NDE_Digital_Market.Model.DTO;
-using NDE_Digital_Market.Services.UserService;
 
 namespace NDE_Digital_Market.Data_Access_Layer
 {
@@ -329,8 +308,14 @@ namespace NDE_Digital_Market.Data_Access_Layer
 
 
 
+                    string UserId = userId.ToString();
+                    if(companyCode != null)
+                    {
+                        companyCode = CommonServices.EncryptPassword(companyCode);
+                    }
+                    UserId = CommonServices.EncryptPassword(UserId);
 
-                    return (new { message = "Login successful",IsSuccess = true, userId, role, IsSellerAdmin, companyCode, token, newRefreshToken, cookieOptions , cookieOptions2 });
+                    return (new { message = "Login successful",IsSuccess = true, UserId, role, IsSellerAdmin, companyCode, token, newRefreshToken, cookieOptions , cookieOptions2 });
                 }
                 else
                 {

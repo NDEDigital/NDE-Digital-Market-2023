@@ -60,14 +60,7 @@ namespace NDE_Digital_Market.Services.UserService
             userModel.PhoneNumber = user.PhoneNumber;
             userModel.Password = user.Password;
 
-            object result = await _user_DAL.LoginUser(userModel);
-            dynamic dynamicResult = result; // Convert the result to dynamic
-            if (dynamicResult != null)
-            {
-                dynamicResult.userId = CommonServices.EncryptPassword(dynamicResult.userId);
-                dynamicResult.companyCode = CommonServices.EncryptPassword(dynamicResult.companyCode);
-            }
-            return dynamicResult;
+            return await _user_DAL.LoginUser(userModel);
         }
 
         public async Task<object> GenerateRefreshToken(string token)
