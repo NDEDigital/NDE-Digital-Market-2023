@@ -669,208 +669,208 @@ namespace NDE_Digital_Market.Controllers
 
 
 
-        [HttpPost]
-        [Authorize(Roles = "admin")]
-        [Route("getReturnDataForAdmin/{pageNumber}/{pageSize}")]
+    //    [HttpPost]
+    //    [Authorize(Roles = "admin")]
+    //    [Route("getReturnDataForAdmin/{pageNumber}/{pageSize}")]
 
-        public IActionResult getReturnDataForAdmin([FromForm] string status, int pageNumber, int pageSize, [FromForm] string searchby, [FromForm] string searchValue, [FromForm] string? fromDate = null, [FromForm] string? toDate = null)
-        {
-            int PendingCount = 0, ApprovedCount = 0, DeliveredCount = 0, ReturnedCount = 0, CancelledCount = 0, TotalRowCount = 0, ToReturnCount = 0;
-            List<ProductReturnModel> returnData = new List<ProductReturnModel>();
-            using SqlConnection con = new SqlConnection(_prominentConnection);
-            con.Open();
-            string condition = "FROM  [ProductReturn] r  LEFT JOIN  [ReturnType] t ON r.[TypeId] = t.[TypeId]" +
-                         " JOIN  OrderDetails od ON r.[DetailsId] = od.[OrderDetailId] AND od.[Status] = @status";
+    //    public IActionResult getReturnDataForAdmin([FromForm] string status, int pageNumber, int pageSize, [FromForm] string searchby, [FromForm] string searchValue, [FromForm] string? fromDate = null, [FromForm] string? toDate = null)
+    //    {
+    //        int PendingCount = 0, ApprovedCount = 0, DeliveredCount = 0, ReturnedCount = 0, CancelledCount = 0, TotalRowCount = 0, ToReturnCount = 0;
+    //        List<ProductReturnModel> returnData = new List<ProductReturnModel>();
+    //        using SqlConnection con = new SqlConnection(_prominentConnection);
+    //        con.Open();
+    //        string condition = "FROM  [ProductReturn] r  LEFT JOIN  [ReturnType] t ON r.[TypeId] = t.[TypeId]" +
+    //                     " JOIN  OrderDetails od ON r.[DetailsId] = od.[OrderDetailId] AND od.[Status] = @status";
 
 
-            if (searchValue != "All")
-            {
-                condition += " AND ";
+    //        if (searchValue != "All")
+    //        {
+    //            condition += " AND ";
 
-                if (searchby == "OrderNo")
-                {
-                    condition += " r.[OrderNo] LIKE @searchValue";
-                }
-                else if (searchby == "GroupName")
-                {
-                    condition += "  r.[GroupName] LIKE @searchValue";
-                }
-                else if (searchby == "GoodsName")
-                {
-                    condition += "r.[GoodsName] LIKE @searchValue";
-                }
-                else if (searchby == "ReturnType")
-                {
-                    condition += " t.[ReturnType] LIKE @searchValue";
-                }
-            }
+    //            if (searchby == "OrderNo")
+    //            {
+    //                condition += " r.[OrderNo] LIKE @searchValue";
+    //            }
+    //            else if (searchby == "GroupName")
+    //            {
+    //                condition += "  r.[GroupName] LIKE @searchValue";
+    //            }
+    //            else if (searchby == "GoodsName")
+    //            {
+    //                condition += "r.[GoodsName] LIKE @searchValue";
+    //            }
+    //            else if (searchby == "ReturnType")
+    //            {
+    //                condition += " t.[ReturnType] LIKE @searchValue";
+    //            }
+    //        }
 
-            if (!string.IsNullOrEmpty(fromDate))
-            {
+    //        if (!string.IsNullOrEmpty(fromDate))
+    //        {
                 
 
-                condition += " And r.[ApplyDate] BETWEEN  @fromDate AND  @toDate";
-            }
+    //            condition += " And r.[ApplyDate] BETWEEN  @fromDate AND  @toDate";
+    //        }
 
-            string query = $@"
-        DECLARE @TotalRow AS INT;
-        SET @TotalRow = (SELECT COUNT(*) FROM  OrderMaster);
+    //        string query = $@"
+    //    DECLARE @TotalRow AS INT;
+    //    SET @TotalRow = (SELECT COUNT(*) FROM  OrderMaster);
 
-        SELECT 
-            @TotalRow AS TotalRowCount,
-            (SELECT COUNT(*) FROM  OrderMaster WHERE Status = 'Pending') AS PendingCount,
-            (SELECT COUNT(*) FROM  OrderMaster WHERE Status = 'Approved') AS ApprovedCount,
-            (SELECT COUNT(*) FROM  OrderDetails WHERE Status = 'Returned') AS ReturnedCount,
-    (SELECT COUNT(*) FROM  OrderDetails WHERE Status = 'to Return') AS ToReturnCount,
-            (SELECT COUNT(*) FROM  OrderMaster WHERE Status = 'Cancelled') AS CancelledCount,
-            (SELECT COUNT(*) FROM  OrderMaster WHERE Status = 'Delivered') AS DeliveredCount
+    //    SELECT 
+    //        @TotalRow AS TotalRowCount,
+    //        (SELECT COUNT(*) FROM  OrderMaster WHERE Status = 'Pending') AS PendingCount,
+    //        (SELECT COUNT(*) FROM  OrderMaster WHERE Status = 'Approved') AS ApprovedCount,
+    //        (SELECT COUNT(*) FROM  OrderDetails WHERE Status = 'Returned') AS ReturnedCount,
+    //(SELECT COUNT(*) FROM  OrderDetails WHERE Status = 'to Return') AS ToReturnCount,
+    //        (SELECT COUNT(*) FROM  OrderMaster WHERE Status = 'Cancelled') AS CancelledCount,
+    //        (SELECT COUNT(*) FROM  OrderMaster WHERE Status = 'Delivered') AS DeliveredCount
  
-        FROM  OrderMaster;"+
-                " SELECT r.[ReturnId], r.[GroupName],r.[GoodsName], r.[GroupCode], r.[GoodsId],r.[TypeId],r.[Remarks],r.[OrderNo],r.[DeliveryDate],r.[Price],r.[DetailsId],r.[SellerCode],r.[ApplyDate] ,t.[TypeId]," +
-                "t.[ReturnType], od.[OrderDetailId],od.[Status] , ( SELECT COUNT(*) " + @condition + ") AS TotalRowCount " + condition + " ORDER BY OrderNo DESC" +
-                " OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
+    //    FROM  OrderMaster;"+
+    //            " SELECT r.[ReturnId], r.[GroupName],r.[GoodsName], r.[GroupCode], r.[GoodsId],r.[TypeId],r.[Remarks],r.[OrderNo],r.[DeliveryDate],r.[Price],r.[DetailsId],r.[SellerCode],r.[ApplyDate] ,t.[TypeId]," +
+    //            "t.[ReturnType], od.[OrderDetailId],od.[Status] , ( SELECT COUNT(*) " + @condition + ") AS TotalRowCount " + condition + " ORDER BY OrderNo DESC" +
+    //            " OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
 
 
-            SqlCommand cmd = new SqlCommand(query, con);
+    //        SqlCommand cmd = new SqlCommand(query, con);
 
-            cmd.Parameters.AddWithValue("@status", status);
-            cmd.Parameters.AddWithValue("@PageSize", pageSize);
-            cmd.Parameters.AddWithValue("@Offset", (pageNumber - 1) * pageSize);
-            if (!string.IsNullOrEmpty(searchValue))
-            {
-                cmd.Parameters.AddWithValue("@searchValue", "%" + searchValue + "%");
-            }
-            if (!string.IsNullOrEmpty(fromDate))
-            {
-                cmd.Parameters.AddWithValue("@FromDate", fromDate);
-                cmd.Parameters.AddWithValue("@ToDate", toDate);
-            }
+    //        cmd.Parameters.AddWithValue("@status", status);
+    //        cmd.Parameters.AddWithValue("@PageSize", pageSize);
+    //        cmd.Parameters.AddWithValue("@Offset", (pageNumber - 1) * pageSize);
+    //        if (!string.IsNullOrEmpty(searchValue))
+    //        {
+    //            cmd.Parameters.AddWithValue("@searchValue", "%" + searchValue + "%");
+    //        }
+    //        if (!string.IsNullOrEmpty(fromDate))
+    //        {
+    //            cmd.Parameters.AddWithValue("@FromDate", fromDate);
+    //            cmd.Parameters.AddWithValue("@ToDate", toDate);
+    //        }
 
-            SqlDataAdapter adapter = new SqlDataAdapter(cmd);
-            DataSet ds = new DataSet();
-            adapter.Fill(ds);
+    //        SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+    //        DataSet ds = new DataSet();
+    //        adapter.Fill(ds);
 
   
-            // Check if the dataset contains the tables you need
-            if (ds.Tables.Count >= 1)
-            {
-                DataTable dataTable1st = ds.Tables[0]; // Get the 1st table from the dataset
-                DataTable dataTable = ds.Tables[1]; // Get the 2nd table from the dataset
-                foreach (DataRow row in dataTable1st.Rows)
-                {
+    //        // Check if the dataset contains the tables you need
+    //        if (ds.Tables.Count >= 1)
+    //        {
+    //            DataTable dataTable1st = ds.Tables[0]; // Get the 1st table from the dataset
+    //            DataTable dataTable = ds.Tables[1]; // Get the 2nd table from the dataset
+    //            foreach (DataRow row in dataTable1st.Rows)
+    //            {
 
-                    PendingCount = int.Parse(row["PendingCount"].ToString());
-                    ApprovedCount = int.Parse(row["ApprovedCount"].ToString());
-                    DeliveredCount = int.Parse(row["DeliveredCount"].ToString());
-                    ReturnedCount = int.Parse(row["ReturnedCount"].ToString());
-                    TotalRowCount = int.Parse(row["TotalRowCount"].ToString());
-                    CancelledCount = int.Parse(row["CancelledCount"].ToString());
-                    ToReturnCount = int.Parse(row["ToReturnCount"].ToString());
-                    // Other status counts...
-                }
-                List<ProductReturnModel> ordersData = new List<ProductReturnModel>();
-                foreach (DataRow row in dataTable.Rows)
-                {
-                    ProductReturnModel modelObj = new ProductReturnModel();
-                    // int
-                    modelObj.TypeId = int.Parse(row["TypeId"].ToString());
-                    modelObj.Price = int.Parse(row["Price"].ToString());
-                    modelObj.ReturnId = int.Parse(row["ReturnId"].ToString());
-                    modelObj.DetailsId = int.Parse(row["DetailsId"].ToString());
-                    modelObj.totalRowsCount = int.Parse(row["TotalRowCount"].ToString());
-                    // string
-                    modelObj.ReturnType = row["ReturnType"].ToString();
-                    modelObj.OrderNo = row["OrderNo"].ToString();
-                    modelObj.GroupName = row["GroupName"].ToString();
-                    modelObj.GoodsName = row["GoodsName"].ToString();
-                    modelObj.ApplyDate = DateTime.Parse(row["ApplyDate"].ToString());
-                    modelObj.DeliveryDate = DateTime.Parse(row["DeliveryDate"].ToString());
-                    modelObj.Remarks = row["Remarks"].ToString();
-                    modelObj.Status = row["Status"].ToString();
+    //                PendingCount = int.Parse(row["PendingCount"].ToString());
+    //                ApprovedCount = int.Parse(row["ApprovedCount"].ToString());
+    //                DeliveredCount = int.Parse(row["DeliveredCount"].ToString());
+    //                ReturnedCount = int.Parse(row["ReturnedCount"].ToString());
+    //                TotalRowCount = int.Parse(row["TotalRowCount"].ToString());
+    //                CancelledCount = int.Parse(row["CancelledCount"].ToString());
+    //                ToReturnCount = int.Parse(row["ToReturnCount"].ToString());
+    //                // Other status counts...
+    //            }
+    //            List<ProductReturnModel> ordersData = new List<ProductReturnModel>();
+    //            foreach (DataRow row in dataTable.Rows)
+    //            {
+    //                ProductReturnModel modelObj = new ProductReturnModel();
+    //                // int
+    //                modelObj.TypeId = int.Parse(row["TypeId"].ToString());
+    //                modelObj.Price = int.Parse(row["Price"].ToString());
+    //                modelObj.ReturnId = int.Parse(row["ReturnId"].ToString());
+    //                modelObj.DetailsId = int.Parse(row["DetailsId"].ToString());
+    //                modelObj.totalRowsCount = int.Parse(row["TotalRowCount"].ToString());
+    //                // string
+    //                modelObj.ReturnType = row["ReturnType"].ToString();
+    //                modelObj.OrderNo = row["OrderNo"].ToString();
+    //                modelObj.GroupName = row["GroupName"].ToString();
+    //                modelObj.GoodsName = row["GoodsName"].ToString();
+    //                modelObj.ApplyDate = DateTime.Parse(row["ApplyDate"].ToString());
+    //                modelObj.DeliveryDate = DateTime.Parse(row["DeliveryDate"].ToString());
+    //                modelObj.Remarks = row["Remarks"].ToString();
+    //                modelObj.Status = row["Status"].ToString();
 
-                    // Add other properties here...
-                    ordersData.Add(modelObj);
-                }
-                // Create an anonymous object to hold the data in the desired format
-                var result = new
-                {
-                    statusCount = new
-                    {
-                        PendingCount,
-                        ApprovedCount,
-                        CancelledCount,
-                        ReturnedCount,
-                        DeliveredCount,
-                        TotalRowCount,
-                        ToReturnCount
-                    },
-                    ordersData
-                };
-                return Ok(result);
-            }
+    //                // Add other properties here...
+    //                ordersData.Add(modelObj);
+    //            }
+    //            // Create an anonymous object to hold the data in the desired format
+    //            var result = new
+    //            {
+    //                statusCount = new
+    //                {
+    //                    PendingCount,
+    //                    ApprovedCount,
+    //                    CancelledCount,
+    //                    ReturnedCount,
+    //                    DeliveredCount,
+    //                    TotalRowCount,
+    //                    ToReturnCount
+    //                },
+    //                ordersData
+    //            };
+    //            return Ok(result);
+    //        }
 
-            return null;
+    //        return null;
 
-        }
+    //    }
 
 
-        //------------ get return data for SELLER --------
+        ////------------ get return data for SELLER --------
 
-        [HttpPost]
-        [Authorize(Roles = "seller")]
-        [Route("GetReturnData/{pageNumber}/{pageSize}")]
-        public IActionResult getReturnData([FromForm] string status, int pageNumber, int pageSize)
-        {
-            List<ProductReturnModel> returnData = new List<ProductReturnModel>();
-            string condition = "FROM  [ProductReturn] r " +
-        "LEFT JOIN  [ReturnType] t ON r.[TypeId] = t.[TypeId]" +
-        "JOIN  OrderDetails od ON r.[DetailsId] = od.[OrderDetailId] AND od.[Status] = @status";
-         string sqlSelect = "SELECT r.[ReturnId],r.[GoodsName], r.[GroupName], r.[GroupCode], r.[GoodsId],r.[TypeId],r.[Remarks],r.[OrderNo],r.[DeliveryDate],r.[Price],r.[DetailsId],r.[SellerCode],r.[ApplyDate] ,t.[TypeId]," +
-                "t.[ReturnType], od.[OrderDetailId],od.[Status] , ( SELECT COUNT(*) " + @condition + ") AS TotalRowCount " + condition + " ORDER BY [ApplyDate] DESC" +
-                " OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
-            using (SqlConnection connection = new SqlConnection(_prominentConnection))
-            {
-                using (SqlCommand cmd = new SqlCommand(sqlSelect, connection))
-                {
-                    try
-                    {
-                        connection.Open();
-                         cmd.Parameters.AddWithValue("@status", status);
-                        cmd.Parameters.AddWithValue("@PageSize", pageSize);
-                        cmd.Parameters.AddWithValue("@Offset", (pageNumber - 1) * pageSize);
-                        SqlDataReader reader = cmd.ExecuteReader();
-                        while (reader.Read())
-                        {
-                            ProductReturnModel returnType = new ProductReturnModel
-                            {
-                                TypeId = (int)reader["TypeId"],
-                                ReturnType = reader["ReturnType"].ToString(),
-                                Price = (double)reader["Price"],
+        //[HttpPost]
+        //[Authorize(Roles = "seller")]
+        //[Route("GetReturnData/{pageNumber}/{pageSize}")]
+        //public IActionResult getReturnData([FromForm] string status, int pageNumber, int pageSize)
+        //{
+        //    List<ProductReturnModel> returnData = new List<ProductReturnModel>();
+        //    string condition = "FROM  [ProductReturn] r " +
+        //"LEFT JOIN  [ReturnType] t ON r.[TypeId] = t.[TypeId]" +
+        //"JOIN  OrderDetails od ON r.[DetailsId] = od.[OrderDetailId] AND od.[Status] = @status";
+        // string sqlSelect = "SELECT r.[ReturnId],r.[GoodsName], r.[GroupName], r.[GroupCode], r.[GoodsId],r.[TypeId],r.[Remarks],r.[OrderNo],r.[DeliveryDate],r.[Price],r.[DetailsId],r.[SellerCode],r.[ApplyDate] ,t.[TypeId]," +
+        //        "t.[ReturnType], od.[OrderDetailId],od.[Status] , ( SELECT COUNT(*) " + @condition + ") AS TotalRowCount " + condition + " ORDER BY [ApplyDate] DESC" +
+        //        " OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
+        //    using (SqlConnection connection = new SqlConnection(_prominentConnection))
+        //    {
+        //        using (SqlCommand cmd = new SqlCommand(sqlSelect, connection))
+        //        {
+        //            try
+        //            {
+        //                connection.Open();
+        //                 cmd.Parameters.AddWithValue("@status", status);
+        //                cmd.Parameters.AddWithValue("@PageSize", pageSize);
+        //                cmd.Parameters.AddWithValue("@Offset", (pageNumber - 1) * pageSize);
+        //                SqlDataReader reader = cmd.ExecuteReader();
+        //                while (reader.Read())
+        //                {
+        //                    ProductReturnModel returnType = new ProductReturnModel
+        //                    {
+        //                        TypeId = (int)reader["TypeId"],
+        //                        ReturnType = reader["ReturnType"].ToString(),
+        //                        Price = (double)reader["Price"],
 
-                                Status = reader["Status"] == DBNull.Value ? null : reader["Status"].ToString(),
-                                Remarks = reader["Remarks"] == DBNull.Value ? null : reader["Remarks"].ToString(),
-                                GroupName = reader["GroupName"].ToString(),
-                                GoodsName = reader["GoodsName"].ToString(),
-                                ReturnId = (int)reader["ReturnId"],
-                                DetailsId = (int)reader["DetailsId"],
-                                TotalRowCount = (int)reader["TotalRowCount"],
-                                ApplyDate = reader.GetDateTime(reader.GetOrdinal("ApplyDate")),
-                                OrderNo = reader["OrderNo"].ToString(),
-                                DeliveryDate = reader.GetDateTime(reader.GetOrdinal("DeliveryDate")),
-                            };
-                            returnData.Add(returnType);
-                        }
-                        reader.Close();
-                        return Ok(returnData);
-                    }
-                    catch (Exception ex)
-                    {
-                        return BadRequest($"Error: {ex.Message}");
-                    }
-                }
-            }
-            return Ok();
-        }
+        //                        Status = reader["Status"] == DBNull.Value ? null : reader["Status"].ToString(),
+        //                        Remarks = reader["Remarks"] == DBNull.Value ? null : reader["Remarks"].ToString(),
+        //                        GroupName = reader["GroupName"].ToString(),
+        //                        GoodsName = reader["GoodsName"].ToString(),
+        //                        ReturnId = (int)reader["ReturnId"],
+        //                        DetailsId = (int)reader["DetailsId"],
+        //                        TotalRowCount = (int)reader["TotalRowCount"],
+        //                        ApplyDate = reader.GetDateTime(reader.GetOrdinal("ApplyDate")),
+        //                        OrderNo = reader["OrderNo"].ToString(),
+        //                        DeliveryDate = reader.GetDateTime(reader.GetOrdinal("DeliveryDate")),
+        //                    };
+        //                    returnData.Add(returnType);
+        //                }
+        //                reader.Close();
+        //                return Ok(returnData);
+        //            }
+        //            catch (Exception ex)
+        //            {
+        //                return BadRequest($"Error: {ex.Message}");
+        //            }
+        //        }
+        //    }
+        //    return Ok();
+        //}
 
 
 
