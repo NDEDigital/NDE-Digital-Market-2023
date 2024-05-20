@@ -15,6 +15,7 @@ using NDE_Digital_Market.Services.TopSellerService;
 using NDE_Digital_Market.Services.SellerInventoryService;
 using NDE_Digital_Market.Services.SellerActiveAndInactiveService;
 using NDE_Digital_Market.Services.ProductReturnService;
+using NDE_Digital_Market.Services.ProductListService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -68,6 +69,9 @@ builder.Services.AddScoped<SellerActiveAndInactive_DAL>();
 
 builder.Services.AddScoped<IProductReturn_Service, ProductReturn_Service>();
 builder.Services.AddScoped<ProductReturn_DAL>();
+
+builder.Services.AddScoped<IProductList_Service, ProductList_Service>();
+builder.Services.AddScoped<ProductList_DAL>();
 
 //builder.Services.AddScoped<NDE_Digital_Market.Controllers.UserController>();
 //builder.Services.AddScoped<NDE_Digital_Market.Services.CompanyRegistrationServices.ICompanyRegistration, NDE_Digital_Market.Services.CompanyRegistrationServices.CompanyRegistration>();
