@@ -68,8 +68,6 @@ namespace NDE_Digital_Market.Controllers
         }
 
 
-
-
         [HttpGet("GetProductForAddQtyByUserId/{UserId}/{productGroupId}")]
         [Authorize(Roles = "seller")]
         public async Task<IActionResult> GetProductForAddQtyByUserId(int UserId, int productGroupId)
@@ -123,14 +121,6 @@ namespace NDE_Digital_Market.Controllers
 
             return Ok();
         }
-
-
-
-
-
-
-
-
 
 
         [HttpPost("PortalReceivedPost")]
@@ -262,10 +252,6 @@ namespace NDE_Digital_Market.Controllers
         }
 
 
-
-
-
-
         private async Task<Boolean> SellerProductPriceAndOfferCheck(int ProductId, int? userId)
         {
 
@@ -284,6 +270,7 @@ namespace NDE_Digital_Market.Controllers
             }
             return check;
         }
+
 
         [HttpPost("CreateSellerProductPriceAndOffer")]
         [Authorize(Roles = "seller")]
@@ -347,7 +334,6 @@ namespace NDE_Digital_Market.Controllers
 
 
         [HttpPut("UpdateSellerProductPriceAndOffer")]
-
         [Authorize(Roles = "seller")]
         public async Task<IActionResult> UpdateSellerProductPriceAndOffer([FromForm] SellerProductPriceAndOfferDto sellerproductdata)
         {
@@ -450,7 +436,6 @@ namespace NDE_Digital_Market.Controllers
 
         [HttpGet]
         [Authorize(Roles = "seller")]
-
         [Route("GetSellerProductsByCompanyCode")]
         public async Task<IActionResult> GetSellerProductsByCompanyCode(string userID, Int32? status = null)
         {
@@ -521,8 +506,6 @@ namespace NDE_Digital_Market.Controllers
         }
 
 
-
-        
         [HttpGet("GetPortalReceivedByUserId")]
         [Authorize(Roles = "seller")]
         public async Task<ActionResult> GetPortalReceivedByUserId(int userId)
@@ -567,6 +550,7 @@ namespace NDE_Digital_Market.Controllers
                 return StatusCode(500, "An error occurred while retrieving data: " + ex.Message);
             }
         }
+
 
         [HttpGet]
         [Authorize(Roles = "seller")]
