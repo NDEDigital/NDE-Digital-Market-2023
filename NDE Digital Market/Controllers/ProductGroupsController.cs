@@ -278,9 +278,7 @@ namespace NDE_Digital_Market.Controllers
 
 
         [HttpGet]
-
         [Route("GetProductGroupsListByStatus")]
-
         [Authorize(Roles = "admin")]
         public async Task<List<ProductGroupByStatusDTO>> GetProductGroupsListByStatus(Int32? status = null)
         {
