@@ -212,6 +212,7 @@ namespace NDE_Digital_Market.Data_Access_Layer
         }
 
 
+
         private async Task<Boolean> SellerProductPriceAndOfferCheck(int ProductId, int? userId)
         {
             try
@@ -401,7 +402,7 @@ namespace NDE_Digital_Market.Data_Access_Layer
         }
 
 
-        public async Task<DataTable> GetSellerProductsByCompanyCode(int userID, Int32? status = null)
+        public async Task<DataTable> GetSellerProductsForPriceAndOfferByUserId(int userID, Int32? status = null)
         {
             
             try
@@ -499,6 +500,7 @@ namespace NDE_Digital_Market.Data_Access_Layer
                 }
             }
         }
+
 
     }
 }

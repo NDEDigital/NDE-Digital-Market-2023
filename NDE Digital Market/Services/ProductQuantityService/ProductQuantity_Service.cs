@@ -1,581 +1,292 @@
-﻿namespace NDE_Digital_Market.Services.ProductQuantityService
-{
-    public class ProductQuantity_Service
-    {
-        public ProductQuantity_Service()
-        {
+﻿using NDE_Digital_Market.Data_Access_Layer;
+using NDE_Digital_Market.Model;
+using NDE_Digital_Market.Model.DTO;
+using NDE_Digital_Market.SharedServices;
+using System.Data;
 
+namespace NDE_Digital_Market.Services.ProductQuantityService
+{
+    public class ProductQuantity_Service : IProductQuantity_Service
+    {
+        private readonly ProductQuantity_DAL _productQuantity_DAL;
+        public ProductQuantity_Service(ProductQuantity_DAL productQuantity_DAL)
+        {
+            _productQuantity_DAL = productQuantity_DAL;
         }
 
 
 
-        //public async Task<IActionResult> ProductGroupsDropdownByUserId(int userID)
-        //{
-        //    var productGroupsDropdownByUserId = new List<ProductGroupsDropdown>();
-        //    try
-        //    {
-        //        using (var connection = new SqlConnection(_healthCareConnection))
-        //        {
-        //            using (var command = new SqlCommand("GetProductGroupsDropdownByUserId", connection))
-        //            {
-        //                command.CommandType = CommandType.StoredProcedure;
-        //                command.Parameters.Add(new SqlParameter("@userID", userID));
-        //                await connection.OpenAsync();
-        //                using (var reader = await command.ExecuteReaderAsync())
-        //                {
-        //                    while (await reader.ReadAsync())
-        //                    {
-        //                        var productGroupsDropdown = new ProductGroupsDropdown();
-        //                        productGroupsDropdown.ProductGroupID = Convert.ToInt32(reader["ProductGroupID"]);
-        //                        productGroupsDropdown.ProductGroupName = reader["ProductGroupName"].ToString();
-        //                        productGroupsDropdownByUserId.Add(productGroupsDropdown);
-        //                    }
-        //                }
-        //            }
-        //        }
-        //        return Ok(productGroupsDropdownByUserId);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, "An error occurred while retrieving companies: " + ex.Message);
-        //    }
-        //}
-
-
-        //public async Task<IActionResult> GetProductForAddQtyByUserId(int UserId, int productGroupId)
-        //{
-        //    var products = new List<SellerPoductListModel>();
-
-        //    try
-        //    {
-        //        using (var connection = new SqlConnection(_healthCareConnection))
-        //        {
-        //            using (var command = new SqlCommand("GetProductForAddQtyByUserId", connection))
-        //            {
-        //                command.CommandType = CommandType.StoredProcedure;
-        //                command.Parameters.Add(new SqlParameter("@UserId", UserId));
-        //                command.Parameters.Add(new SqlParameter("@productGroupId", productGroupId));
-        //                await connection.OpenAsync();
-
-        //                using (var reader = await command.ExecuteReaderAsync())
-        //                {
-        //                    while (await reader.ReadAsync())
-        //                    {
-        //                        var product = new SellerPoductListModel
-        //                        {
-        //                            ProductId = reader.GetInt32(reader.GetOrdinal("ProductId")),
-        //                            ProductName = reader.GetString(reader.GetOrdinal("ProductName")),
-        //                            ProductGroupId = reader.GetInt32(reader.GetOrdinal("ProductGroupID")),
-        //                            Specification = reader.IsDBNull(reader.GetOrdinal("Specification")) ? null : reader.GetString(reader.GetOrdinal("Specification")),
-        //                            UnitId = reader.IsDBNull(reader.GetOrdinal("UnitId")) ? 0 : reader.GetInt32(reader.GetOrdinal("UnitId")),
-        //                            Unit = reader.IsDBNull(reader.GetOrdinal("Unit")) ? null : reader.GetString(reader.GetOrdinal("Unit")),
-        //                            Price = reader.IsDBNull(reader.GetOrdinal("Price")) ? 0 : reader.GetDecimal(reader.GetOrdinal("Price")),
-        //                            AvailableQty = reader.IsDBNull(reader.GetOrdinal("AvailableQty")) ? 0 : reader.GetDecimal(reader.GetOrdinal("AvailableQty"))
-        //                        };
-        //                        products.Add(product);
-        //                    }
-        //                }
-        //            }
-        //        }
-
-        //        //if (products.Count == 0)
-        //        //{
-        //        //    return NotFound("No products found for the given user ID.");
-        //        //}
-
-        //        return Ok(products);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, "An error occurred while retrieving products: " + ex.Message);
-        //    }
-
-
-        //    return Ok();
-        //}
-
-
-        //public async Task<IActionResult> InsertPortalReceivedAsync(PortalReceivedMasterDto portaldata)
-        //{
-
-        //    // Start a transaction
-        //    SqlTransaction transaction = null;
-        //    try
-        //    {
-        //        string systemCode = string.Empty;
-        //        await con.OpenAsync();
-        //        transaction = con.BeginTransaction();
-
-        //        // Execute the stored procedure to generate the system code
-        //        SqlCommand cmdSP = new SqlCommand("spMakeSystemCode", con, transaction);
-        //        {
-        //            cmdSP.CommandType = CommandType.StoredProcedure;
-        //            cmdSP.Parameters.AddWithValue("@TableName", "PortalReceivedMaster");
-        //            cmdSP.Parameters.AddWithValue("@Date", DateTime.Now.ToString("yyyy-MM-dd"));
-        //            cmdSP.Parameters.AddWithValue("@AddNumber", 1);
-
-        //            var tempSystem = await cmdSP.ExecuteScalarAsync();
-        //            systemCode = tempSystem?.ToString() ?? string.Empty;
-        //        }
-
-        //        int PortalReceivedId = int.Parse(systemCode.Split('%')[0]);
-        //        string PortalReceivedCode = systemCode.Split('%')[1];
-        //        //SP END
-        //        portaldata.PortalReceivedId = PortalReceivedId;
-        //        portaldata.PortalReceivedCode = PortalReceivedCode;
-
-        //        SqlCommand cmd = new SqlCommand("InsertPortalReceivedMaster", con, transaction);
-        //        cmd.CommandType = CommandType.StoredProcedure;
-        //        cmd.Parameters.AddWithValue("@PortalReceivedId", PortalReceivedId);
-        //        cmd.Parameters.AddWithValue("@PortalReceivedCode", PortalReceivedCode);
-        //        cmd.Parameters.AddWithValue("@MaterialReceivedDate", DateTime.Now);
-        //        cmd.Parameters.AddWithValue("@ChallanNo", portaldata.ChallanNo ?? String.Empty);
-
-
-
-        //        cmd.Parameters.AddWithValue("@ChallanDate", portaldata.ChallanDate ?? (object)DBNull.Value);
-
-
-        //        cmd.Parameters.AddWithValue("@Remarks", portaldata.Remarks ?? String.Empty);
-        //        cmd.Parameters.AddWithValue("@UserId", portaldata.UserId);
-
-
-        //        cmd.Parameters.AddWithValue("@AddedBy", portaldata.AddedBy);
-        //        cmd.Parameters.AddWithValue("@AddedDate", DateTime.Now);
-        //        cmd.Parameters.AddWithValue("@AddedPC", portaldata.AddedPC);
-
-        //        int a = await cmd.ExecuteNonQueryAsync();
-
-        //        if (a > 0)
-        //        {
-        //            var detailsResult = await InsertPortalReceivedAsync(PortalReceivedId, portaldata.PortalReceivedDetailslist, transaction);
-        //            if (detailsResult is BadRequestObjectResult)
-        //            {
-        //                throw new Exception((detailsResult as BadRequestObjectResult).Value.ToString());
-        //            }
-        //        }
-        //        else
-        //        {
-        //            return BadRequest(new { message = "Portal Master data isn't Inserted Successfully." });
-        //        }
-        //        // If everything is fine, commit the transaction
-        //        transaction.Commit();
-        //        return Ok(portaldata);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // If there is any error, rollback the transaction
-        //        if (transaction != null)
-        //        {
-        //            transaction.Rollback();
-        //        }
-        //        return BadRequest(ex.Message);
-        //    }
-        //    finally
-        //    {
-        //        // Finally block to ensure the connection is always closed
-        //        if (con.State == ConnectionState.Open)
-        //        {
-        //            await con.CloseAsync();
-        //        }
-        //    }
-        //}
-
-
-        //private async Task<IActionResult> InsertPortalReceivedAsync(int PortalReceivedId, List<PortalReceivedDetailsDto> PortalReceivedDetailsList, SqlTransaction transaction)
-        //{
-        //    try
-        //    {
-        //        for (int i = 0; i < PortalReceivedDetailsList.Count; i++)
-        //        {
-        //            PortalReceivedDetailsList[i].PortalReceivedId = PortalReceivedId;
-        //            string query = "InsertPortalReceivedDetails";
-        //            //checking if user already exect for not.
-        //            SqlCommand CheckCMD = new SqlCommand(query, con, transaction);
-        //            CheckCMD.CommandType = CommandType.StoredProcedure;
-
-        //            CheckCMD.Parameters.Clear();
-        //            CheckCMD.Parameters.AddWithValue("@PortalReceivedId", PortalReceivedId);
-        //            CheckCMD.Parameters.AddWithValue("@ProductGroupID", PortalReceivedDetailsList[i].ProductGroupId);
-        //            CheckCMD.Parameters.AddWithValue("@ProductId", PortalReceivedDetailsList[i].ProductId);
-        //            CheckCMD.Parameters.AddWithValue("@Specification", PortalReceivedDetailsList[i].Specification);
-        //            CheckCMD.Parameters.AddWithValue("@ReceivedQty", PortalReceivedDetailsList[i].ReceivedQty);
-        //            CheckCMD.Parameters.AddWithValue("@UnitId", PortalReceivedDetailsList[i].UnitId);
-        //            CheckCMD.Parameters.AddWithValue("@Price", PortalReceivedDetailsList[i].Price);
-        //            CheckCMD.Parameters.AddWithValue("@TotalPrice", PortalReceivedDetailsList[i].TotalPrice);
-        //            CheckCMD.Parameters.AddWithValue("@UserId", PortalReceivedDetailsList[i].UserId);
-        //            CheckCMD.Parameters.AddWithValue("@Remarks", PortalReceivedDetailsList[i].Remarks ?? String.Empty);
-
-
-        //            CheckCMD.Parameters.AddWithValue("@AddedBy", PortalReceivedDetailsList[i].AddedBy);
-        //            CheckCMD.Parameters.AddWithValue("@DateAdded", DateTime.Now);
-        //            CheckCMD.Parameters.AddWithValue("@AddedPC", PortalReceivedDetailsList[i].AddedPC);
-
-        //            await CheckCMD.ExecuteNonQueryAsync();
-
-        //        }
-        //        return Ok(new { message = "Portal Details data Inserted Successfully." });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(ex.Message);
-        //    }
-        //}
-
-
-        //private async Task<Boolean> SellerProductPriceAndOfferCheck(int ProductId, int? userId)
-        //{
-
-        //    string query = @"SELECT COUNT(*) AS ProductCount FROM SellerProductPriceAndOffer WHERE ProductId = @ProductId AND CompanyCode =(SELECT UPPER(CompanyCode) FROM UserRegistration WHERE UserId = @UserId)";
-        //    SqlCommand cmd = new SqlCommand(query, con);
-        //    cmd.CommandType = CommandType.Text;
-        //    cmd.Parameters.AddWithValue("@ProductId", ProductId);
-        //    cmd.Parameters.AddWithValue("@UserId", userId);
-        //    await con.OpenAsync();
-        //    int count = (int)await cmd.ExecuteScalarAsync();
-        //    await con.CloseAsync();
-        //    Boolean check = false;
-        //    if (count > 0)
-        //    {
-        //        check = true;
-        //    }
-        //    return check;
-        //}
-
-
-        //public async Task<IActionResult> CreateSellerProductPriceAndOfferAsync([FromForm] SellerProductPriceAndOfferDto sellerproductdata)
-        //{
-        //    try
-        //    {
-        //        Boolean ProductPriceAndOfferExist = await SellerProductPriceAndOfferCheck(sellerproductdata.ProductId, sellerproductdata.UserId);
-        //        if (ProductPriceAndOfferExist)
-        //        {
-        //            return BadRequest(new { message = "ProductPriceAndOffer Allready Added." });
-        //        }
-        //        else
-        //        {
-        //            string ImagePath = CommonServices.UploadFiles(foldername, filename, sellerproductdata.ImageFile);
-
-        //            //SP END
-        //            string query = @"INSERT INTO SellerProductPriceAndOffer(ProductId, UserId, Price,DiscountAmount,DiscountPct,EffectivateDate,
-        //            EndDate,ImagePath,Status,IsActive, AddedDate,AddedBy,AddedPC,TotalPrice,CompanyCode) 
-        //            VALUES (@ProductId,@UserId,@Price,@DiscountAmount,@DiscountPct,@EffectivateDate,@EndDate, @ImagePath,
-        //            @Status, @IsActive, @AddedDate,@AddedBy, @AddedPC,@TotalPrice, (SELECT UPPER(CompanyCode) FROM UserRegistration WHERE UserId = @UserId));";
-        //            SqlCommand cmd = new SqlCommand(query, con);
-        //            cmd.CommandType = CommandType.Text;
-        //            cmd.Parameters.AddWithValue("@ProductId", sellerproductdata.ProductId);
-        //            cmd.Parameters.AddWithValue("@UserId", sellerproductdata.UserId);
-        //            cmd.Parameters.AddWithValue("@Price", sellerproductdata.Price);
-        //            cmd.Parameters.AddWithValue("@DiscountAmount", sellerproductdata.DiscountAmount ?? (object)DBNull.Value);
-        //            cmd.Parameters.AddWithValue("@DiscountPct", sellerproductdata.DiscountPct ?? (object)DBNull.Value);
-        //            cmd.Parameters.AddWithValue("@EffectivateDate", sellerproductdata.EffectivateDate ?? (object)DBNull.Value);
-        //            cmd.Parameters.AddWithValue("@EndDate", sellerproductdata.EndDate ?? (object)DBNull.Value);
-        //            cmd.Parameters.AddWithValue("@ImagePath", ImagePath);
-        //            cmd.Parameters.AddWithValue("@Status", "Pending");
-        //            cmd.Parameters.AddWithValue("@IsActive", 1);
-        //            cmd.Parameters.AddWithValue("@TotalPrice", sellerproductdata.TotalPrice);
-
-        //            cmd.Parameters.AddWithValue("@AddedBy", sellerproductdata.AddedBy);
-        //            cmd.Parameters.AddWithValue("@AddedDate", DateTime.Now);
-        //            cmd.Parameters.AddWithValue("@AddedPC", sellerproductdata.AddedPC);
-
-        //            await con.OpenAsync();
-        //            int res = await cmd.ExecuteNonQueryAsync();
-        //            await con.CloseAsync();
-        //            if (res > 0)
-        //            {
-        //                return Ok(new { message = "SellerProductPriceAndOffer Added Successfully." });
-        //            }
-        //            else
-        //            {
-        //                return BadRequest(new { message = "SellerProductPriceAndOffer Add Unsuccessfull." });
-        //            }
-        //        }
-
-
-
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(new { message = ex.Message });
-        //    }
-        //}
-
-
-        //public async Task<IActionResult> UpdateSellerProductPriceAndOffer([FromForm] SellerProductPriceAndOfferDto sellerproductdata)
-        //{
-        //    try
-        //    {
-        //        // Validation
-        //        if (sellerproductdata == null)
-        //        {
-        //            return BadRequest(new { message = "Invalid request data." });
-        //        }
-
-        //        // Additional validation as needed for required fields, e.g., ProductId, UserId, Price, etc.
-
-        //        Boolean check = await SellerProductPriceAndOfferCheck(sellerproductdata.ProductId, sellerproductdata.UserId);
-
-        //        if (check)
-        //        {
-        //            await con.OpenAsync();
-
-        //            using (SqlTransaction transaction = con.BeginTransaction())
-        //            {
-        //                try
-        //                {
-
-        //                    string ImagePath = CommonServices.UploadFiles(foldername, filename, sellerproductdata.ImageFile);
-
-        //                    string query = "UpdateSellerProductPriceAndOffer";
-        //                    SqlCommand cmd = new SqlCommand(query, con, transaction);
-        //                    cmd.CommandType = CommandType.StoredProcedure;
-
-
-        //                    if (ImagePath != null)
-        //                    {
-        //                        // Adding parameters with null checks
-        //                        cmd.Parameters.AddWithValue("@ProductId", sellerproductdata.ProductId);
-        //                        cmd.Parameters.AddWithValue("@UserId", sellerproductdata.UserId);
-        //                        cmd.Parameters.AddWithValue("@Price", sellerproductdata.Price ?? (object)DBNull.Value);
-        //                        cmd.Parameters.AddWithValue("@DiscountAmount", sellerproductdata.DiscountAmount ?? (object)DBNull.Value);
-        //                        cmd.Parameters.AddWithValue("@DiscountPct", sellerproductdata.DiscountPct ?? (object)DBNull.Value);
-        //                        cmd.Parameters.AddWithValue("@EffectivateDate", sellerproductdata.EffectivateDate ?? (object)DBNull.Value);
-        //                        cmd.Parameters.AddWithValue("@EndDate", sellerproductdata.EndDate ?? (object)DBNull.Value);
-        //                        cmd.Parameters.AddWithValue("@Status", "Pending");
-        //                        cmd.Parameters.AddWithValue("@IsActive", 1);
-        //                        cmd.Parameters.AddWithValue("@UpdatedBy", sellerproductdata.UpdatedBy ?? (object)DBNull.Value);
-        //                        cmd.Parameters.AddWithValue("@UpdatedDate", DateTime.Now);
-        //                        cmd.Parameters.AddWithValue("@UpdatedPC", sellerproductdata.UpdatedPC ?? (object)DBNull.Value);
-        //                        cmd.Parameters.AddWithValue("@TotalPrice", sellerproductdata.TotalPrice ?? (object)DBNull.Value);
-        //                        cmd.Parameters.AddWithValue("@ImagePath", ImagePath);
-
-
-        //                        await cmd.ExecuteNonQueryAsync();
-        //                    }
-        //                    else
-        //                    {
-        //                        // Adding parameters with null checks
-        //                        cmd.Parameters.AddWithValue("@ProductId", sellerproductdata.ProductId);
-        //                        cmd.Parameters.AddWithValue("@UserId", sellerproductdata.UserId);
-        //                        cmd.Parameters.AddWithValue("@Price", sellerproductdata.Price ?? (object)DBNull.Value);
-        //                        cmd.Parameters.AddWithValue("@DiscountAmount", sellerproductdata.DiscountAmount ?? (object)DBNull.Value);
-        //                        cmd.Parameters.AddWithValue("@DiscountPct", sellerproductdata.DiscountPct ?? (object)DBNull.Value);
-        //                        cmd.Parameters.AddWithValue("@EffectivateDate", sellerproductdata.EffectivateDate ?? (object)DBNull.Value);
-        //                        cmd.Parameters.AddWithValue("@EndDate", sellerproductdata.EndDate ?? (object)DBNull.Value);
-        //                        cmd.Parameters.AddWithValue("@Status", "Pending");
-        //                        cmd.Parameters.AddWithValue("@IsActive", 1);
-        //                        cmd.Parameters.AddWithValue("@UpdatedBy", sellerproductdata.UpdatedBy ?? (object)DBNull.Value);
-        //                        cmd.Parameters.AddWithValue("@UpdatedDate", DateTime.Now);
-        //                        cmd.Parameters.AddWithValue("@UpdatedPC", sellerproductdata.UpdatedPC ?? (object)DBNull.Value);
-        //                        cmd.Parameters.AddWithValue("@TotalPrice", sellerproductdata.TotalPrice ?? (object)DBNull.Value);
-
-        //                        await cmd.ExecuteNonQueryAsync();
-        //                    }
-
-
-
-        //                    transaction.Commit();
-        //                    return Ok(new { message = "Price updated successfully." });
-        //                }
-        //                catch (Exception ex)
-        //                {
-        //                    transaction.Rollback();
-        //                    return BadRequest(new { message = $"Error updating price: {ex.Message}" });
-        //                }
-        //                finally
-        //                {
-        //                    con.Close();
-        //                }
-        //            }
-        //        }
-        //        else
-        //        {
-        //            return NotFound(new { message = "Price not found!" });
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(new { message = $"Error updating price: {ex.Message}" });
-        //    }
-        //}
-
-
-        //public async Task<IActionResult> GetSellerProductsByCompanyCode(string userID, Int32? status = null)
-        //{
-        //    var sellerProductsByCompanyCode = new List<SellerProductsByCompanyCodeDto>();
-        //    try
-        //    {
-        //        using (var connection = new SqlConnection(_healthCareConnection))
-        //        {
-        //            using (var command = new SqlCommand("GetSellerProductsByCompanyCode", connection))
-        //            {
-        //                command.CommandType = CommandType.StoredProcedure;
-        //                command.Parameters.Add(new SqlParameter("@userID", userID));
-        //                command.Parameters.Add(new SqlParameter("@status", status));
-        //                await connection.OpenAsync();
-        //                using (var reader = await command.ExecuteReaderAsync())
-        //                {
-        //                    while (await reader.ReadAsync())
-        //                    {
-        //                        var sellerProduct = new SellerProductsByCompanyCodeDto();
-
-        //                        sellerProduct.SellerProductId = Convert.ToInt32(reader["SellerProductId"]);
-        //                        sellerProduct.ProductId = Convert.ToInt32(reader["ProductId"]);
-        //                        sellerProduct.ProductName = reader["ProductName"].ToString();
-        //                        sellerProduct.UserId = reader["UserId"].ToString();
-        //                        sellerProduct.FullName = reader["FullName"].ToString();
-        //                        sellerProduct.Price = reader["Price"] != DBNull.Value ? Convert.ToDecimal(reader["Price"]) : 0;
-        //                        sellerProduct.DiscountAmount = reader["DiscountAmount"] != DBNull.Value ? Convert.ToDecimal(reader["DiscountAmount"]) : 0;
-        //                        sellerProduct.DiscountPct = reader["DiscountPct"] != DBNull.Value ? Convert.ToDecimal(reader["DiscountPct"]) : 0;
-        //                        sellerProduct.EffectivateDate = reader["EffectivateDate"] != DBNull.Value ? Convert.ToDateTime(reader["EffectivateDate"]) : DateTime.MinValue;
-        //                        sellerProduct.EndDate = reader["EndDate"] != DBNull.Value ? Convert.ToDateTime(reader["EndDate"]) : DateTime.MinValue;
-        //                        sellerProduct.ImagePath = reader["ImagePath"].ToString();
-        //                        sellerProduct.Status = reader["Status"].ToString();
-        //                        sellerProduct.IsActive = reader["IsActive"] != DBNull.Value ? Convert.ToBoolean(reader["IsActive"]) : false;
-        //                        sellerProduct.TotalPrice = reader["TotalPrice"] != DBNull.Value ? Convert.ToDecimal(reader["TotalPrice"]) : 0;
-        //                        sellerProduct.AddedDate = reader["AddedDate"] != DBNull.Value ? Convert.ToDateTime(reader["AddedDate"]) : DateTime.MinValue;
-        //                        sellerProduct.UnitName = reader["UnitName"].ToString();
-        //                        sellerProduct.ProductGroupName = reader["ProductGroupName"].ToString();
-        //                        sellerProduct.ProductGroupID = Convert.ToInt32(reader["ProductGroupID"]);
-
-
-        //                        DateTime? endDate = null;
-        //                        if (reader["EndDate"] != DBNull.Value)
-        //                        {
-        //                            endDate = Convert.ToDateTime(reader["EndDate"]);
-        //                            if (endDate <= DateTime.Now)
-        //                            {
-        //                                sellerProduct.TotalPrice = sellerProduct.Price;
-        //                                sellerProduct.DiscountAmount = 0;
-        //                                sellerProduct.DiscountPct = 0;
-        //                            }
-        //                        }
-
-
-
-
-        //                        sellerProductsByCompanyCode.Add(sellerProduct);
-        //                    }
-
-        //                }
-        //            }
-        //        }
-        //        return Ok(sellerProductsByCompanyCode);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, "An error occurred while retrieving companies: " + ex.Message);
-        //    }
-        //}
-
-
-        //public async Task<ActionResult> GetPortalReceivedByUserId(int userId)
-        //{
-        //    try
-        //    {
-        //        List<PortalReceived> portalReceivedList = new List<PortalReceived>();
-
-        //        using (con)
-        //        {
-        //            using (var command = new SqlCommand("SELECT [PortalReceivedId], [PortalReceivedCode], [MaterialReceivedDate], UserId FROM [PortalReceivedMaster] WHERE UserId = @UserId ORDER BY [PortalReceivedCode] DESC ", con))
-        //            {
-        //                command.Parameters.AddWithValue("@UserId", userId);
-        //                await con.OpenAsync();
-
-        //                using (var reader = await command.ExecuteReaderAsync())
-        //                {
-        //                    while (await reader.ReadAsync())
-        //                    {
-        //                        PortalReceived portalReceived = new PortalReceived
-        //                        {
-        //                            PortalReceivedId = Convert.ToInt32(reader["PortalReceivedId"]),
-        //                            PortalReceivedCode = reader["PortalReceivedCode"].ToString(),
-        //                            MaterialReceivedDate = reader["MaterialReceivedDate"] != DBNull.Value ? Convert.ToDateTime(reader["MaterialReceivedDate"]) : (DateTime?)null,
-        //                            UserId = Convert.ToInt32(reader["UserId"])
-        //                        };
-        //                        portalReceivedList.Add(portalReceived);
-        //                    }
-        //                }
-        //            }
-        //        }
-
-        //        if (portalReceivedList.Count == 0)
-        //        {
-        //            return NotFound("No data found for the given user ID.");
-        //        }
-
-        //        return Ok(portalReceivedList);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, "An error occurred while retrieving data: " + ex.Message);
-        //    }
-        //}
-
-
-        //public async Task<IActionResult> GetPortalData(int PortalReceivedId)
-        //{
-        //    using (var connection = new SqlConnection(_healthCareConnection))
-        //    {
-        //        try
-        //        {
-        //            PortalAfterInsert portalAfterInsert = new PortalAfterInsert();
-        //            string portalAfter = "GetPortalDataAfterInsertByPortalReceivedId";
-        //            connection.Open();
-        //            SqlCommand cmdportal = new SqlCommand(portalAfter, connection);
-        //            cmdportal.CommandType = CommandType.StoredProcedure;
-        //            cmdportal.Parameters.AddWithValue("@PortalReceivedId", PortalReceivedId);
-        //            SqlDataAdapter adapter = new SqlDataAdapter(cmdportal);
-        //            DataSet ds = new DataSet();
-        //            adapter.Fill(ds);
-        //            DataTable reader = ds.Tables[0];
-        //            DataTable reader1 = ds.Tables[1];
-        //            for (int i = 0; i < reader.Rows.Count; i++)
-        //            {
-        //                portalAfterInsert.PortalReceivedId = Convert.ToInt32(reader.Rows[i]["PortalReceivedId"].ToString());
-        //                portalAfterInsert.PortalReceivedCode = reader.Rows[i]["PortalReceivedCode"].ToString();
-        //                portalAfterInsert.MaterialReceivedDate = Convert.ToDateTime(reader.Rows[i]["MaterialReceivedDate"].ToString());
-        //                portalAfterInsert.ChallanNo = reader.Rows[i]["ChallanNo"].ToString();
-        //                portalAfterInsert.ChallanDate = reader.Rows[i]["ChallanDate"] != DBNull.Value ? Convert.ToDateTime(reader.Rows[i]["ChallanDate"]) : (DateTime?)null;
-        //                portalAfterInsert.Remarks = reader.Rows[i]["Remarks"].ToString();
-        //            }
-        //            for (int i = 0; i < reader1.Rows.Count; i++)
-        //            {
-        //                PortalReceivedDetailAfterInsert portalReceivedDetailAfterInsert = new PortalReceivedDetailAfterInsert
-        //                {
-        //                    PortalReceivedId = Convert.ToInt32(reader1.Rows[i]["PortalReceivedId"].ToString()),
-        //                    PortalDetailsId = Convert.ToInt32(reader1.Rows[i]["PortalDetailsId"].ToString()),
-        //                    ProductGroupId = Convert.ToInt32(reader1.Rows[i]["ProductGroupId"].ToString()),
-        //                    ProductGroupName = reader1.Rows[i]["ProductGroupName"].ToString(),
-        //                    ProductId = Convert.ToInt32(reader1.Rows[i]["ProductId"].ToString()),
-        //                    ProductName = reader1.Rows[i]["ProductName"].ToString(),
-        //                    Specification = reader1.Rows[i]["Specification"].ToString(),
-        //                    ReceivedQty = Convert.ToDecimal(reader1.Rows[i]["ReceivedQty"].ToString()),
-        //                    UnitId = Convert.ToInt32(reader1.Rows[i]["UnitId"].ToString()),
-        //                    Unit = reader1.Rows[i]["Unit"].ToString(),
-        //                    Price = Convert.ToDecimal(reader1.Rows[i]["Price"].ToString()),
-        //                    TotalPrice = Convert.ToDecimal(reader1.Rows[i]["TotalPrice"].ToString()),
-        //                    AvailableQty = Convert.ToDecimal(reader1.Rows[i]["AvailableQty"].ToString()),
-        //                    Remarks = reader1.Rows[i]["Remarks"].ToString(),
-        //                };
-        //                portalAfterInsert.PortalReceivedDetailAfterInsertlList.Add(portalReceivedDetailAfterInsert);
-        //            }
-        //            return Ok(new { message = "portal Data After Insert got successfully", portalAfterInsert });
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            return BadRequest(new { message = "An error occurred while fetching the portal Data After Insert." });
-        //        }
-        //        finally
-        //        {
-        //            if (connection.State == ConnectionState.Open)
-        //            {
-        //                connection.Close();
-        //            }
-        //        }
-        //    }
-        //}
+        public async Task<List<ProductGroupsListForDropdownDTO>> ProductGroupsDropdownByUserId(string userID)
+        {
+
+            int decryptId = int.Parse(CommonServices.DecryptPassword(userID));
+
+            DataTable dataTable = await _productQuantity_DAL.ProductGroupsDropdownByUserId(decryptId);
+
+            List<ProductGroupsListForDropdownDTO> list = new List<ProductGroupsListForDropdownDTO>();
+            // Check if dataTable is null
+            if (dataTable == null)
+            {
+                return null;
+            }
+            foreach (DataRow row in dataTable.Rows)
+            {
+                ProductGroupsListForDropdownDTO modelObj = new ProductGroupsListForDropdownDTO();
+
+                modelObj.ProductGroupID = CommonServices.EncryptPassword(row["ProductGroupID"].ToString());
+                modelObj.ProductGroupName = row["ProductGroupName"].ToString();
+
+                list.Add(modelObj);
+            }
+            return list;
+        }
+
+
+        public async Task<List<GetSellerProductListForAddQtyDTO>> GetProductForAddQtyByUserId(string UserId, string productGroupId)
+        {
+
+            int DecryptUserId = int.Parse(CommonServices.DecryptPassword(UserId));
+            int DecryptGroupId = int.Parse(CommonServices.DecryptPassword(productGroupId));
+
+            DataTable dataTable = await _productQuantity_DAL.GetProductForAddQtyByUserId(DecryptUserId, DecryptGroupId);
+
+            List<GetSellerProductListForAddQtyDTO> list = new List<GetSellerProductListForAddQtyDTO>();
+            // Check if dataTable is null
+            if (dataTable == null)
+            {
+                return null;
+            }
+            foreach (DataRow row in dataTable.Rows)
+            {
+                GetSellerProductListForAddQtyDTO modelObj = new GetSellerProductListForAddQtyDTO();
+
+                modelObj.ProductId = CommonServices.EncryptPassword(row["ProductId"].ToString());
+                modelObj.ProductName = row["ProductName"].ToString();
+                modelObj.ProductGroupId = CommonServices.EncryptPassword(row["ProductGroupID"].ToString());
+                modelObj.Specification = row["Specification"].ToString();
+                modelObj.UnitId = CommonServices.EncryptPassword(row["UnitId"].ToString());
+                modelObj.Unit = row["Unit"].ToString();
+                modelObj.Price = Convert.ToDecimal(row["Price"]);
+                modelObj.AvailableQty = Convert.ToDecimal(row["AvailableQty"]);
+
+                list.Add(modelObj);
+            }
+            return list;
+
+        }
+
+
+        public async Task<object> InsertPortalReceivedAsync(InsertPortalReceivedMasterDTO portaldata)
+        {
+
+            PortalReceivedMasterModel Model = new PortalReceivedMasterModel();
+
+            Model.MaterialReceivedDate = portaldata.MaterialReceivedDate;
+            Model.ChallanNo = portaldata.ChallanNo;
+            Model.ChallanDate = portaldata.ChallanDate;
+            Model.Remarks = portaldata.Remarks;
+            Model.UserId = int.Parse(CommonServices.DecryptPassword(portaldata.UserId));
+            Model.CompanyCode = CommonServices.DecryptPassword(portaldata.CompanyCode);
+            Model.AddedBy = portaldata.AddedBy;
+            Model.AddedPC = portaldata.AddedPC;
+
+            for(int i=0; i < portaldata.PortalReceivedDetailslist.Count; i++)
+            {
+
+                Model.PortalReceivedDetailslist[i].ProductGroupId = int.Parse(CommonServices.DecryptPassword(portaldata.PortalReceivedDetailslist[i].ProductGroupId));
+                Model.PortalReceivedDetailslist[i].ProductId = int.Parse(CommonServices.DecryptPassword(portaldata.PortalReceivedDetailslist[i].ProductId));
+                Model.PortalReceivedDetailslist[i].Specification = portaldata.PortalReceivedDetailslist[i].Specification;
+                Model.PortalReceivedDetailslist[i].ReceivedQty = portaldata.PortalReceivedDetailslist[i].ReceivedQty;
+                Model.PortalReceivedDetailslist[i].UnitId = int.Parse(CommonServices.DecryptPassword(portaldata.PortalReceivedDetailslist[i].UnitId));
+                Model.PortalReceivedDetailslist[i].Price = portaldata.PortalReceivedDetailslist[i].Price;
+                Model.PortalReceivedDetailslist[i].TotalPrice = portaldata.PortalReceivedDetailslist[i].TotalPrice;
+                Model.PortalReceivedDetailslist[i].UserId = int.Parse(CommonServices.DecryptPassword(portaldata.PortalReceivedDetailslist[i].UserId));
+                Model.PortalReceivedDetailslist[i].Remarks = portaldata.PortalReceivedDetailslist[i].Remarks;
+                Model.PortalReceivedDetailslist[i].AddedBy = portaldata.PortalReceivedDetailslist[i].AddedBy;
+                Model.PortalReceivedDetailslist[i].AddedPC = portaldata.PortalReceivedDetailslist[i].AddedPC;
+            }
+
+
+            return await _productQuantity_DAL.InsertPortalReceivedAsync(Model);
+        }
+
+
+
+        public async Task<object> CreateSellerProductPriceAndOfferAsync(InsertSellerProductPriceAndOfferDTO sellerproductdata)
+        {
+            SellerProductPriceAndOfferModel Model = new SellerProductPriceAndOfferModel();
+
+            Model.ProductId = int.Parse(CommonServices.DecryptPassword(sellerproductdata.ProductId));
+            Model.UserId = int.Parse(CommonServices.DecryptPassword(sellerproductdata.UserId));
+            Model.Price = sellerproductdata.Price;
+            Model.DiscountAmount = sellerproductdata.DiscountAmount;
+            Model.DiscountPct = sellerproductdata.DiscountPct;
+            Model.EffectivateDate = sellerproductdata.EffectivateDate;
+            Model.EndDate = sellerproductdata.EndDate;
+            Model.ImageFile = sellerproductdata.ImageFile;
+            Model.TotalPrice = sellerproductdata.TotalPrice;
+            Model.CompanyCode = CommonServices.DecryptPassword(sellerproductdata.CompanyCode);
+            Model.AddedBy = sellerproductdata.AddedBy;
+            Model.AddedPC = sellerproductdata.AddedPC;
+
+
+
+            return await _productQuantity_DAL.CreateSellerProductPriceAndOfferAsync(Model);
+        }
+
+
+        public async Task<object> UpdateSellerProductPriceAndOffer(UpdateSellerProductPriceAndOfferDTO sellerproductdata)
+        {
+            SellerProductPriceAndOfferModel Model = new SellerProductPriceAndOfferModel();
+
+            Model.ProductId = int.Parse(CommonServices.DecryptPassword(sellerproductdata.ProductId));
+            Model.UserId = int.Parse(CommonServices.DecryptPassword(sellerproductdata.UserId));
+            Model.Price = sellerproductdata.Price;
+            Model.DiscountAmount = sellerproductdata.DiscountAmount;
+            Model.DiscountPct = sellerproductdata.DiscountPct;
+            Model.EffectivateDate = sellerproductdata.EffectivateDate;
+            Model.EndDate = sellerproductdata.EndDate;
+            Model.ImageFile = sellerproductdata.ImageFile;
+            Model.TotalPrice = sellerproductdata.TotalPrice;
+            Model.CompanyCode = CommonServices.DecryptPassword(sellerproductdata.CompanyCode);
+
+            Model.UpdatedPC = sellerproductdata.UpdatedPC;
+            Model.UpdatedBy = sellerproductdata.UpdatedBy;
+
+
+            return await _productQuantity_DAL.UpdateSellerProductPriceAndOffer(Model);
+        }
+
+
+        public async Task<List<GetSellerProductForPriceAndOfferByUserIdDTO>> GetSellerProductsForPriceAndOfferByUserId(string UserId, Int32? status = null)
+        {
+            int DecryptUserId = int.Parse(CommonServices.DecryptPassword(UserId));
+
+            DataTable dataTable = await _productQuantity_DAL.GetSellerProductsForPriceAndOfferByUserId(DecryptUserId, status);
+
+            List<GetSellerProductForPriceAndOfferByUserIdDTO> list = new List<GetSellerProductForPriceAndOfferByUserIdDTO>();
+            // Check if dataTable is null
+            if (dataTable == null)
+            {
+                return null;
+            }
+
+            foreach (DataRow row in dataTable.Rows)
+            {
+                GetSellerProductForPriceAndOfferByUserIdDTO sellerProduct = new GetSellerProductForPriceAndOfferByUserIdDTO();
+
+                sellerProduct.SellerProductId = CommonServices.EncryptPassword(row["SellerProductId"].ToString());
+                sellerProduct.ProductId = CommonServices.EncryptPassword(row["ProductId"].ToString());
+                sellerProduct.ProductName = row["ProductName"].ToString();
+                sellerProduct.UserId = CommonServices.EncryptPassword(row["UserId"].ToString());
+                sellerProduct.FullName = row["FullName"].ToString();
+                sellerProduct.Price = row["Price"] != DBNull.Value ? Convert.ToDecimal(row["Price"]) : 0;
+                sellerProduct.DiscountAmount = row["DiscountAmount"] != DBNull.Value ? Convert.ToDecimal(row["DiscountAmount"]) : 0;
+                sellerProduct.DiscountPct = row["DiscountPct"] != DBNull.Value ? Convert.ToDecimal(row["DiscountPct"]) : 0;
+                sellerProduct.EffectivateDate = row["EffectivateDate"] != DBNull.Value ? Convert.ToDateTime(row["EffectivateDate"]) : DateTime.MinValue;
+                sellerProduct.EndDate = row["EndDate"] != DBNull.Value ? Convert.ToDateTime(row["EndDate"]) : DateTime.MinValue;
+                sellerProduct.ImagePath = row["ImagePath"].ToString();
+                sellerProduct.Status = row["Status"].ToString();
+                sellerProduct.IsActive = row["IsActive"] != DBNull.Value ? Convert.ToBoolean(row["IsActive"]) : false;
+                sellerProduct.TotalPrice = row["TotalPrice"] != DBNull.Value ? Convert.ToDecimal(row["TotalPrice"]) : 0;
+                sellerProduct.AddedDate = row["AddedDate"] != DBNull.Value ? Convert.ToDateTime(row["AddedDate"]) : DateTime.MinValue;
+                sellerProduct.UnitName = row["UnitName"].ToString();
+                sellerProduct.ProductGroupName = row["ProductGroupName"].ToString();
+                sellerProduct.ProductGroupID = CommonServices.EncryptPassword(row["ProductGroupID"].ToString());
+
+
+                DateTime? endDate = null;
+                if (row["EndDate"] != DBNull.Value)
+                {
+                    endDate = Convert.ToDateTime(row["EndDate"]);
+                    if (endDate <= DateTime.UtcNow)
+                    {
+                        sellerProduct.TotalPrice = sellerProduct.Price;
+                        sellerProduct.DiscountAmount = 0;
+                        sellerProduct.DiscountPct = 0;
+                    }
+                }
+
+
+
+
+                list.Add(sellerProduct);
+            }
+            return list;
+
+
+        }
+
+
+        public async Task<List<GetPortalReceivedListByUserIdDTO>> GetPortalReceivedByUserId(string UserId)
+        {
+            int DecryptUserId = int.Parse(CommonServices.DecryptPassword(UserId));
+            DataTable dataTable = await _productQuantity_DAL.GetPortalReceivedByUserId(DecryptUserId);
+
+            List<GetPortalReceivedListByUserIdDTO> list = new List<GetPortalReceivedListByUserIdDTO>();
+            // Check if dataTable is null
+            if (dataTable == null)
+            {
+                return null;
+            }
+
+            foreach (DataRow row in dataTable.Rows)
+            {
+                GetPortalReceivedListByUserIdDTO obj = new GetPortalReceivedListByUserIdDTO();
+                {
+                    obj.PortalReceivedId = CommonServices.EncryptPassword(row["PortalReceivedId"].ToString());
+                    obj.PortalReceivedCode = CommonServices.EncryptPassword(row["PortalReceivedCode"].ToString());
+                    obj.MaterialReceivedDate = row["MaterialReceivedDate"] != DBNull.Value ? Convert.ToDateTime(row["MaterialReceivedDate"]) : (DateTime?)null;
+                    obj.UserId = CommonServices.EncryptPassword(row["UserId"].ToString());
+                };
+                list.Add(obj);
+            }
+            return list;
+
+        }
+
+
+        public async Task<GetPortalReceivedMasterDataAfterInsertDTO> GetPortalData(string PortalReceivedId)
+        {
+
+            int DecryptPortalReceivedId = int.Parse(CommonServices.DecryptPassword(PortalReceivedId));
+            DataTable dataTable = await _productQuantity_DAL.GetPortalData(DecryptPortalReceivedId);
+
+            GetPortalReceivedMasterDataAfterInsertDTO portalAfterInsert = new GetPortalReceivedMasterDataAfterInsertDTO();
+
+            foreach (DataRow row in dataTable.Rows)
+            {
+                portalAfterInsert.PortalReceivedId = CommonServices.EncryptPassword(row["PortalReceivedId"].ToString());
+                portalAfterInsert.PortalReceivedCode = CommonServices.EncryptPassword(row["PortalReceivedCode"].ToString());
+                portalAfterInsert.MaterialReceivedDate = Convert.ToDateTime(row["MaterialReceivedDate"].ToString());
+                portalAfterInsert.ChallanNo = row["ChallanNo"].ToString();
+                portalAfterInsert.ChallanDate = row["ChallanDate"] != DBNull.Value ? Convert.ToDateTime(row["ChallanDate"]) : (DateTime?)null;
+                portalAfterInsert.Remarks = row["Remarks"].ToString();
+            }
+            foreach (DataRow row in dataTable.Rows)
+            {
+                GetPortalReceivedDetailsDataAfterInsertDTO portalReceivedDetailAfterInsert = new GetPortalReceivedDetailsDataAfterInsertDTO
+                {
+                    PortalReceivedId = CommonServices.EncryptPassword(row["PortalReceivedId"].ToString()),
+                    PortalDetailsId = CommonServices.EncryptPassword(row["PortalDetailsId"].ToString()),
+                    ProductGroupId = CommonServices.EncryptPassword(row["ProductGroupId"].ToString()),
+                    ProductGroupName = row["ProductGroupName"].ToString(),
+                    ProductId = CommonServices.EncryptPassword(row["ProductId"].ToString()),
+                    ProductName = row["ProductName"].ToString(),
+                    Specification = row["Specification"].ToString(),
+                    ReceivedQty = Convert.ToDecimal(row["ReceivedQty"].ToString()),
+                    UnitId = CommonServices.EncryptPassword(row["UnitId"].ToString()),
+                    Unit = row["Unit"].ToString(),
+                    Price = Convert.ToDecimal(row["Price"].ToString()),
+                    TotalPrice = Convert.ToDecimal(row["TotalPrice"].ToString()),
+                    AvailableQty = Convert.ToDecimal(row["AvailableQty"].ToString()),
+                    Remarks = row["Remarks"].ToString(),
+                };
+                portalAfterInsert.PortalReceivedDetailAfterInsertlList.Add(portalReceivedDetailAfterInsert);
+            }
+            return portalAfterInsert;
+
+        }
 
 
     }

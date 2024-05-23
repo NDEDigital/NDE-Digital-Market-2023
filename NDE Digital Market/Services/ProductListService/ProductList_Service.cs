@@ -50,7 +50,7 @@ public class ProductList_Service: IProductList_Service
         Model.UpdatedBy = productDto.UpdatedBy;
         Model.UpdatedPC = productDto.UpdatedPC;
 
-        return await _productList_DAL.CreateProductGroupsAsync(Model);
+        return await _productList_DAL.UpdateProductListAsync(Model);
     }
 
     //======================================================================
