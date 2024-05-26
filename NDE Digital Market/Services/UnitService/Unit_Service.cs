@@ -51,7 +51,11 @@ namespace NDE_Digital_Market.Services.UnitService
 
         public async Task<object> PutUnit(UpdateUnitDTO unit)
         {
+            int decryptedId = int.Parse(CommonServices.DecryptPassword(unit.UnitId));
+
             UnitModel model = new UnitModel();
+            model.UnitId = decryptedId;
+
             model.Name = unit.Name;
             model.Description = unit.Description;
             model.UpdatedBy = unit.UpdatedBy;

@@ -135,6 +135,7 @@ namespace NDE_Digital_Market.Controllers
             }
         }
 
+
         private async Task<IActionResult> InsertOrderDateDetailsAsync(int OrderMasterId, List<OrderDetailsDto> OrderDetailsList, SqlTransaction transaction)
         {
             try
@@ -178,10 +179,6 @@ namespace NDE_Digital_Market.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
-
-
-
 
 
 
@@ -473,6 +470,7 @@ namespace NDE_Digital_Market.Controllers
             public string? status { get; set; }
             public SellerSalesMasterDto? sellerSalesMasterDto { get; set; }
         }
+
 
         [HttpPut("UpdateSellerOrderDetailsStatus")]
         [Authorize(Roles ="seller")]

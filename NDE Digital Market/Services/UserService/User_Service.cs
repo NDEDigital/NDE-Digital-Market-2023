@@ -72,7 +72,7 @@ namespace NDE_Digital_Market.Services.UserService
 
         public async Task<GetSingleUserDetailsDTO> getSingleUser(string UserId)
         {
-            string decryptedUserId = CommonServices.Decrypt<string>(UserId);
+            string decryptedUserId = CommonServices.DecryptPassword(UserId);
             DataTable dataTable = await _user_DAL.getSingleUser(decryptedUserId);
 
             GetSingleUserDetailsDTO user = new GetSingleUserDetailsDTO();
@@ -118,7 +118,7 @@ namespace NDE_Digital_Market.Services.UserService
         {
 
             UserModel userModel = new UserModel();
-            string decryptedUserId = CommonServices.Decrypt<string>(user.UserId);
+            string decryptedUserId = CommonServices.DecryptPassword(user.UserId);
             int decryptedUserIdInt;
             if (int.TryParse(decryptedUserId, out decryptedUserIdInt))
             {

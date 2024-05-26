@@ -18,6 +18,7 @@ using NDE_Digital_Market.Services.ProductReturnService;
 using NDE_Digital_Market.Services.ProductListService;
 using NDE_Digital_Market.Services.ProductGroupService;
 using NDE_Digital_Market.Services.ProductQuantityService;
+using NDE_Digital_Market.Services.PermissionToDashboardService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -80,6 +81,9 @@ builder.Services.AddScoped<ProductGroup_DAL>();
 
 builder.Services.AddScoped<IProductQuantity_Service, ProductQuantity_Service>();
 builder.Services.AddScoped<ProductQuantity_DAL>();
+
+builder.Services.AddScoped<IPermissionToDashboard_Service, PermissionToDashboard_Service>();
+builder.Services.AddScoped<PermissionToDashboard_DAL>();
 
 //builder.Services.AddScoped<NDE_Digital_Market.Controllers.UserController>();
 //builder.Services.AddScoped<NDE_Digital_Market.Services.CompanyRegistrationServices.ICompanyRegistration, NDE_Digital_Market.Services.CompanyRegistrationServices.CompanyRegistration>();
