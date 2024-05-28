@@ -78,7 +78,7 @@ namespace NDE_Digital_Market.Services.OrderService
                 obj.OrderNo = row["OrderNo"].ToString();
                 obj.OrderDate = Convert.ToDateTime(row["OrderDate"]);
                 obj.Address = row["Address"].ToString();
-                obj.UserId = CommonServices.EncryptPassword((row["UserId"].ToString());
+                obj.UserId = CommonServices.EncryptPassword(row["UserId"].ToString());
                 obj.PaymentMethod = row["PaymentMethod"].ToString();
                 obj.NumberOfItem = Convert.ToInt32(row["NumberOfItem"]);
                 obj.TotalPrice = Convert.ToInt32(row["TotalPrice"]);
