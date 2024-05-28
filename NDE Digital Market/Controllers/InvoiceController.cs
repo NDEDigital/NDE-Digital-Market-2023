@@ -6,6 +6,7 @@ using System.Data;
 using Microsoft.AspNetCore.Authorization;
 using NDE_Digital_Market.DTOs;
 using NDE_Digital_Market.Model;
+using NDE_Digital_Market.Services.InvoiceService;
 
 namespace NDE_Digital_Market.Controllers
 {
@@ -16,16 +17,10 @@ namespace NDE_Digital_Market.Controllers
     public class InvoiceController : Controller
     {
 
-        private readonly string _connectionSteel;
-        private readonly string _connectionDigitalMarket;
-        private readonly string connectionHealthCare;
-        public InvoiceController(IConfiguration config)
+        private readonly IInvoice_Service _invoice_Service;
+        public InvoiceController(IInvoice_Service invoice_Service)
         {
-            CommonServices commonServices = new CommonServices(config);
-            _connectionSteel = config.GetConnectionString("DefaultConnection");
-            _connectionDigitalMarket = config.GetConnectionString("DigitalMarketConnection");
-            connectionHealthCare = commonServices.HealthCareConnection;
-
+            _invoice_Service = invoice_Service;
         }
 
         //========================================== Added By Maru =================================
@@ -34,75 +29,28 @@ namespace NDE_Digital_Market.Controllers
 
         [HttpGet]
         [Route("GetInvoiceDataForBuyer")]
-        public async Task<IActionResult> GetInvoiceDataForBuyer(int OrderMasterId)
+        public async Task<IActionResult> GetInvoiceDataForBuyer(string OrderMasterId)
         {
-            SqlConnection con = new SqlConnection(connectionHealthCare);
             try
             {
-                GetOrderInvoiceByMasterIdDto invoice = new GetOrderInvoiceByMasterIdDto();
-                string queryForBuyer = "GetOrderInvoiceByMasterId";
-                con.Open();
-                SqlCommand cmdForBuyer = new SqlCommand(queryForBuyer, con);
-                cmdForBuyer.CommandType = CommandType.StoredProcedure;
-
-                cmdForBuyer.Parameters.AddWithValue("@OrderMasterId", OrderMasterId);
-                SqlDataAdapter adapter = new SqlDataAdapter(cmdForBuyer);
-                DataSet ds = new DataSet();
-                adapter.Fill(ds);
-                DataTable reader = ds.Tables[0];
-                DataTable reader1 = ds.Tables[1];
-                for (int i = 0; i < reader.Rows.Count; i++)
+                if (OrderMasterId == null)
                 {
-                    invoice.InvoiceNumber = reader.Rows[i]["InvoiceNumber"].ToString();
-                    invoice.OrderDate = Convert.ToDateTime(reader.Rows[i]["OrderDate"].ToString());
-                    invoice.BuyerName = reader.Rows[i]["BuyerName"].ToString();
-                    invoice.Address = reader.Rows[i]["Address"].ToString();
-                    invoice.Phone = reader.Rows[i]["PhoneNumber"].ToString();
-                    invoice.PaymentMethod = reader.Rows[i]["PaymentMethod"].ToString();
-                    invoice.NumberOfItem = Convert.ToInt32(reader.Rows[i]["NumberOfItem"].ToString());
-                    invoice.TotalPrice = Convert.ToDecimal(reader.Rows[i]["TotalPrice"].ToString());
+                    return NotFound(new { message = "Give Valid Data." });
                 }
-                for (int i = 0; i < reader1.Rows.Count; i++)
+                object res = await _invoice_Service.GetInvoiceDataForBuyer(OrderMasterId);
+                if (res == null)
                 {
-                    OrderInvoiceDetails orderDetails = new OrderInvoiceDetails
-                    {
-
-                        ProductName = reader1.Rows[i]["ProductName"].ToString(),
-                        Status = reader1.Rows[i]["Status"].ToString(),
-                        Specification = reader1.Rows[i]["Specification"].ToString(),
-                        Quantity = Convert.ToInt32(reader1.Rows[i]["Quantity"].ToString()),
-                        SellerId = Convert.ToInt32(reader1.Rows[i]["SellerId"].ToString()),
-                        Unit = reader1.Rows[i]["Unit"].ToString(),
-                        Price = Convert.ToDecimal(reader1.Rows[i]["Price"].ToString()),
-                        DeliveryCharge = Convert.ToDecimal(reader1.Rows[i]["DeliveryCharge"].ToString()),
-                        DiscountAmount = Convert.ToDecimal(reader1.Rows[i]["DiscountAmount"].ToString()),
-                        DeliveryDate = Convert.ToDateTime(reader1.Rows[i]["DeliveryDate"].ToString()),
-                        DiscountPct = Convert.ToDecimal(reader1.Rows[i]["DiscountPct"].ToString()),
-                        NetPrice = Convert.ToDecimal(reader1.Rows[i]["NetPrice"].ToString()),
-                        DetailDeliveryCharge = Convert.ToDecimal(reader1.Rows[i]["DetailDeliveryCharge"].ToString()),
-                        SubTotalPrice = Convert.ToDecimal(reader1.Rows[i]["SubTotalPrice"].ToString()),
-                        SelesPerson = reader1.Rows[i]["SelesPerson"].ToString(),
-                        SelesAddress = reader1.Rows[i]["SelesAddress"].ToString(),
-                        SellerContact = reader1.Rows[i]["SellerContact"].ToString(),
-                        Company = reader1.Rows[i]["Company"].ToString(),
-                    };
-                    invoice.OrderInvoiceDetailList.Add(orderDetails);
+                    return NotFound(new { message = "No Data Found." });
                 }
-
-                return Ok(new { message = "Buyer Order Invoice got successfully", invoice });
+                return Ok(res);
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = "An error occurred while fetching the Buyer Order Invoice data." });
-            }
-            finally
-            {
-                if (con.State == ConnectionState.Open)
-                {
-                    con.Close();
-                }
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
             }
         }
+
+
 
         //public IActionResult GetInvoiceDataForAdmin(int OrderID)
         //{
@@ -170,65 +118,28 @@ namespace NDE_Digital_Market.Controllers
         //}
 
         //========================================== Added By Rey =================================
+        
+        
         [HttpGet]
         [Route("GetInvoiceDataForSeller")]
-        public async Task<IActionResult> GetInvoiceDataForSeller(int SSMId)
+        public async Task<IActionResult> GetInvoiceDataForSeller(string SSMId)
         {
-            SellerInvoice invoice = new SellerInvoice();
-
             try
             {
-                SqlConnection con = new SqlConnection(connectionHealthCare);
-                string queryForSeller = "SellerInvoice";
-                con.Open();
-                SqlCommand cmdForSeller = new SqlCommand(queryForSeller, con);
-                cmdForSeller.CommandType = CommandType.StoredProcedure;
-                cmdForSeller.Parameters.AddWithValue("@SSMId", SSMId);
-                SqlDataAdapter adapter = new SqlDataAdapter(cmdForSeller);
-                DataSet ds = new DataSet();
-                adapter.Fill(ds);
-                DataTable reader = ds.Tables[0];
-                DataTable reader1 = ds.Tables[1];
-                con.Close();
-                for (int i = 0; i < reader.Rows.Count; i++)
+                if (SSMId == null)
                 {
-                    invoice.SSMCode = reader.Rows[i]["SSMCode"].ToString();
-                    invoice.SSMDate = Convert.ToDateTime(reader.Rows[i]["SSMDate"].ToString());
-                    invoice.SelesPerson = reader.Rows[i]["SelesPerson"].ToString();
-                    invoice.Company = reader.Rows[i]["Company"].ToString();
-                    invoice.SelesAddress = reader.Rows[i]["SelesAddress"].ToString();
-                    invoice.Phone = reader.Rows[i]["Phone"].ToString();
-                    invoice.Challan = reader.Rows[i]["Challan"].ToString();
-                    invoice.Remarks = reader.Rows[i]["Remarks"].ToString();
+                    return NotFound(new { message = "Give Valid Data." });
                 }
-
-                for (int i = 0; i < reader1.Rows.Count; i++)
+                object res = await _invoice_Service.GetInvoiceDataForSeller(SSMId);
+                if (res == null)
                 {
-                    SellerInvoiceDetails sellerDetails = new SellerInvoiceDetails
-                    {
-                        OrderNo = reader1.Rows[i]["OrderNo"].ToString(),
-                        ProductGroupName = reader1.Rows[i]["ProductGroupName"].ToString(),
-                        ProductName = reader1.Rows[i]["ProductName"].ToString(),
-                        Specification = reader1.Rows[i]["Specification"].ToString(),
-                        StockQty = Convert.ToDecimal(reader1.Rows[i]["StockQty"].ToString()),
-                        SaleQty = Convert.ToInt32(reader1.Rows[i]["SaleQty"].ToString()),
-                        Unit = reader1.Rows[i]["Unit"].ToString(),
-                        NetPrice = Convert.ToDecimal(reader1.Rows[i]["NetPrice"].ToString()),
-                        SSLRemarks = reader1.Rows[i]["SSLRemarks"].ToString(),
-                        BuyerName = reader1.Rows[i]["BuyerName"].ToString(),
-                        BuyerPhone = reader1.Rows[i]["BuyerPhone"].ToString(),
-                        Address = reader1.Rows[i]["Address"].ToString(),
-                    };
-                    invoice.SellerInvoiceDetailList.Add(sellerDetails);
+                    return NotFound(new { message = "No Data Found." });
                 }
-
-                return Ok(new { message = "Sellers Order Invoice got successfully", invoice });
+                return Ok(res);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-  
-                return StatusCode(500, new { message = "Internal Server Error" });
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
             }
         }
 
