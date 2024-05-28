@@ -1,8 +1,8 @@
-﻿namespace NDE_Digital_Market.DTOs
+﻿namespace NDE_Digital_Market.Model
 {
-    public class OrderDetailsDto
+    public class OrderDetailsModel : CommonFieldsModel
     {
-        public string CompanyCode { get; set; } 
+        public string CompanyCode { get; set; }
         public int? OrderMasterId { get; set; }
         public int? UserId { get; set; }
         public int? ProductId { get; set; }
@@ -16,7 +16,5 @@
         public DateTime? DeliveryDate { get; set; }
         public decimal? DiscountPct { get; set; }
         public decimal? NetPrice { get; set; }
-        public string? AddedBy { get; set; }
-        public string? AddedPC { get; set; }
     }
 }
