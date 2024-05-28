@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NDE_Digital_Market.DTOs;
+using NDE_Digital_Market.Services.DashboardService;
 using NDE_Digital_Market.SharedServices;
 using System.Data;
 using System.Data.SqlClient;
@@ -11,12 +12,11 @@ namespace NDE_Digital_Market.Controllers
     [Authorize(Roles ="seller")]
     public class DashboardController : ControllerBase
     {
-        private readonly string _healthCareConnection;
 
-        public DashboardController(IConfiguration config)
+        private readonly IDashboard_Service _Dashboard_Service;
+        public DashboardController(IDashboard_Service Dashboard_Service)
         {
-            CommonServices commonServices = new CommonServices(config);
-            _healthCareConnection = commonServices.HealthCareConnection;
+            _Dashboard_Service = Dashboard_Service;
         }
 
 
@@ -25,54 +25,24 @@ namespace NDE_Digital_Market.Controllers
         [HttpGet]
         [Authorize (Roles ="seller")]
         [Route("sellerDashboard/{UserId}")]
-        public List<DashboardDto> CompanySellerDetails(string UserId)
+        public async Task<IActionResult> CompanySellerDetails(string UserId)
         {
-            List<DashboardDto> dbList = new List<DashboardDto>();
-
             try
             {
-                using (SqlConnection con = new SqlConnection(_healthCareConnection))
+                if (UserId == null)
                 {
-                    con.Open();
-
-                    using (SqlCommand cmd = new SqlCommand(@" SELECT M.MenuId,M.MenuName,M.IsActive
-                                                FROM MenuList M
-                                                LEFT JOIN Permission P ON M.MenuId = P.MenuId AND P.UserId = @UserId
-                                                WHERE M.IsActive=1 AND P.MenuId IS NULL AND M.IsAdmin!=1  ;
-", con))
-                    {
-
-                        cmd.Parameters.AddWithValue("@UserId", UserId);
-
-                        using (SqlDataReader reader = cmd.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                DashboardDto db = new DashboardDto();
-                                db.MenuId = Convert.ToInt32(reader["MenuId"]);
-                                //UserId = reader.GetInt32(userId),
-                                db.MenuName = reader["MenuName"].ToString();
-                                dbList.Add(db);
-
-                            }
-                        }
-                    }
-
-                    con.Close();
-
-
-
+                    return NotFound(new { message = "Give Valid Data." });
                 }
-
-
-
-                return dbList;
+                object res = await _Dashboard_Service.CompanySellerDetails(UserId);
+                if (res == null)
+                {
+                    return NotFound(new { message = "No Data Found." });
+                }
+                return Ok(res);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error: {ex.Message}");
-                // You might want to handle errors more gracefully
-                return null;
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
             }
         }
 
