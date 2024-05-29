@@ -5,6 +5,7 @@ using System.Data;
 using System.Data.SqlClient;
 using NDE_Digital_Market.SharedServices;
 using Microsoft.AspNetCore.Authorization;
+using NDE_Digital_Market.Services.GoodsService;
 
 namespace NDE_Digital_Market.Controllers
 {
@@ -12,237 +13,98 @@ namespace NDE_Digital_Market.Controllers
     [ApiController]
     public class GoodsController : ControllerBase
     {
-      
-        
-        private readonly string _healthCareConnection;
-        public GoodsController(IConfiguration config)
-        {
-            CommonServices commonServices = new CommonServices(config);
-            _healthCareConnection = commonServices.HealthCareConnection;
-        }
 
-        // ============ NavData ============================
+        private readonly IGoods_Service _Goods_Service;
+        public GoodsController(IGoods_Service Goods_Service)
+        {
+            _Goods_Service = Goods_Service;
+        }
 
         [HttpGet]
         [Route("GetNavData")]
-        public async Task<List<NavModel>> GetNavData()
+        public async Task<IActionResult> GetNavData()
         {
-            List<NavModel> lst = new List<NavModel>();
-
             try
             {
-                using (SqlConnection con = new SqlConnection(_healthCareConnection))
-                {
-                    await con.OpenAsync();
-                    string query = "GetNavBeltData";
 
-                    using (SqlCommand cmd = new SqlCommand(query, con))
-                    {
-                        cmd.CommandType = CommandType.StoredProcedure;
-                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
-                        {
-                            while (await reader.ReadAsync())
-                            {
-                                NavModel modelObj = new NavModel
-                                {
-                                    ProductGroupCode = reader["ProductGroupCode"].ToString(),
-                                    ProductGroupName = reader["ProductGroupName"].ToString(),
-                                    //ProductGroupPrefix = reader["ProductGroupPrefix"].ToString(),
-                                    //ProductGroupDetails = reader["ProductGroupDetails"].ToString(),
-                                    ImagePath = reader["ImagePath"].ToString(),
-                                    ProductGroupID = Convert.ToInt32(reader["ProductGroupID"])
-                                };
-                                lst.Add(modelObj);
-                            }
-                        }
-                    }
+                object res = await _Goods_Service.GetNavData();
+                if (res == null)
+                {
+                    return NotFound(new { message = "No Data Found." });
                 }
+                return Ok(res);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                throw;
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
             }
-            return lst;
         }
      
+
         [HttpGet]
         [Authorize(Roles = "seller")]
         [Route("GetDataForDropdown")]
-        public async Task<ActionResult<List<NavModel>>> getForDropDown()
+        public async Task<IActionResult> getForDropDown()
         {
-            List<NavModel> lst = new List<NavModel>();
-
             try
             {
-                using (SqlConnection con = new SqlConnection(_healthCareConnection))
+                object res = await _Goods_Service.getForDropDown();
+                if (res == null)
                 {
-                    await con.OpenAsync();
-                    string query = @"SELECT * FROM ProductGroups Where IsActive = 1";
-
-                    using (SqlCommand cmd = new SqlCommand(query, con))
-                    {
-                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
-                        {
-                            while (await reader.ReadAsync())
-                            {
-                                NavModel modelObj = new NavModel
-                                {
-                                    ProductGroupCode = reader["ProductGroupCode"].ToString(),
-                                    ProductGroupName = reader["ProductGroupName"].ToString(),
-                                    ProductGroupPrefix = reader["ProductGroupPrefix"].ToString(),
-                                    ProductGroupDetails = reader["ProductGroupDetails"].ToString(),
-                                    ImagePath = reader["ImagePath"].ToString(),
-                                    ProductGroupID = Convert.ToInt32(reader["ProductGroupID"])
-                                };
-                                lst.Add(modelObj);
-                            }
-                        }
-                    }
+                    return NotFound(new { message = "No Data Found." });
                 }
+                return Ok(res);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"An error occurred: {ex.Message}");
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
             }
-            return lst;
         }
 
 
         [HttpGet]
         [Route("GetGoodsList")]
-        public async Task<List<AllProductDto>> GetGoodsList()
+        public async Task<IActionResult> GetGoodsList()
         {
-            List<AllProductDto> lst = new List<AllProductDto>();
-
             try
             {
-                using (SqlConnection con = new SqlConnection(_healthCareConnection))
+
+                object res = await _Goods_Service.GetGoodsList();
+                if (res == null)
                 {
-                    await con.OpenAsync();
-                    string query = "GetAllProductListWithAvailableQty";
-
-                    using (SqlCommand cmd = new SqlCommand(query, con))
-                    {
-                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
-                        {
-                            while (await reader.ReadAsync())
-                            {
-                                AllProductDto modelObj = new AllProductDto();
-                                modelObj.CompanyCode = reader["CompanyCode"].ToString();
-                                modelObj.CompanyName = reader["CompanyName"].ToString();
-                                modelObj.ProductGroupName = reader["ProductGroupName"].ToString();
-                                modelObj.ProductId = Convert.ToInt32(reader["ProductId"]);
-                                modelObj.ProductName = reader["ProductName"].ToString();
-                                modelObj.ProductGroupID = Convert.ToInt32(reader["ProductGroupID"]);
-                                modelObj.Specification = reader["Specification"].ToString();
-                                modelObj.UnitId = Convert.ToInt32(reader["UnitId"]);
-                                modelObj.Unit = reader["Unit"].ToString();
-                                modelObj.Price = reader["Price"] != DBNull.Value ? Convert.ToDecimal(reader["Price"]) : 0;
-                                modelObj.DiscountAmount = reader["DiscountAmount"] != DBNull.Value ? Convert.ToDecimal(reader["DiscountAmount"]) : 0;
-                                modelObj.DiscountPct = reader["DiscountPct"] != DBNull.Value ? Convert.ToDecimal(reader["DiscountPct"]) : 0;
-                                modelObj.ImagePath = reader["ImagePath"].ToString();
-                                modelObj.TotalPrice = reader["TotalPrice"] != DBNull.Value ? Convert.ToDecimal(reader["TotalPrice"]) : 0;
-                                modelObj.SellerId = Convert.ToInt32(reader["SellerId"]);
-                                modelObj.AvailableQty = Convert.ToInt32(reader["AvailableQty"]);
-                                DateTime? endDate = null;
-                                if (reader["EndDate"] != DBNull.Value)
-                                {
-                                    endDate = Convert.ToDateTime(reader["EndDate"]);
-                                    if (endDate <= DateTime.Now)
-                                    {
-
-                                        modelObj.TotalPrice = modelObj.Price;
-                                        modelObj.DiscountAmount = 0;
-                                        modelObj.DiscountPct = 0;
-                                    }
-                                }
-
-
-                                lst.Add(modelObj);
-                            }
-                        }
-                    }
+                    return NotFound(new { message = "No Data Found." });
                 }
+                return Ok(res);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                throw;
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
             }
-
-            return lst;
         }
 
         //====================== Product Details in url =================
 
         [HttpGet]
         [Route("GetGoodsDetails/{CompanyCode}/{ProductId}")]
-        public async Task<AllProductDto> GetGoodsDetails(string CompanyCode,int ProductId)
+        public async Task<IActionResult> GetGoodsDetails(string CompanyCode,string ProductId)
         {
-            AllProductDto modelObj = new AllProductDto();
-
             try
             {
-                using (SqlConnection con = new SqlConnection(_healthCareConnection))
+                if (CompanyCode == null || ProductId == null)
                 {
-                    await con.OpenAsync();
-                    string query = "GetAvailableProductDetails";
-
-                    using (SqlCommand cmd = new SqlCommand(query, con))
-                    {
-                        cmd.CommandType = CommandType.StoredProcedure;
-                            cmd.Parameters.AddWithValue("@ProductId", ProductId );
-                            cmd.Parameters.AddWithValue("@CompanyCode", CompanyCode);
-                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
-                        {
-
-                            while (await reader.ReadAsync())
-                            {
-                               
-                                modelObj.CompanyCode = reader["CompanyCode"].ToString();
-                                modelObj.CompanyName = reader["CompanyName"].ToString();
-                                modelObj.ProductGroupName = reader["ProductGroupName"].ToString();
-                                modelObj.ProductId = Convert.ToInt32(reader["ProductId"]);
-                                modelObj.ProductName = reader["ProductName"].ToString();
-                                modelObj.ProductGroupID = Convert.ToInt32(reader["ProductGroupID"]);
-                                modelObj.Specification = reader["Specification"].ToString();
-                                modelObj.UnitId = Convert.ToInt32(reader["UnitId"]);
-                                modelObj.Unit = reader["Unit"].ToString();
-                                modelObj.Price = reader["Price"] != DBNull.Value ? Convert.ToDecimal(reader["Price"]) : 0;
-                                modelObj.DiscountAmount = reader["DiscountAmount"] != DBNull.Value ? Convert.ToDecimal(reader["DiscountAmount"]) : 0;
-                                modelObj.DiscountPct = reader["DiscountPct"] != DBNull.Value ? Convert.ToDecimal(reader["DiscountPct"]) : 0;
-                                modelObj.ImagePath = reader["ImagePath"].ToString();
-                                modelObj.TotalPrice = reader["TotalPrice"] != DBNull.Value ? Convert.ToDecimal(reader["TotalPrice"]) : 0;
-                                modelObj.SellerId = Convert.ToInt32(reader["SellerId"]);
-                                modelObj.AvailableQty = Convert.ToInt32(reader["AvailableQty"]);
-                                DateTime? endDate = null;
-                                if (reader["EndDate"] != DBNull.Value)
-                                {
-                                    endDate = Convert.ToDateTime(reader["EndDate"]);
-                                    if (endDate <= DateTime.Now)
-                                    {
-
-                                        modelObj.TotalPrice = modelObj.Price;
-                                        modelObj.DiscountAmount = 0;
-                                        modelObj.DiscountPct = 0;
-                                    }
-                                }
-
-
-                                
-                            }
-                        }
-                    }
+                    return NotFound(new { message = "Give Valid Data." });
                 }
+                object res = await _Goods_Service.GetGoodsDetails(CompanyCode, ProductId);
+                if (res == null)
+                {
+                    return NotFound(new { message = "No Data Found." });
+                }
+                return Ok(res);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                throw;
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
             }
-
-            return modelObj;
         }
         //====================== ProductCompany =================
 
@@ -251,38 +113,23 @@ namespace NDE_Digital_Market.Controllers
         [Route("GetProductCompany/{ProductGroupCode}")]
         public async Task<IActionResult> GetProductCompany(string ProductGroupCode)
         {
-            var companiesByProductGroup = new List<CompanyListDto>();
             try
             {
-                using (var connection = new SqlConnection(_healthCareConnection))
+                if (ProductGroupCode == null)
                 {
-                    using (var command = new SqlCommand("GetCompaniesByProductGroupCode", connection))
-                    {
-                        command.CommandType = CommandType.StoredProcedure;
-                        command.Parameters.Add(new SqlParameter("@ProductGroupCode", ProductGroupCode));
-                        await connection.OpenAsync();
-                        using (var reader = await command.ExecuteReaderAsync())
-                        {
-                            while (await reader.ReadAsync())
-                            {
-                                var companiesByProduct = new CompanyListDto
-                                {
-                                    CompanyName = reader["CompanyName"].ToString(),
-                                    CompanyCode = reader["CompanyCode"].ToString(),
-                                    CompanyImage = reader["CompanyImage"].ToString()
-                                };
-                                companiesByProductGroup.Add(companiesByProduct);
-                            }
-                        }
-                    }
+                    return NotFound(new { message = "Give Valid Data." });
                 }
-                return Ok(companiesByProductGroup);
+                object res = await _Goods_Service.GetProductCompany(ProductGroupCode);
+                if (res == null)
+                {
+                    return NotFound(new { message = "No Data Found." });
+                }
+                return Ok(res);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "An error occurred while retrieving companies: " + ex.Message);
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
             }
-
         }
 
 
@@ -290,63 +137,22 @@ namespace NDE_Digital_Market.Controllers
         [Route("GetProductList")]
         public async Task<IActionResult> GetProductList(string CompanyCode, string ProductGroupCode)
         {
-            var goodsQuantitys = new List<CompanyProductListDto>();
             try
             {
-                using (var connection = new SqlConnection(_healthCareConnection))
+                if (CompanyCode == null || ProductGroupCode == null)
                 {
-                    using (var command = new SqlCommand("GetProductDetailsByCompanyAndGroup", connection))
-                    {
-                        command.CommandType = CommandType.StoredProcedure;
-                        command.Parameters.Add(new SqlParameter("@CompanyCode", CompanyCode));
-                        command.Parameters.Add(new SqlParameter("@ProductGroupCode", ProductGroupCode));
-                        await connection.OpenAsync();
-                        using (var reader = await command.ExecuteReaderAsync())
-                        {
-                            while (await reader.ReadAsync())
-                            {
-                                var goodsQuantity = new CompanyProductListDto
-                                {
-                                    CompanyCode = reader["CompanyCode"].ToString(),
-                                    CompanyName = reader["CompanyName"].ToString(),
-                                    ProductId = Convert.ToInt32(reader["ProductId"]),
-                                    ProductName = reader["ProductName"].ToString(),
-                                    ProductGroupID = Convert.ToInt32(reader["ProductGroupID"]),
-                                    ProductGroupName = reader["ProductGroupName"].ToString(),
-                                    Specification = reader["Specification"].ToString(),
-                                    UnitId = Convert.ToInt32(reader["UnitId"]),
-                                    Unit = reader["Unit"].ToString(),
-                                    Price = reader["Price"] != DBNull.Value ? Convert.ToDecimal(reader["Price"]) : 0,
-                                    DiscountAmount = reader["DiscountAmount"] != DBNull.Value ? Convert.ToDecimal(reader["DiscountAmount"]) : 0,
-                                    DiscountPct = reader["DiscountPct"] != DBNull.Value ? Convert.ToDecimal(reader["DiscountPct"]) : 0,
-                                    ImagePath = reader["ImagePath"].ToString(),
-                                    TotalPrice = reader["TotalPrice"] != DBNull.Value ? Convert.ToDecimal(reader["TotalPrice"]) : 0,
-                                    SellerId = Convert.ToInt32(reader["SellerId"]),
-                                    AvailableQty = Convert.ToInt32(reader["AvailableQty"])
-                                };
-                                DateTime? endDate = null;
-                                if (reader["EndDate"] != DBNull.Value)
-                                {
-                                    endDate = Convert.ToDateTime(reader["EndDate"]);
-                                    if (endDate <= DateTime.Now)
-                                    {
-
-                                        goodsQuantity.TotalPrice = goodsQuantity.Price;
-                                        goodsQuantity.DiscountAmount = 0;
-                                        goodsQuantity.DiscountPct = 0;
-                                    }
-                                }
-                                goodsQuantitys.Add(goodsQuantity);
-                            }
-                        }
-                    }
+                    return NotFound(new { message = "Give Valid Data." });
                 }
-               
-                return Ok(goodsQuantitys);
+                object res = await _Goods_Service.GetProductList(CompanyCode, ProductGroupCode);
+                if (res == null)
+                {
+                    return NotFound(new { message = "No Data Found." });
+                }
+                return Ok(res);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "An error occurred while retrieving companies: " + ex.Message);
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
             }
         }
 
@@ -356,50 +162,28 @@ namespace NDE_Digital_Market.Controllers
 
         [HttpGet]
         [Route("GetRecommendedProductList/{CompanyCode}/{ProductId}")]
-        public async Task<IActionResult> GetRecommendedProductList(string CompanyCode, int ProductId)
+        public async Task<IActionResult> GetRecommendedProductList(string CompanyCode, string ProductId)
         {
-
             try
             {
-                List<RecommendedProductListModel> List = new List<RecommendedProductListModel>();
-                using (SqlConnection con = new SqlConnection(_healthCareConnection))
+                if (CompanyCode == null || CompanyCode == null)
                 {
-                    await con.OpenAsync();
-                    string query = @"GetrecommendedProductList";
-
-                    using (SqlCommand cmd = new SqlCommand(query, con))
-                    {
-                        cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.Parameters.AddWithValue("@ProductId", ProductId);
-                        cmd.Parameters.AddWithValue("@CompanyCode", CompanyCode);
-                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
-                        {
-
-                            while (await reader.ReadAsync())
-                            {
-                                RecommendedProductListModel modelObj = new RecommendedProductListModel();
-                                modelObj.ProductId = Convert.ToInt32(reader["ProductId"]);
-                                modelObj.ProductName = reader["ProductName"].ToString();
-                                modelObj.ImagePath = reader["ImagePath"].ToString();
-                                modelObj.CompanyCode = reader["CompanyCode"].ToString();
-                                modelObj.CompanyName = reader["CompanyName"].ToString();
-                                modelObj.AvailableQty = Convert.ToDecimal(reader["AvailableQty"]);
-                                modelObj.TotalPrice = Convert.ToDecimal(reader["TotalPrice"]);
-
-                                List.Add(modelObj);
-
-                            }
-                        }
-                    }
-                    return Ok(List);
+                    return NotFound(new { message = "Give Valid Data." });
                 }
-
+                object res = await _Goods_Service.GetRecommendedProductList(CompanyCode, ProductId);
+                if (res == null)
+                {
+                    return NotFound(new { message = "No Data Found." });
+                }
+                return Ok(res);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
             }
         }
+
+
 
     }
 }
