@@ -17,7 +17,7 @@ namespace NDE_Digital_Market.Services.WishListService
         public async Task<List<GetAllWishListDTO>> GetWishList(string UserId)
         {
 
-            string decryptedUserId = CommonServices.Decrypt<string>(UserId);
+            int decryptedUserId = int.Parse(CommonServices.DecryptPassword(UserId));
 
             DataTable dataTable = await _wishList_DAL.GetWishList(decryptedUserId);
 
@@ -33,16 +33,16 @@ namespace NDE_Digital_Market.Services.WishListService
                 GetAllWishListDTO wishListItem = new GetAllWishListDTO();
 
                 //wishListItem.UserId = CommonServices.Encrypt(Convert.ToInt32(row["UserId"]));
-                wishListItem.CompanyCode = CommonServices.Encrypt(row["CompanyCode"].ToString());
+                wishListItem.CompanyCode = CommonServices.EncryptPassword(row["CompanyCode"].ToString());
                 wishListItem.CompanyName = row["CompanyName"].ToString();
                 wishListItem.ProductGroupName = row["ProductGroupName"].ToString();
-                wishListItem.ProductId = CommonServices.Encrypt(Convert.ToInt32(row["ProductId"]));
+                wishListItem.ProductId = CommonServices.EncryptPassword(row["ProductId"].ToString());
                 wishListItem.ProductName = row["ProductName"].ToString();
-                wishListItem.GroupCode = CommonServices.Encrypt(row["ProductGroupCode"].ToString());
-                wishListItem.SellerId = CommonServices.Encrypt(Convert.ToInt32(row["SellerId"]));
-                wishListItem.ProductGroupID = CommonServices.Encrypt(Convert.ToInt32(row["ProductGroupID"]));
+                wishListItem.GroupCode = CommonServices.EncryptPassword(row["ProductGroupCode"].ToString());
+                wishListItem.SellerId = CommonServices.EncryptPassword(row["SellerId"].ToString());
+                wishListItem.ProductGroupID = CommonServices.EncryptPassword((row["ProductGroupID"].ToString()));
                 wishListItem.Specification = row["Specification"].ToString();
-                wishListItem.UnitId = CommonServices.Encrypt(Convert.ToInt32(row["UnitId"]));
+                wishListItem.UnitId = CommonServices.EncryptPassword(row["UnitId"].ToString());
                 wishListItem.Unit = row["Unit"].ToString();
                 wishListItem.Price = row["Price"] != DBNull.Value ? Convert.ToDecimal(row["Price"]) : 0;
                 wishListItem.DiscountAmount = row["DiscountAmount"] != DBNull.Value ? Convert.ToDecimal(row["DiscountAmount"]) : 0;
@@ -72,17 +72,17 @@ namespace NDE_Digital_Market.Services.WishListService
         }
         public async Task<object> InsertWishList(string UserId, string ProductId, string CompanyCode)
         {
-            string decryptedUserId = CommonServices.Decrypt<string>(UserId);
-            string decryptedProductId = CommonServices.Decrypt<string>(ProductId);
-            string decryptedCompanyCode = CommonServices.Decrypt<string>(CompanyCode);
+            int decryptedUserId = int.Parse(CommonServices.DecryptPassword(UserId));
+            int decryptedProductId = int.Parse(CommonServices.DecryptPassword(ProductId));
+            string decryptedCompanyCode = CommonServices.DecryptPassword(CompanyCode);
             return await _wishList_DAL.InsertWishList(decryptedUserId, decryptedProductId, decryptedCompanyCode);
         }
 
         public async Task<object> DeleteWishList(string UserId, string ProductId, string CompanyCode)
         {
-            string decryptedUserId = CommonServices.Decrypt<string>(UserId);
-            string decryptedProductId = CommonServices.Decrypt<string>(ProductId);
-            string decryptedCompanyCode = CommonServices.Decrypt<string>(CompanyCode);
+            int decryptedUserId = int.Parse(CommonServices.DecryptPassword(UserId));
+            int decryptedProductId = int.Parse(CommonServices.DecryptPassword(ProductId));
+            string decryptedCompanyCode = CommonServices.DecryptPassword(CompanyCode);
 
             return await _wishList_DAL.DeleteWishList(decryptedUserId, decryptedProductId, decryptedCompanyCode);
         }

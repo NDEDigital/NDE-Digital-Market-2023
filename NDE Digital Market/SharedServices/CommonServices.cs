@@ -38,77 +38,77 @@ namespace NDE_Digital_Market.SharedServices
         }
 
 
-        public static string Encrypt<T>(T value)
-        {
-            byte[] clearBytes;
+        //public static string Encrypt<T>(T value)
+        //{
+        //    byte[] clearBytes;
 
-            if (typeof(T) == typeof(string))
-            {
-                clearBytes = Encoding.Unicode.GetBytes(value as string);
-            }
-            else if (typeof(T) == typeof(int))
-            {
-                clearBytes = BitConverter.GetBytes((int)(object)value);
-            }
-            else
-            {
-                throw new ArgumentException("Unsupported type for encryption.");
-            }
+        //    if (typeof(T) == typeof(string))
+        //    {
+        //        clearBytes = Encoding.Unicode.GetBytes(value as string);
+        //    }
+        //    else if (typeof(T) == typeof(int))
+        //    {
+        //        clearBytes = BitConverter.GetBytes((int)(object)value);
+        //    }
+        //    else
+        //    {
+        //        throw new ArgumentException("Unsupported type for encryption.");
+        //    }
 
-            using (Aes encryptor = Aes.Create())
-            {
-                var pdb = new Rfc2898DeriveBytes(EncryptionKey, new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 });
-                encryptor.Key = pdb.GetBytes(32);
-                encryptor.IV = pdb.GetBytes(16);
-                using (var ms = new MemoryStream())
-                {
-                    using (var cs = new CryptoStream(ms, encryptor.CreateEncryptor(), CryptoStreamMode.Write))
-                    {
-                        cs.Write(clearBytes, 0, clearBytes.Length);
-                        cs.Close();
-                    }
-                    return Convert.ToBase64String(ms.ToArray());
-                }
-            }
-        }
+        //    using (Aes encryptor = Aes.Create())
+        //    {
+        //        var pdb = new Rfc2898DeriveBytes(EncryptionKey, new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 });
+        //        encryptor.Key = pdb.GetBytes(32);
+        //        encryptor.IV = pdb.GetBytes(16);
+        //        using (var ms = new MemoryStream())
+        //        {
+        //            using (var cs = new CryptoStream(ms, encryptor.CreateEncryptor(), CryptoStreamMode.Write))
+        //            {
+        //                cs.Write(clearBytes, 0, clearBytes.Length);
+        //                cs.Close();
+        //            }
+        //            return Convert.ToBase64String(ms.ToArray());
+        //        }
+        //    }
+        //}
 
-        public static T Decrypt<T>(string cipherText)
-        {
-            byte[] cipherBytes = Convert.FromBase64String(cipherText);
+        //public static T Decrypt<T>(string cipherText)
+        //{
+        //    byte[] cipherBytes = Convert.FromBase64String(cipherText);
 
-            using (Aes encryptor = Aes.Create())
-            {
-                var pdb = new Rfc2898DeriveBytes(EncryptionKey, new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 });
-                encryptor.Key = pdb.GetBytes(32);
-                encryptor.IV = pdb.GetBytes(16);
-                using (var ms = new MemoryStream())
-                {
-                    using (var cs = new CryptoStream(ms, encryptor.CreateDecryptor(), CryptoStreamMode.Write))
-                    {
-                        cs.Write(cipherBytes, 0, cipherBytes.Length);
-                        cs.Close();
-                    }
-                    byte[] decryptedBytes = ms.ToArray();
+        //    using (Aes encryptor = Aes.Create())
+        //    {
+        //        var pdb = new Rfc2898DeriveBytes(EncryptionKey, new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 });
+        //        encryptor.Key = pdb.GetBytes(32);
+        //        encryptor.IV = pdb.GetBytes(16);
+        //        using (var ms = new MemoryStream())
+        //        {
+        //            using (var cs = new CryptoStream(ms, encryptor.CreateDecryptor(), CryptoStreamMode.Write))
+        //            {
+        //                cs.Write(cipherBytes, 0, cipherBytes.Length);
+        //                cs.Close();
+        //            }
+        //            byte[] decryptedBytes = ms.ToArray();
 
-                    if (typeof(T) == typeof(string))
-                    {
-                        return (T)(object)Encoding.Unicode.GetString(decryptedBytes);
-                    }
-                    else if (typeof(T) == typeof(int))
-                    {
-                        if (decryptedBytes.Length != sizeof(int))
-                        {
-                            throw new ArgumentException("Decrypted byte array length does not match expected integer size.");
-                        }
-                        return (T)(object)BitConverter.ToInt32(decryptedBytes, 0);
-                    }
-                    else
-                    {
-                        throw new ArgumentException("Unsupported type for decryption.");
-                    }
-                }
-            }
-        }
+        //            if (typeof(T) == typeof(string))
+        //            {
+        //                return (T)(object)Encoding.Unicode.GetString(decryptedBytes);
+        //            }
+        //            else if (typeof(T) == typeof(int))
+        //            {
+        //                if (decryptedBytes.Length != sizeof(int))
+        //                {
+        //                    throw new ArgumentException("Decrypted byte array length does not match expected integer size.");
+        //                }
+        //                return (T)(object)BitConverter.ToInt32(decryptedBytes, 0);
+        //            }
+        //            else
+        //            {
+        //                throw new ArgumentException("Unsupported type for decryption.");
+        //            }
+        //        }
+        //    }
+        //}
 
 
 
@@ -230,6 +230,7 @@ namespace NDE_Digital_Market.SharedServices
 
             return filePath;
         }
+
         //public static string UploadFiles(string foldername, string filename, IFormFile file)
         //{
         //    if (file == null || file.Length == 0)

@@ -1,13 +1,13 @@
-﻿namespace NDE_Digital_Market.Model
+﻿namespace NDE_Digital_Market.Model.DTO
 {
-    public class AddToCartModal
+    public class GetAddToCartDataDTO
     {
-        public int? Id { get; set; }
-        public int BuyerUserID { get; set; }
+        public string? Id { get; set; }
+        public string BuyerUserID { get; set; }
         public string CompanyCode { get; set; }
-        public int ProductID { get; set; }
-        public int ProductGroupID { get; set; }
-        public int UnitID { get; set; }
+        public string ProductID { get; set; }
+        public string ProductGroupID { get; set; }
+        public string UnitID { get; set; }
         public int ProductCartQuantity { get; set; }
         public DateTime? AddedDate { get; set; }
         public string? AddedBy { get; set; }

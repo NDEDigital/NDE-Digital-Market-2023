@@ -84,7 +84,7 @@ namespace NDE_Digital_Market.Data_Access_Layer
         //    return lst;
         //}
 
-        public async Task<DataTable> GetWishList(string UserId)
+        public async Task<DataTable> GetWishList(int UserId)
         {
             DataTable dataTable = new DataTable();
 
@@ -119,7 +119,7 @@ namespace NDE_Digital_Market.Data_Access_Layer
 
 
 
-        public async Task<object> InsertWishList(string UserId, string ProductId, string CompanyCode)
+        public async Task<object> InsertWishList(int UserId, int ProductId, string CompanyCode)
         {
             try
             {
@@ -175,7 +175,7 @@ namespace NDE_Digital_Market.Data_Access_Layer
         }
 
 
-        public async Task<object> DeleteWishList(string UserId, string ProductId, string CompanyCode)
+        public async Task<object> DeleteWishList(int UserId, int ProductId, string CompanyCode)
         {
             try
             {

@@ -133,12 +133,8 @@ namespace NDE_Digital_Market.Services.UserService
         {
             CommonServices.createPasswordHash(user.Password, out byte[] passwordHash, out byte[] passwordSalt);
             UserModel userModel = new UserModel();
-            string decryptedUserId = CommonServices.Decrypt<string>(user.UserId);
-            int decryptedUserIdInt;
-            if (int.TryParse(decryptedUserId, out decryptedUserIdInt))
-            {
-                userModel.UserId = decryptedUserIdInt;
-            }
+            userModel.UserId = int.Parse(CommonServices.DecryptPassword(user.UserId));
+
             userModel.FullName = user.FullName;
             userModel.Address = user.Address;
             userModel.Email = user.Email;
