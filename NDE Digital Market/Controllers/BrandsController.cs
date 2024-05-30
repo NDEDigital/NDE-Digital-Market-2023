@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NDE_Digital_Market.Model;
+using NDE_Digital_Market.Model.DTO;
+using NDE_Digital_Market.Services.BrandsService;
 using NDE_Digital_Market.SharedServices;
 using System.Data;
 using System.Data.SqlClient;
@@ -11,204 +13,80 @@ namespace NDE_Digital_Market.Controllers
     [ApiController]
     public class BrandsController : ControllerBase
     {
-        private readonly IConfiguration _configuration;
-        private readonly SqlConnection con;
-        public BrandsController(IConfiguration configuration)
-        {
-            CommonServices commonServices = new CommonServices(configuration);
-            _configuration = configuration;
-            con = new SqlConnection(commonServices.HealthCareConnection);
 
+        private readonly IBrands_Service _Brands_Service;
+        public BrandsController(IBrands_Service Brands_Service)
+        {
+            _Brands_Service = Brands_Service;
         }
 
         [HttpGet]
         [Route("GetBrandList")]
         public async Task<IActionResult> GetBrandListAsync(bool? isActive)
         {
-            List<BrandsModel> lstModel = new List<BrandsModel>();
-
             try
             {
-                await con.OpenAsync();
-                string query;
-                if (isActive.HasValue)
-                {
-                    query = "SELECT * FROM Brands WHERE isActive = @IsActive;";
-                }
-                else
-                {
-                    query = "SELECT * FROM Brands WHERE DATEDIFF(hour, AddedDate, GETDATE()) <= 24;";
-                }
 
-                using (SqlCommand cmd = new SqlCommand(query, con))
+                object res = await _Brands_Service.GetBrandListAsync(isActive);
+                if (res == null)
                 {
-                    if (isActive.HasValue)
-                    {
-                        cmd.Parameters.AddWithValue("@IsActive", isActive.Value);
-                    }
-
-                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
-                    {
-                        while (await reader.ReadAsync())
-                        {
-                            BrandsModel modelObj = new BrandsModel();
-                            {
-                                modelObj.BrandId = Convert.ToInt32(reader["BrandId"]);
-                                modelObj.BrandName = reader["BrandName"].ToString();
-                                modelObj.Description = reader["Description"].ToString() ?? "";
-                                modelObj.ShortName = reader["ShortName"].ToString() ?? "";
-                                modelObj.IsActive = Convert.ToBoolean(reader["IsActive"]);
-                            }
-
-                            lstModel.Add(modelObj);
-                        }
-                    }
+                    return NotFound(new { message = "No Data Found." });
                 }
+                return Ok(res);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
             }
-            finally
-            {
-                if (con.State == ConnectionState.Open)
-                {
-                    await con.CloseAsync();
-                }
-            }
-            return Ok(lstModel);
         }
 
 
         [HttpPost]
         [Route("AddBrand")]
-        public async Task<IActionResult> PostBrandAsync([FromForm] BrandsModel model)
+        public async Task<IActionResult> PostBrandAsync([FromForm] InsertBrandDataDTO model)
         {
             try
             {
-                await con.OpenAsync();
-                string query = @"INSERT INTO Brands (BrandName, ShortName, Description, IsActive, AddedBy, AddedPC, AddedDate)
-                         VALUES (@BrandName, @ShortName, @Description, @IsActive, @AddedBy, @AddedPC, @AddedDate);";
-
-                using (SqlCommand cmd = new SqlCommand(query, con))
+                if (model == null)
                 {
-                    cmd.Parameters.AddWithValue("@BrandName", model.BrandName);
-                    cmd.Parameters.AddWithValue("@ShortName", model.ShortName ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Description", model.Description ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@IsActive", true);
-                    cmd.Parameters.AddWithValue("@AddedBy", model.AddedBy);
-                    cmd.Parameters.AddWithValue("@AddedPC", model.AddedPC);
-                    cmd.Parameters.AddWithValue("@AddedDate", DateTime.UtcNow);
-
-                    await cmd.ExecuteNonQueryAsync();
+                    return NotFound(new { message = "No Data Found." });
                 }
-
-                return Ok(new { message = "Brand added successfully" });
+                object res = await _Brands_Service.PostBrandAsync(model);
+                if (res == null)
+                {
+                    return NotFound(new { message = "No Data Found." });
+                }
+                return Ok(res);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                // Log the exception
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Error adding the Brand" });
-            }
-            finally
-            {
-                if (con.State == ConnectionState.Open)
-                {
-                    await con.CloseAsync();
-                }
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
             }
         }
 
         [HttpPut]
         [Route("UpdateBrand")]
-        public async Task<IActionResult> PutBrand([FromForm] BrandsModel model)
+        public async Task<IActionResult> PutBrand([FromForm] UpdateBrandsDTO model)
         {
-            if (model == null || model.BrandId == null)
-            {
-                return BadRequest(new { message = "Invalid Brand data." });
-            }
+
 
             try
             {
-                string query = "UPDATE Brands SET ";
-                List<string> setClauses = new List<string>();
-
-                if (model.BrandName != null)
+                if (model == null || model.BrandId == null)
                 {
-                    setClauses.Add("BrandName = @BrandName");
+                    return BadRequest(new { message = "Invalid Brand data." });
                 }
 
-                if (model.ShortName != null)
+                object res = await _Brands_Service.PutBrand(model);
+                if (res == null)
                 {
-                    setClauses.Add("ShortName = @short");
+                    return NotFound(new { message = "No Data Found." });
                 }
-
-                if (model.Description != null)
-                {
-                    setClauses.Add("Description = @Description");
-                }
-
-                // Add other parameters here...
-
-                setClauses.Add("UpdatedBy = @UpdatedBy");
-                setClauses.Add("UpdatedPC = @UpdatedPC");
-                setClauses.Add("UpdatedDate = @DateUpdated");
-
-                query += string.Join(", ", setClauses);
-                query += " WHERE BrandId = @BrandId;";
-
-                await con.OpenAsync();
-
-                using (SqlCommand cmd = new SqlCommand(query, con))
-                {
-                    cmd.Parameters.AddWithValue("@BrandId", model.BrandId);
-
-                    if (model.BrandName != null)
-                    {
-                        cmd.Parameters.AddWithValue("@BrandName", model.BrandName);
-                    }
-
-                    if (model.ShortName != null)
-                    {
-                        cmd.Parameters.AddWithValue("@short", model.ShortName);
-                    }
-
-                    if (model.Description != null)
-                    {
-                        cmd.Parameters.AddWithValue("@Description", model.Description);
-                    }
-
-                    // Add other parameters here...
-
-                    cmd.Parameters.AddWithValue("@UpdatedBy", model.UpdatedBy);
-                    cmd.Parameters.AddWithValue("@UpdatedPC", model.UpdatedPC);
-                    cmd.Parameters.AddWithValue("@DateUpdated", DateTime.UtcNow);
-
-                    int rowsAffected = await cmd.ExecuteNonQueryAsync();
-                    if (rowsAffected > 0)
-                    {
-                        return Ok(new { message = "Brand updated successfully." });
-                    }
-                    else
-                    {
-                        return NotFound(new { message = "Brand not found." });
-                    }
-                }
+                return Ok(res);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                // Log the exception
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Error updating the Brand." });
-            }
-            finally
-            {
-                if (con.State == ConnectionState.Open)
-                {
-                    await con.CloseAsync();
-                }
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
             }
         }
 
@@ -267,56 +145,24 @@ namespace NDE_Digital_Market.Controllers
         [Route("ChangeBrandsStatus")]
         public async Task<IActionResult> ChangeBrandsStatus(string BrandIDs, bool isActive)
         {
-            if (string.IsNullOrEmpty(BrandIDs))
-            {
-                return BadRequest(new { message = "No Brand IDs provided." });
-            }
 
             try
             {
-                await con.OpenAsync();
-                string[] ids = BrandIDs.Split(',');
-
-                string query = @"UPDATE Brands 
-                        SET IsActive = @IsActive 
-                        WHERE BrandId IN ({0});";
-
-                // Construct the SQL parameter placeholders dynamically
-                string parameterPlaceholders = string.Join(",", ids.Select((s, i) => $"@BrandId{i}"));
-                query = string.Format(query, parameterPlaceholders);
-
-                using (SqlCommand cmd = new SqlCommand(query, con))
+                if (BrandIDs == null || isActive == null)
                 {
-                    // Add parameters for each unit ID
-                    for (int i = 0; i < ids.Length; i++)
-                    {
-                        cmd.Parameters.AddWithValue($"@BrandId{i}", ids[i]);
-                    }
-                    cmd.Parameters.AddWithValue("@IsActive", isActive);
-
-                    int rowsAffected = await cmd.ExecuteNonQueryAsync();
-                    if (rowsAffected > 0)
-                    {
-                        return Ok(new { message = "Brands updated successfully." });
-                    }
-                    else
-                    {
-                        return NotFound(new { message = "No Brand found." });
-                    }
+                    return BadRequest(new { message = "Invalid Brand data." });
                 }
+
+                object res = await _Brands_Service.ChangeBrandsStatus(BrandIDs, isActive);  
+                if (res == null)
+                {
+                    return NotFound(new { message = "No Data Found." });
+                }
+                return Ok(res);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                // Log the exception
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Error updating the Brand." });
-            }
-            finally
-            {
-                if (con.State == ConnectionState.Open)
-                {
-                    await con.CloseAsync();
-                }
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
             }
         }
 
