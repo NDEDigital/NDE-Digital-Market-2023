@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NDE_Digital_Market.Services.UserControllOfDashboardService;
 using NDE_Digital_Market.SharedServices;
 using System.Data.SqlClient;
 
@@ -7,55 +8,33 @@ using System.Data.SqlClient;
 [Authorize]
 public class UserControllOfDashboardController : ControllerBase
 {
-    private readonly string _healthCareConnection;
 
-    public UserControllOfDashboardController(IConfiguration config)
+    private readonly IUserControllOfDashboard_Service _UserControllOfDashboard_Service;
+    public UserControllOfDashboardController(IUserControllOfDashboard_Service UserControllOfDashboard_Service)
     {
-        CommonServices commonServices = new CommonServices(config);
-        _healthCareConnection = commonServices.HealthCareConnection;
+        _UserControllOfDashboard_Service = UserControllOfDashboard_Service;
     }
 
     [HttpDelete("deleteMenuItems/{UserId}")]
     [Authorize (Roles ="seller")]
-    public async Task<IActionResult> DeleteMenuItems(int UserId, [FromBody] List<int> menuIdsToDelete)
+    public async Task<IActionResult> DeleteMenuItems(string UserId, [FromBody] List<string> menuIdsToDelete)
     {
         try
         {
-            using (SqlConnection con = new SqlConnection(_healthCareConnection))
+            if (UserId == null || menuIdsToDelete ==  null)
             {
-                await con.OpenAsync();
-
-                // Create a parameterized query with dynamic number of parameters
-                string query = $"DELETE FROM Permission WHERE UserId = @UserId AND MenuId IN ({string.Join(",", menuIdsToDelete.Select((id, index) => $"@MenuId{index}"))})";
-
-                using (SqlCommand cmd = new SqlCommand(query, con))
-                {
-                    cmd.Parameters.AddWithValue("@UserId", UserId);
-
-                    // Add parameters for each menu ID
-                    for (int i = 0; i < menuIdsToDelete.Count; i++)
-                    {
-                        cmd.Parameters.AddWithValue($"@MenuId{i}", menuIdsToDelete[i]);
-                    }
-
-                    int rowsAffected = await cmd.ExecuteNonQueryAsync();
-
-                    if (rowsAffected > 0)
-                    {
-                        return Ok(new { message = "Menu items deleted successfully." });
-                    }
-                    else
-                    {
-                        return NotFound(new { message = "User or menu items not found." });
-                    }
-                }
+                return NotFound(new { message = "Give Valid Data." });
             }
+            object res = await _UserControllOfDashboard_Service.DeleteMenuItems(UserId, menuIdsToDelete);
+            if (res == null)
+            {
+                return NotFound(new { message = "No Data Found." });
+            }
+            return Ok(res);
         }
         catch (Exception ex)
         {
-            // Log the exception
-            // logger.LogError(ex, "An error occurred while processing the request.");
-            return StatusCode(500, $"An error occurred while processing the request. Details: {ex.Message}");
+            return BadRequest(new { message = "Server Error. Try Again!!!" });
         }
     }
 
