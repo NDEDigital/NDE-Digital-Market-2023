@@ -14,14 +14,18 @@ namespace NDE_Digital_Market.Services.AddBanner
         Task<List<ImageBanner>> GetAddBannerForAdmin(bool? status);
         Task<List<ImageBanner>> GetBannerForShowingInHomePage();
 
+
+        Task<List<ImageBanner>> GetAddForShowingInHomePage();
+
         //Task<List<BannerDto>> GetBanners();
 
         //Task<ImageBanner> GetBannerById(int bannerId);
 
         Task<string> UpdateBanner(BannerDto Banner);
 
-
+        //Task<int> UpdateBanners(ImageBanner banner);
 
         Task<bool> DeleteBanner(int bannerId);
+        
     }
 }
