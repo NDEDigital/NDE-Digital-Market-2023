@@ -214,7 +214,7 @@ namespace NDE_Digital_Market.Controllers
             {
                 Console.WriteLine($"An error occurred: {ex.Message}");
                 // Log the exception
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Error updating the unit." });
+                return BadRequest(new { message = "Error updating the unit." });
             }
             finally
             {
