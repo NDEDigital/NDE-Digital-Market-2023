@@ -156,7 +156,8 @@ public class ProductList_Service: IProductList_Service
 
         for (int i = 0; i < productIds.Count; i++)
         {
-            decryptedIds[i] = int.Parse(CommonServices.DecryptPassword(productIds[i]));
+            //decryptedIds[i] = int.Parse(CommonServices.DecryptPassword(productIds[i]));
+            decryptedIds.Add(int.Parse(CommonServices.DecryptPassword(productIds[i])));
         }
         return await _productList_DAL.MakeProductActiveOrInactiveAsync(decryptedIds, IsActive);
     }

@@ -17,53 +17,66 @@ namespace NDE_Digital_Market.Services.InvoiceService
         public async Task<GetOrderInvoiceDataForBuyerByOrderMasterIdDTO> GetInvoiceDataForBuyer(string OrderMasterId)
         {
             int DecryptOrderMasterId = int.Parse(CommonServices.DecryptPassword(OrderMasterId));
-            DataTable dataTable = await _invoice_DAL.GetInvoiceDataForBuyer(DecryptOrderMasterId);
 
-            GetOrderInvoiceDataForBuyerByOrderMasterIdDTO invoice = new GetOrderInvoiceDataForBuyerByOrderMasterIdDTO();
-            // Check if dataTable is null
-            if (dataTable == null)
+            DataSet dataSet = await _invoice_DAL.GetInvoiceDataForBuyer(DecryptOrderMasterId);
+
+            // Check if dataSet is null
+            if (dataSet == null || dataSet.Tables.Count < 2)
             {
                 return null;
             }
 
-            foreach (DataRow row in dataTable.Rows)
-            {
-                invoice.InvoiceNumber = row["InvoiceNumber"].ToString();
-                invoice.OrderDate = Convert.ToDateTime(row["OrderDate"].ToString());
-                invoice.BuyerName = row["BuyerName"].ToString();
-                invoice.Address = row["Address"].ToString();
-                invoice.Phone = row["PhoneNumber"].ToString();
-                invoice.PaymentMethod = row["PaymentMethod"].ToString();
-                invoice.NumberOfItem = Convert.ToInt32(row["NumberOfItem"].ToString());
-                invoice.TotalPrice = Convert.ToDecimal(row["TotalPrice"].ToString());
-            }
-            foreach (DataRow row in dataTable.Rows)
-            {
-                GetOrderInvoiceDataForBuyerByOrderMasterIdDetailsDTO orderDetails = new GetOrderInvoiceDataForBuyerByOrderMasterIdDetailsDTO
-                {
+            // Get the invoice information table
+            DataTable invoiceTable = dataSet.Tables[0];
 
-                    ProductName = row["ProductName"].ToString(),
-                    Status = row["Status"].ToString(),
-                    Specification = row["Specification"].ToString(),
-                    Quantity = Convert.ToInt32(row["Quantity"].ToString()),
-                    SellerId = CommonServices.EncryptPassword(row["SellerId"].ToString()),
-                    Unit = row["Unit"].ToString(),
-                    Price = Convert.ToDecimal(row["Price"].ToString()),
-                    DeliveryCharge = Convert.ToDecimal(row["DeliveryCharge"].ToString()),
-                    DiscountAmount = Convert.ToDecimal(row["DiscountAmount"].ToString()),
-                    DeliveryDate = Convert.ToDateTime(row["DeliveryDate"].ToString()),
-                    DiscountPct = Convert.ToDecimal(row["DiscountPct"].ToString()),
-                    NetPrice = Convert.ToDecimal(row["NetPrice"].ToString()),
-                    DetailDeliveryCharge = Convert.ToDecimal(row["DetailDeliveryCharge"].ToString()),
-                    SubTotalPrice = Convert.ToDecimal(row["SubTotalPrice"].ToString()),
-                    SelesPerson = row["SelesPerson"].ToString(),
-                    SelesAddress = row["SelesAddress"].ToString(),
-                    SellerContact = row["SellerContact"].ToString(),
-                    Company = row["Company"].ToString(),
-                };
+            // Get the order details table
+            DataTable orderDetailsTable = dataSet.Tables[1];
+
+            // Populate the invoice model
+            GetOrderInvoiceDataForBuyerByOrderMasterIdDTO invoice = new GetOrderInvoiceDataForBuyerByOrderMasterIdDTO();
+            if (invoiceTable.Rows.Count > 0)
+            {
+                DataRow invoiceRow = invoiceTable.Rows[0]; // Assuming only one row for invoice info
+
+                invoice.InvoiceNumber = invoiceRow["InvoiceNumber"].ToString();
+                invoice.OrderDate = Convert.ToDateTime(invoiceRow["OrderDate"]);
+                invoice.BuyerName = invoiceRow["BuyerName"].ToString();
+                invoice.Address = invoiceRow["Address"].ToString();
+                invoice.Phone = invoiceRow["PhoneNumber"].ToString();
+                invoice.PaymentMethod = invoiceRow["PaymentMethod"].ToString();
+                invoice.NumberOfItem = Convert.ToInt32(invoiceRow["NumberOfItem"]);
+                invoice.TotalPrice = Convert.ToDecimal(invoiceRow["TotalPrice"]);
+            }
+
+            // Populate the order details
+            foreach (DataRow row in orderDetailsTable.Rows)
+            {
+                GetOrderInvoiceDataForBuyerByOrderMasterIdDetailsDTO orderDetails = new GetOrderInvoiceDataForBuyerByOrderMasterIdDetailsDTO();
+
+                orderDetails.ProductName = row["ProductName"].ToString();
+                orderDetails.Status = row["Status"].ToString();
+                orderDetails.Specification = row["Specification"].ToString();
+                orderDetails.Quantity = Convert.ToInt32(row["Quantity"]);
+                orderDetails.SellerId = CommonServices.EncryptPassword(row["SellerId"].ToString());
+                orderDetails.Unit = row["Unit"].ToString();
+                orderDetails.Price = Convert.ToDecimal(row["Price"]);
+                orderDetails.DeliveryCharge = Convert.ToDecimal(row["DeliveryCharge"]);
+                orderDetails.DiscountAmount = Convert.ToDecimal(row["DiscountAmount"]);
+                orderDetails.DeliveryDate = Convert.ToDateTime(row["DeliveryDate"]);
+                orderDetails.DiscountPct = Convert.ToDecimal(row["DiscountPct"]);
+                orderDetails.NetPrice = Convert.ToDecimal(row["NetPrice"]);
+                orderDetails.DetailDeliveryCharge = Convert.ToDecimal(row["DetailDeliveryCharge"]);
+                orderDetails.SubTotalPrice = Convert.ToDecimal(row["SubTotalPrice"]);
+                orderDetails.SelesPerson = row["SelesPerson"].ToString();
+                orderDetails.SelesAddress = row["SelesAddress"].ToString();
+                orderDetails.SellerContact = row["SellerContact"].ToString();
+                orderDetails.Company = row["Company"].ToString();
+
                 invoice.OrderInvoiceDetailList.Add(orderDetails);
             }
+
             return invoice;
+
 
         }
 

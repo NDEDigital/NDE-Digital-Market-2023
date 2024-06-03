@@ -391,22 +391,33 @@ public class ProductList_DAL
 
                 await con.OpenAsync();
 
+                // Log the final query and parameters
+                Console.WriteLine("Executing query: " + query);
+                foreach (SqlParameter param in command.Parameters)
+                {
+                    Console.WriteLine($"{param.ParameterName} = {param.Value}");
+                }
+
                 // Execute the command
                 int rowsAffected = await command.ExecuteNonQueryAsync();
 
                 if (rowsAffected == 0)
                 {
-                    return (new { message = $"No products found." });
+                    Console.WriteLine("No products found.");
+                    return new { message = "No products found." };
                 }
 
+                Console.WriteLine($"{rowsAffected} rows affected.");
                 await con.CloseAsync();
             }
 
-            return (new { message = $"Products' IsActive status changed." });
+            return new { message = "Products' IsActive status changed." };
         }
         catch (Exception ex)
         {
-            return (new { message = $"Products' IsActive status not changed: {ex.Message}" });
+            Console.WriteLine($"Error: {ex.Message}");
+            return new { message = $"Products' IsActive status not changed: {ex.Message}" };
         }
     }
+
 }

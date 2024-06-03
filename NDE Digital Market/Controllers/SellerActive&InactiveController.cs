@@ -23,16 +23,25 @@ namespace NDE_Digital_Market.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "admin")]
+        [AllowAnonymous]
+        //[Authorize(Roles = "admin")]
         [Route("getSellerActive&Inactive/{IsSeller}")]
         public async Task<IActionResult> CompanySellerDetails(string? CompanyCode, bool IsSeller, bool IsActive)
         {
-            object res = await _sellerActiveAndInactive_Service.CompanySellerDetails(CompanyCode, IsSeller, IsActive);
-            if (res == null)
+            try
             {
-                return NotFound(new { message = "Unit not Found." });
+                object res = await _sellerActiveAndInactive_Service.CompanySellerDetails(CompanyCode, IsSeller, IsActive);
+                if (res == null)
+                {
+                    return NotFound(new { message = "Unit not Found." });
+                }
+                return Ok(res);
             }
-            return Ok(res);
+            catch(Exception ex)
+            {
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
+            }
+
         }
 
         [HttpPut]

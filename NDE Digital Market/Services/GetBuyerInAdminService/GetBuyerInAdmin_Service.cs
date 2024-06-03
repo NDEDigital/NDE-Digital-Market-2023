@@ -37,6 +37,8 @@ namespace NDE_Digital_Market.Services.GetBuyerInAdminService
                 obj.AddedDate = (DateTime)(row["AddedDate"] as DateTime?);
                 obj.IsActive = row["IsActive"] as bool? ?? IsActive;
                 obj.IsBuyer = row["IsBuyer"] as bool? ?? IsBuyer;
+
+                list.Add(obj);
             }
 
             return list;

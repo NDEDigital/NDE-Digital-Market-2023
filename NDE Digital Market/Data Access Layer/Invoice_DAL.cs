@@ -13,12 +13,12 @@ namespace NDE_Digital_Market.Data_Access_Layer
             _healthCareConnection = commonServices.HealthCareConnection;
         }
 
-        public async Task<DataTable> GetInvoiceDataForBuyer(int OrderMasterId)
+        public async Task<DataSet> GetInvoiceDataForBuyer(int OrderMasterId)
         {
 
             try
             {
-                DataTable dataTable = new DataTable();
+                DataSet dataSet = new DataSet(); // Use DataSet instead of DataTable
                 string query = "GetOrderInvoiceByMasterId";
                 using (SqlConnection con = new SqlConnection(_healthCareConnection))
                 {
@@ -31,17 +31,18 @@ namespace NDE_Digital_Market.Data_Access_Layer
 
                         using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
                         {
-                            adapter.Fill(dataTable);
+                            adapter.Fill(dataSet); // Fill the DataSet
                         }
                     }
                     await con.CloseAsync();
                 }
-                return dataTable;
+                return dataSet; // Return the DataSet containing multiple tables
             }
             catch (Exception ex)
             {
                 return null;
             }
+
         }
 
 

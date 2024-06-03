@@ -92,11 +92,19 @@ namespace NDE_Digital_Market.Controllers
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> MakeGroupActiveOrInactiveAsync(string groupIds, bool? IsActive)
         {
-            if (groupIds == null)
+            try
             {
-                return BadRequest(new { message = "No product IDs provided." });
+                if (groupIds == null)
+                {
+                    return BadRequest(new { message = "No product IDs provided." });
+                }
+                return Ok(await _productGroup_Service.MakeGroupActiveOrInactiveAsync(groupIds, IsActive));
             }
-            return Ok(await _productGroup_Service.MakeGroupActiveOrInactiveAsync(groupIds, IsActive));
+            catch(Exception ex)
+            {
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
+            }
+
         }
 
 

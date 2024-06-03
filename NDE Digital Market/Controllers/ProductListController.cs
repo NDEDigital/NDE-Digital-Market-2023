@@ -101,11 +101,19 @@ public class ProductListController : ControllerBase
     [HttpPut("MakeProductActiveOrInactive")]
     public async Task<IActionResult> MakeProductActiveOrInactiveAsync(List<string> productIds, bool? IsActive)
     {
-        if (productIds == null)
+        try
         {
-            return BadRequest(new { message = "No product IDs provided." });
+            if (productIds == null)
+            {
+                return BadRequest(new { message = "No product IDs provided." });
+            }
+            return Ok(await _productList_Service.MakeProductActiveOrInactiveAsync(productIds, IsActive));
         }
-        return Ok(await _productList_Service.MakeProductActiveOrInactiveAsync(productIds, IsActive));
+        catch(Exception ex)
+        {
+            return BadRequest(new { message = "Server Error. Try Again!!!" });
+        }
+
     }
 }
 
