@@ -15,11 +15,15 @@ namespace NDE_Digital_Market.Services.SellerActiveAndInactiveService
             _sellerActiveAndInactive_DAL = sellerActiveAndInactive_DAL;
         }
 
-        public async Task<List<GetCompanySellerDetailsDTO>> CompanySellerDetails(string CompanyCode, bool IsSeller, bool IsActive)
+        public async Task<List<GetCompanySellerDetailsDTO>> CompanySellerDetails(string? CompanyCode, bool IsSeller, bool IsActive)
         {
             try
             {
-                string decryptedcode = CommonServices.DecryptPassword(CompanyCode);
+                string decryptedcode = string.Empty;
+                if (CompanyCode != null)
+                {
+                     decryptedcode= CommonServices.DecryptPassword(CompanyCode);
+                }
 
                 DataTable dataTable = await _sellerActiveAndInactive_DAL.CompanySellerDetails(decryptedcode, IsSeller, IsActive);
 

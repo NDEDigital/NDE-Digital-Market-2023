@@ -36,6 +36,7 @@ namespace NDE_Digital_Market.Services.DashboardGetDataService
                 
                 permission.MenuId = CommonServices.EncryptPassword(row["MenuId"].ToString());
                 permission.MenuName = row["MenuName"].ToString();
+                permission.NavigateUrl = row["NavigateUrl"].ToString();
                 // Add other properties if needed
                 result.Add(permission);
             }

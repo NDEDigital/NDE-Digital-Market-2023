@@ -25,12 +25,8 @@ namespace NDE_Digital_Market.Controllers
         [HttpGet]
         [Authorize(Roles = "admin")]
         [Route("getSellerActive&Inactive/{IsSeller}")]
-        public async Task<IActionResult> CompanySellerDetails(string CompanyCode, bool IsSeller, bool IsActive)
+        public async Task<IActionResult> CompanySellerDetails(string? CompanyCode, bool IsSeller, bool IsActive)
         {
-            if (CompanyCode == null)
-            {
-                return BadRequest(new { message = "Give Valid Data." });
-            }
             object res = await _sellerActiveAndInactive_Service.CompanySellerDetails(CompanyCode, IsSeller, IsActive);
             if (res == null)
             {

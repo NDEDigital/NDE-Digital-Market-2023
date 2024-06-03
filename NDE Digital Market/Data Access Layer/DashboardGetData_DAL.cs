@@ -29,14 +29,14 @@ namespace NDE_Digital_Market.Data_Access_Layer
 
                         IF @Status = 0
                         BEGIN
-                            SELECT P.UserId, P.MenuId, M.IsActive, M.MenuName 
+                            SELECT P.UserId, P.MenuId, M.IsActive, M.MenuName, M.NavigateUrl
                             FROM Permission P 
                             JOIN MenuList M ON P.MenuId = M.MenuId
                             WHERE P.UserId = @UserId AND M.IsActive = 1;
                         END
                         ELSE IF @Status = 1
                         BEGIN
-                            SELECT MenuId, MenuName
+                            SELECT MenuId, MenuName, NavigateUrl
                             FROM MenuList
                             WHERE IsAdmin != 1 AND IsActive = 1;
                         END

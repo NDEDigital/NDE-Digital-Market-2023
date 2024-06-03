@@ -20,7 +20,7 @@ namespace NDE_Digital_Market.Data_Access_Layer
                 DataTable dataTable = new DataTable();
                 string query = @"SELECT UR.UserId, UR.FullName, UR.PhoneNumber, UR.Email, UR.Address, UR.AddedDate, UR.IsActive, UR.CompanyCode, UR.IsBuyer
                                             FROM UserRegistration UR
-                                            WHERE (UR.IsBuyer = 1 AND UR.IsActive = @IsActive);";
+                                            WHERE (UR.IsBuyer = @IsBuyer AND UR.IsActive = @IsActive);";
                 using (SqlConnection con = new SqlConnection(_healthCareConnection))
                 {
                     await con.OpenAsync();

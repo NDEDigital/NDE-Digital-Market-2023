@@ -14,8 +14,14 @@ namespace NDE_Digital_Market.Data_Access_Layer
             _healthCareConnection = commonServices.HealthCareConnection;
         }
 
-        public async Task<DataTable> CompanySellerDetails(string CompanyCode, bool IsSeller, bool IsActive)
+        public async Task<DataTable> CompanySellerDetails(string? CompanyCode, bool IsSeller, bool IsActive)
         {
+
+            if(CompanyCode == null)
+            {
+                CompanyCode = "AllComapny";
+            }
+
             DataTable dataTable = new DataTable();
 
             try
