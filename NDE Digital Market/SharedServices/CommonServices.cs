@@ -41,68 +41,51 @@ namespace NDE_Digital_Market.SharedServices
 
         public static string EncryptPassword(string clearText)
         {
-            try
+            string EncryptionKey = "MAKV2SPBNI99212";
+            // Padding the input string to make it 64 bits (8 bytes) long
+            clearText = clearText.PadLeft(8, '0');
+            byte[] clearBytes = Encoding.Unicode.GetBytes(clearText);
+            using (Aes encryptor = Aes.Create())
             {
-                byte[] clearBytes = Encoding.Unicode.GetBytes(clearText);
-                using (Aes encryptor = Aes.Create())
+                Rfc2898DeriveBytes pdb = new Rfc2898DeriveBytes(EncryptionKey, new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 });
+                encryptor.Key = pdb.GetBytes(32);
+                encryptor.IV = pdb.GetBytes(16);
+                using (MemoryStream ms = new MemoryStream())
                 {
-                    var pdb = new Rfc2898DeriveBytes(EncryptionKey, new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 });
-                    encryptor.Key = pdb.GetBytes(32);
-                    encryptor.IV = pdb.GetBytes(16);
-                    using (var ms = new MemoryStream())
+                    using (CryptoStream cs = new CryptoStream(ms, encryptor.CreateEncryptor(), CryptoStreamMode.Write))
                     {
-                        using (var cs = new CryptoStream(ms, encryptor.CreateEncryptor(), CryptoStreamMode.Write))
-                        {
-                            cs.Write(clearBytes, 0, clearBytes.Length);
-                            cs.FlushFinalBlock();
-                        }
-                        clearText = Convert.ToBase64String(ms.ToArray());
+                        cs.Write(clearBytes, 0, clearBytes.Length);
+                        cs.Close();
                     }
+                    return Convert.ToBase64String(ms.ToArray());
                 }
-                return clearText;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Encryption failed: {ex.Message}");
-                throw;
             }
         }
 
         public static string DecryptPassword(string cipherText)
         {
-            try
+            string EncryptionKey = "MAKV2SPBNI99212";
+            byte[] cipherBytes = Convert.FromBase64String(cipherText);
+            using (Aes encryptor = Aes.Create())
             {
-                byte[] cipherBytes = Convert.FromBase64String(cipherText);
-                using (Aes encryptor = Aes.Create())
+                Rfc2898DeriveBytes pdb = new Rfc2898DeriveBytes(EncryptionKey, new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 });
+                encryptor.Key = pdb.GetBytes(32);
+                encryptor.IV = pdb.GetBytes(16);
+                using (MemoryStream ms = new MemoryStream())
                 {
-                    var pdb = new Rfc2898DeriveBytes(EncryptionKey, new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 });
-                    encryptor.Key = pdb.GetBytes(32);
-                    encryptor.IV = pdb.GetBytes(16);
-                    using (var ms = new MemoryStream())
+                    using (CryptoStream cs = new CryptoStream(ms, encryptor.CreateDecryptor(), CryptoStreamMode.Write))
                     {
-                        using (var cs = new CryptoStream(ms, encryptor.CreateDecryptor(), CryptoStreamMode.Write))
-                        {
-                            cs.Write(cipherBytes, 0, cipherBytes.Length);
-                            cs.FlushFinalBlock();
-                        }
-                        cipherText = Encoding.Unicode.GetString(ms.ToArray());
+                        cs.Write(cipherBytes, 0, cipherBytes.Length);
+                        cs.Close();
                     }
+                    string clearText = Encoding.Unicode.GetString(ms.ToArray());
+                    // Removing padding added during encryption
+                    clearText = clearText.TrimStart('0');
+                    return clearText;
                 }
-                return cipherText;
-            }
-            catch (FormatException ex)
-            {
-                // Handle format exception when the input is not valid Base64
-                Console.WriteLine($"FormatException: {ex.Message}");
-                throw;
-            }
-            catch (Exception ex)
-            {
-                // Handle other potential exceptions
-                Console.WriteLine($"Exception: {ex.Message}");
-                throw;
             }
         }
+
 
 
 
@@ -177,6 +160,8 @@ namespace NDE_Digital_Market.SharedServices
         //}
 
         // ================= compress image ======================================
+
+
         public static string UploadFiles(string foldername, string filename, IFormFile file)
         {
             if (file == null || file.Length == 0)
