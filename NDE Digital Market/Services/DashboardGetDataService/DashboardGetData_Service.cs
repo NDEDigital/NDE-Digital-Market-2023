@@ -28,11 +28,15 @@ namespace NDE_Digital_Market.Services.DashboardGetDataService
             foreach (DataRow row in dataTable.Rows)
             {
                 var permission = new GetPermissionToDashBoardDataDTO();
-                string userid = row["UserId"].ToString();
-                if(userid != null)
+                if(Status1 != 1)
                 {
-                    permission.UserId = CommonServices.EncryptPassword(userid);
+                    string userid = row["UserId"].ToString();
+                    if (userid != null)
+                    {
+                        permission.UserId = CommonServices.EncryptPassword(userid);
+                    }
                 }
+
                 
                 permission.MenuId = CommonServices.EncryptPassword(row["MenuId"].ToString());
                 permission.MenuName = row["MenuName"].ToString();

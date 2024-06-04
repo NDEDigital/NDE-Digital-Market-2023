@@ -127,7 +127,7 @@ public class ProductList_Service: IProductList_Service
 
         List<GetAllProductListDTO> list = new List<GetAllProductListDTO>();
         // Check if dataTable is null
-        if (dataTable == null)
+        if (dataTable.Rows.Count == 0)
         {
             return null;
         }

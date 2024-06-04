@@ -5,7 +5,7 @@ using System.Data;
 
 namespace NDE_Digital_Market.Services.GoodsService
 {
-    public class Goods_Service
+    public class Goods_Service : IGoods_Service
     {
 
         private readonly Goods_DAL _Goods_DAL;

@@ -6,20 +6,31 @@ using SixLabors.ImageSharp.Processing;
 using System.Data.SqlClient;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace NDE_Digital_Market.SharedServices
 {
     public class CommonServices
     {
+
+        // This constant is used to determine the keysize of the encryption algorithm in bits.
+        // We divide this by 8 within the code below to get the equivalent number of bytes.
+        private const int Keysize = 256;
+
+        // This constant determines the number of iterations for the password bytes generation function.
+        private const int DerivationIterations = 1000;
+
         //public readonly string FilesPath = @"F:\Projects\Health Care\healthcare-frontend\src\assets\images\";
         //public static string FilesPath { get; } = @"F:\Projects\Health Care\healthcare-frontend\src\assets\images\";
+        private static readonly string EncryptionKey = "MAKV2SPBNI99212";
+        private static readonly byte[] Salt = new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 };
 
         public string FilesPath { get; set; }
         public string Filespath1 { get; set; }
         public string HealthCareConnection { get; set; }
         private readonly IConfiguration _configuration;
         private readonly SqlConnection con;
-        private static readonly string EncryptionKey = "MAKV2SPBNI99212"; // Your encryption key
+        //private static readonly string EncryptionKey = "MAKV2SPBNI99212"; // Your encryption key
         //private static readonly string EncryptionKey = "your-encryption-key";
 
         public CommonServices(IConfiguration configuration)
@@ -37,54 +48,81 @@ namespace NDE_Digital_Market.SharedServices
             return HealthCareConnection = _configuration.GetConnectionString("HealthCare");
         }
 
-
-
-        public static string EncryptPassword(string clearText)
+        public static string EncryptPassword(string input)
         {
-            string EncryptionKey = "MAKV2SPBNI99212";
-            // Padding the input string to make it 64 bits (8 bytes) long
-            clearText = clearText.PadLeft(8, '0');
-            byte[] clearBytes = Encoding.Unicode.GetBytes(clearText);
-            using (Aes encryptor = Aes.Create())
-            {
-                Rfc2898DeriveBytes pdb = new Rfc2898DeriveBytes(EncryptionKey, new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 });
-                encryptor.Key = pdb.GetBytes(32);
-                encryptor.IV = pdb.GetBytes(16);
-                using (MemoryStream ms = new MemoryStream())
-                {
-                    using (CryptoStream cs = new CryptoStream(ms, encryptor.CreateEncryptor(), CryptoStreamMode.Write))
-                    {
-                        cs.Write(clearBytes, 0, clearBytes.Length);
-                        cs.Close();
-                    }
-                    return Convert.ToBase64String(ms.ToArray());
-                }
-            }
+            // Encode the string as a byte array using UTF-8 encoding
+            byte[] bytes = Encoding.UTF8.GetBytes(input);
+
+            // Convert the byte array to a hexadecimal string with uppercase characters
+            return BitConverter.ToString(bytes).ToUpper();
         }
 
-        public static string DecryptPassword(string cipherText)
+        public static string DecryptPassword(string hex)
         {
-            string EncryptionKey = "MAKV2SPBNI99212";
-            byte[] cipherBytes = Convert.FromBase64String(cipherText);
-            using (Aes encryptor = Aes.Create())
+            // Remove any non-hexadecimal characters
+            string cleanHex = Regex.Replace(hex, "[^0-9A-F]", "");
+
+            // Split the string into byte pairs
+            int length = cleanHex.Length;
+            byte[] bytes = new byte[length / 2];
+            for (int i = 0; i < length; i += 2)
             {
-                Rfc2898DeriveBytes pdb = new Rfc2898DeriveBytes(EncryptionKey, new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 });
-                encryptor.Key = pdb.GetBytes(32);
-                encryptor.IV = pdb.GetBytes(16);
-                using (MemoryStream ms = new MemoryStream())
-                {
-                    using (CryptoStream cs = new CryptoStream(ms, encryptor.CreateDecryptor(), CryptoStreamMode.Write))
-                    {
-                        cs.Write(cipherBytes, 0, cipherBytes.Length);
-                        cs.Close();
-                    }
-                    string clearText = Encoding.Unicode.GetString(ms.ToArray());
-                    // Removing padding added during encryption
-                    clearText = clearText.TrimStart('0');
-                    return clearText;
-                }
+                bytes[i / 2] = Convert.ToByte(cleanHex.Substring(i, 2), 16);
             }
+
+            // Decode the byte array back to a string using UTF-8 encoding
+            return Encoding.UTF8.GetString(bytes);
         }
+
+
+
+
+        //public static string EncryptPassword(string clearText)
+        //{
+        //    string EncryptionKey = "MAKV2SPBNI99212";
+        //    // Padding the input string to make it 64 bits (8 bytes) long
+        //    clearText = clearText.PadLeft(7, '0');
+        //    byte[] clearBytes = Encoding.Unicode.GetBytes(clearText);
+        //    using (Aes encryptor = Aes.Create())
+        //    {
+        //        Rfc2898DeriveBytes pdb = new Rfc2898DeriveBytes(EncryptionKey, new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 });
+        //        encryptor.Key = pdb.GetBytes(32);
+        //        encryptor.IV = pdb.GetBytes(16);
+        //        using (MemoryStream ms = new MemoryStream())
+        //        {
+        //            using (CryptoStream cs = new CryptoStream(ms, encryptor.CreateEncryptor(), CryptoStreamMode.Write))
+        //            {
+        //                cs.Write(clearBytes, 0, clearBytes.Length);
+        //                cs.Close();
+        //            }
+        //            return Convert.ToBase64String(ms.ToArray());
+        //        }
+        //    }
+        //}
+
+        //public static string DecryptPassword(string cipherText)
+        //{
+        //    string EncryptionKey = "MAKV2SPBNI99212";
+        //    byte[] cipherBytes = Convert.FromBase64String(cipherText);
+        //    using (Aes encryptor = Aes.Create())
+        //    {
+        //        Rfc2898DeriveBytes pdb = new Rfc2898DeriveBytes(EncryptionKey, new byte[] { 0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d, 0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76 });
+        //        encryptor.Key = pdb.GetBytes(32);
+        //        encryptor.IV = pdb.GetBytes(16);
+        //        using (MemoryStream ms = new MemoryStream())
+        //        {
+        //            using (CryptoStream cs = new CryptoStream(ms, encryptor.CreateDecryptor(), CryptoStreamMode.Write))
+        //            {
+        //                cs.Write(cipherBytes, 0, cipherBytes.Length);
+        //                cs.Close();
+        //            }
+        //            string clearText = Encoding.Unicode.GetString(ms.ToArray());
+        //            // Removing padding added during encryption
+        //            clearText = clearText.TrimStart('0');
+        //            return clearText;
+        //        }
+        //    }
+        //}
 
 
 

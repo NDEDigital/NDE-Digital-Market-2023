@@ -708,12 +708,13 @@ namespace NDE_Digital_Market.Services.OrderService
         public async Task<List<GetOrderMasterDataForSellerByCompanyCodeDTO>> getAllOrderForSellerAsync(string CompanyCode, string? status)
         {
 
-            string Decryptuserid = CommonServices.DecryptPassword(CompanyCode);
-            DataTable dataTable = await _order_DAL.getAllOrderForSellerAsync(CompanyCode, status);
+            string DecryptCompanyCode = CommonServices.DecryptPassword(CompanyCode);
+            DataTable dataTable = await _order_DAL.getAllOrderForSellerAsync(DecryptCompanyCode, status);
 
             List<GetOrderMasterDataForSellerByCompanyCodeDTO> MasterList = new List<GetOrderMasterDataForSellerByCompanyCodeDTO>();
+
             // Check if dataTable is null
-            if (dataTable == null)
+            if (dataTable.Rows.Count == 0)
             {
                 return null;
             }
