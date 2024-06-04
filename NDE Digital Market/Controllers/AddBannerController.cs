@@ -64,21 +64,21 @@ namespace NDE_Digital_Market.Controllers
 
 
         [HttpGet("GetAddBannerForAdmin")]
-        public async Task<ActionResult<List<ImageBanner>>> GetAddBannerForAdmin(bool? status)
+        public async Task<List<ImageBanner>> GetAddBannerForAdmin(bool? status)
         {
             var banner = await _AddBanner.GetAddBannerForAdmin(status);
             return banner;
         }
 
         [HttpGet("GetAddBannerForSeller")]
-        public async Task<ActionResult<List<ImageBanner>>> GetAddBannerForSeller(string ComapnayCode)
+        public async Task<List<ImageBanner>> GetAddBannerForSeller(string ComapnayCode)
         {
             var banner = await _AddBanner.GetAddBannerForSeller(ComapnayCode);
             return banner;
         }
 
         [HttpGet("GetBannerForShowingInHomePage")]
-        public async Task<ActionResult<List<ImageBanner>>> GetBannerForShowingInHomePage()
+        public async Task<List<ImageBanner>> GetBannerForShowingInHomePage()
         {
             var banner = await _AddBanner.GetBannerForShowingInHomePage();
             return banner;
