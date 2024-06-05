@@ -1,27 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using NDE_Digital_Market.Model;
 using NDE_Digital_Market.Services.AddBanner;
-using NDE_Digital_Market.Services.CompanyRegistrationServices;
 using NDE_Digital_Market.SharedServices;
-using System;
-using System.Collections.Generic;
-using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
-
-using Microsoft.AspNetCore.Mvc;
-using NDE_Digital_Market.Model;
 using NDE_Digital_Market.DTOs;
-using NDE_Digital_Market.Services.AddBanner;
-using Google.Api.Gax.ResourceNames;
-using static Org.BouncyCastle.Math.EC.ECCurve;
-
-
-
+using NDE_Digital_Market.Model.DTO;
 
 namespace NDE_Digital_Market.Controllers
 {
@@ -31,31 +15,33 @@ namespace NDE_Digital_Market.Controllers
     {
 
         private readonly IAddBanner _AddBanner;
-        private readonly string _connectionString;
 
        
         
 
-        public AddBannerController(IAddBanner addBanner, IConfiguration config) 
+        public AddBannerController(IAddBanner addBanner) 
         {
             this._AddBanner = addBanner;
-            CommonServices commonServices = new CommonServices(config);
-            _connectionString = commonServices.HealthCareConnection;
         }
 
 
 
         [HttpPost("AddBanner")]
-        public async Task<IActionResult> AddBanners([FromForm] BannerDto bannerDto)
+        public async Task<IActionResult> AddBanners([FromForm] InsertAdsAndBannerDTO bannerDto)
         {
-            var res = await _AddBanner.AddBanners(bannerDto);
-            if (res != null)
+            try
             {
-                return Ok(new { message = res });
-
+                if (bannerDto == null)
+                {
+                    return NotFound(new { message = "Give Valid Data." });
+                }
+                object res = await _AddBanner.AddBanners(bannerDto);
+                return Ok(res);
             }
-
-            return BadRequest(new { message = "Company already exists!" });
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
+            }
 
         }
 
@@ -64,32 +50,82 @@ namespace NDE_Digital_Market.Controllers
 
 
         [HttpGet("GetAddBannerForAdmin")]
-        public async Task<List<ImageBanner>> GetAddBannerForAdmin(bool? status)
+        public async Task<IActionResult> GetAddBannerForAdmin(bool? status)
         {
-            var banner = await _AddBanner.GetAddBannerForAdmin(status);
-            return banner;
+            try
+            {
+
+                object res = await _AddBanner.GetAddBannerForAdmin(status);
+                if (res == null)
+                {
+                    return NotFound(new { message = "No Data Found." });
+                }
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
+            }
         }
 
         [HttpGet("GetAddBannerForSeller")]
-        public async Task<List<ImageBanner>> GetAddBannerForSeller(string ComapnayCode)
+        public async Task<IActionResult> GetAddBannerForSeller(string ComapnayCode)
         {
-            var banner = await _AddBanner.GetAddBannerForSeller(ComapnayCode);
-            return banner;
+            try
+            {
+                if (ComapnayCode == null)
+                {
+                    return NotFound(new { message = "Give Valid Data." });
+                }
+                object res = await _AddBanner.GetAddBannerForSeller(ComapnayCode);
+                if (res == null)
+                {
+                    return NotFound(new { message = "No Data Found." });
+                }
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
+            }
         }
 
         [HttpGet("GetBannerForShowingInHomePage")]
-        public async Task<List<ImageBanner>> GetBannerForShowingInHomePage()
+        public async Task<IActionResult> GetBannerForShowingInHomePage()
         {
-            var banner = await _AddBanner.GetBannerForShowingInHomePage();
-            return banner;
+            try
+            {
+
+                object res = await _AddBanner.GetBannerForShowingInHomePage();
+                if (res == null)
+                {
+                    return NotFound(new { message = "No Data Found." });
+                }
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
+            }
         }
 
 
         [HttpGet(" GetAddForShowingInHomePage")]
-        public async Task<ActionResult<List<ImageBanner>>> GetAddForShowingInHomePage()
+        public async Task<ActionResult> GetAddForShowingInHomePage()
         {
-            var banner = await _AddBanner.GetAddForShowingInHomePage();
-            return banner;
+            try
+            {
+                object res = await _AddBanner.GetAddForShowingInHomePage();
+                if (res == null)
+                {
+                    return NotFound(new { message = "No Data Found." });
+                }
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
+            }
         }
 
 
@@ -97,114 +133,47 @@ namespace NDE_Digital_Market.Controllers
 
 
         [HttpPut("UpdateBanner")]
-        public async Task<IActionResult> UpdateBanner([FromForm] BannerDto banner)
+        public async Task<IActionResult> UpdateBanner([FromForm] UpdateAdsAndBannerDTO banner)
         {
-            var mssg = await _AddBanner.UpdateBanner(banner);
-            return Ok(new { message = mssg });
+            try
+            {
+                if (banner == null || banner.BannerID == null)
+                {
+                    return NotFound(new { message = "Give Valid Data." });
+                }
+                object res = await _AddBanner.UpdateBanner(banner);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
+            }
         }
 
 
 
         [HttpPut("UpdateBannerStatus")]
-        public async Task<IActionResult> UpdateBannerStatus([FromBody] BannerDto banner)
+        public async Task<IActionResult> UpdateBannerStatus([FromBody] UpdateAdsAndBannerDTO banner)
         {
-            if (banner == null || banner.BannerID <= 0)
-            {
-                return BadRequest(new
-                {
-                    Message = "Invalid banner data."
-                });
-            }
-            SqlConnection connection = new SqlConnection(_connectionString);
 
             try
             {
-                
-
-                await connection.OpenAsync();
-
-
-
-
-
-
-
-                if(banner.IsActive == true)
+                if (banner == null || banner.BannerID == null)
                 {
-                    string checkquery = @"SELECT  Count(BannerID) as count FROM [NDE_Digital_Development].[dbo].[AdBanner]
-                                    where IsAds = 1 and IsActive = 1 and IsBannerStatus = 1 and EndDate >= DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()), 0) and StartDate <= DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()), 0);";
-
-                    SqlCommand checkcmd = new SqlCommand(checkquery, connection);
-                    using (SqlDataReader reader = await checkcmd.ExecuteReaderAsync())
-                    {
-                        if (await reader.ReadAsync())
-                        {
-                            int res = Convert.ToInt32(reader["count"]);
-                            if (res == 6)
-                            {
-                                return BadRequest(new
-                                {
-                                    Message = "Ads Can't be Approved. Max Size Reached."
-                                });
-                            }
-                        }
-                    }
-
+                    return BadRequest(new { Message = "Invalid banner data."});
                 }
-                string query = @"UPDATE AdBanner 
-                     SET IsActive = @IsActive,
-                         UpdatedDate = @UpdatedDate,
-                         UpdatedBy = @UpdatedBy,
-                         UpdatedPC = @UpdatedPC,
-                         StartDate = @StartDate,
-                         EndDate = @EndDate,
-                         IsBannerStatus = @IsBannerStatus
-                     WHERE BannerID = @BannerID;";
-
-
-                using (SqlCommand cmd = new SqlCommand(query, connection))
-                {
-                        cmd.Parameters.AddWithValue("@BannerID", banner.BannerID);
-                        cmd.Parameters.AddWithValue("@IsActive", banner.IsActive ?? (object)DBNull.Value);
-                        cmd.Parameters.AddWithValue("@UpdatedDate", DateTime.Now);
-                        cmd.Parameters.AddWithValue("@UpdatedBy", banner.UpdatedBy ?? (object)DBNull.Value);
-                        cmd.Parameters.AddWithValue("@UpdatedPC", banner.UpdatedPC ?? (object)DBNull.Value);
-                        cmd.Parameters.AddWithValue("@StartDate", banner.StartDate ?? (object)DBNull.Value);
-                        cmd.Parameters.AddWithValue("@EndDate", banner.EndDate ?? (object)DBNull.Value);
-                        cmd.Parameters.AddWithValue("@IsBannerStatus", banner.IsBannerStatus ?? (object)DBNull.Value);
-
-                        var result = await cmd.ExecuteNonQueryAsync();
-                        if (result > 0)
-                        {
-                            return Ok(new
-                            {
-                                Message = "Banner updated successfully."
-                            });
-                        }
-                        else
-                        {
-                            return BadRequest(new
-                            {
-                                Message = "Failed to update banner."
-                            });
-                        }
-                }
+                object res = await _AddBanner.UpdateBannerStatus(banner);
+                return Ok(res);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
-                return BadRequest(new
-                {
-                    Message = "Failed to update banner/Ads."
-                });
-            }
-            finally
-            {
-                connection.CloseAsync();
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
             }
 
 
         }
+
+
 
         //[HttpPut("UpdateBanners")]
         //public async Task<IActionResult> UpdateBanners([FromForm] ImageBanner banner)
@@ -219,32 +188,21 @@ namespace NDE_Digital_Market.Controllers
 
 
         [HttpDelete("DeleteBanner/{bannerId}")]
-        public async Task<IActionResult> DeleteBanner(int bannerId)
+        public async Task<IActionResult> DeleteBanner(string bannerId)
         {
 
-            bool deleted = await _AddBanner.DeleteBanner(bannerId);
-
-
-            if (deleted)
+            try
             {
-                // Return a success response
-            
-                // If needed, you can return the inserted ItemID
-                return Ok(new
+                if (bannerId == null)
                 {
-                    Message = "Banner deleted successfully.",
-
-                });
+                    return NotFound(new { message = "Give Valid Data." });
+                }
+                object res = await _AddBanner.DeleteBanner(bannerId);
+                return Ok(res);
             }
-            else
+            catch (Exception ex)
             {
-
-        
-                return BadRequest(new
-                {
-                    Message = "Failed to delete banner.",
-
-                });
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
             }
         }
 
