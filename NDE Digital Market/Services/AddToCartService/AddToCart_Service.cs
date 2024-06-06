@@ -53,7 +53,7 @@ namespace NDE_Digital_Market.Services.AddToCartService
 
         public async Task<List<GetAddToCartDataDTO>> GetAddToCartDataByUserID(string userId)
         {
-            int decryptUserId = int.Parse(CommonServices.EncryptPassword(userId));
+            int decryptUserId = int.Parse(CommonServices.DecryptPassword(userId));
             DataTable dataTable = await _AddToCart_DAL.GetAddToCartDataByUserID(decryptUserId);
 
             List<GetAddToCartDataDTO> list = new List<GetAddToCartDataDTO>();
