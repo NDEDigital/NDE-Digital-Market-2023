@@ -94,7 +94,7 @@ namespace NDE_Digital_Market.Services.AddToCartService
         {
             AddToCartModal Model = new AddToCartModal();
             Model.BuyerUserID = int.Parse(CommonServices.DecryptPassword(addToCart.BuyerUserID));
-            Model.CompanyCode = CommonServices.DecryptPassword(addToCart.BuyerUserID);
+            Model.CompanyCode = CommonServices.DecryptPassword(addToCart.CompanyCode);
             Model.ProductID = int.Parse(CommonServices.DecryptPassword(addToCart.ProductID));
             Model.ProductGroupID = int.Parse(CommonServices.DecryptPassword(addToCart.ProductGroupID));
             Model.UnitID = int.Parse(CommonServices.DecryptPassword(addToCart.UnitID));
@@ -118,8 +118,8 @@ namespace NDE_Digital_Market.Services.AddToCartService
 
         public async Task<object> DeleteAddToCart(string id)
         {
-            int decryptUserId = int.Parse(CommonServices.EncryptPassword(id));
-            return await _AddToCart_DAL.GetAddToCartDataByUserID(decryptUserId);
+            int decryptUserId = int.Parse(CommonServices.DecryptPassword(id));
+            return await _AddToCart_DAL.DeleteAddToCart(decryptUserId);
         }
 
     }

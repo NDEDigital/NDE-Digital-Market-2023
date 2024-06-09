@@ -125,7 +125,7 @@ namespace NDE_Digital_Market.Data_Access_Layer
                     CheckCMD.Parameters.Clear();
                     CheckCMD.Parameters.AddWithValue("@OrderMasterId", OrderMasterId);
                     CheckCMD.Parameters.AddWithValue("@CompanyCode", OrderDetailsList[i].CompanyCode);
-                    CheckCMD.Parameters.AddWithValue("@UserId", OrderDetailsList[i].UserId);
+                    CheckCMD.Parameters.AddWithValue("@UserId", 0);
                     CheckCMD.Parameters.AddWithValue("@ProductId", OrderDetailsList[i].ProductId);
                     CheckCMD.Parameters.AddWithValue("@ProductGroupID", OrderDetailsList[i].ProductGroupID);
                     CheckCMD.Parameters.AddWithValue("@Specification", OrderDetailsList[i].Specification);

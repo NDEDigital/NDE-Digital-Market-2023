@@ -109,8 +109,8 @@ namespace NDE_Digital_Market.Data_Access_Layer
                     else
                     {
                         // If the record does not exist, insert the new record
-                        var insertCmd = new SqlCommand(@"INSERT INTO AddToCart (BuyerUserID, CompanyCode, ProductID, ProductGroupID, UnitID, ProductCartQuantity, AddedDate, AddedBy, AddedPC, UpdatedDate, UpdatedBy, UpdatedPC)
-                                    VALUES (@BuyerUserID, @CompanyCode, @ProductID, @ProductGroupID, @UnitID, @ProductCartQuantity, @AddedDate, @AddedBy, @AddedPC, @UpdatedDate, @UpdatedBy, @UpdatedPC)", con);
+                        var insertCmd = new SqlCommand(@"INSERT INTO AddToCart (BuyerUserID, CompanyCode, ProductID, ProductGroupID, UnitID, ProductCartQuantity, AddedDate, AddedBy, AddedPC)
+                                    VALUES (@BuyerUserID, @CompanyCode, @ProductID, @ProductGroupID, @UnitID, @ProductCartQuantity, @AddedDate, @AddedBy, @AddedPC)", con);
 
                         insertCmd.Parameters.AddWithValue("@BuyerUserID", addToCart.BuyerUserID);
                         insertCmd.Parameters.AddWithValue("@CompanyCode", addToCart.CompanyCode);
@@ -121,9 +121,6 @@ namespace NDE_Digital_Market.Data_Access_Layer
                         insertCmd.Parameters.AddWithValue("@AddedDate", DateTime.UtcNow);
                         insertCmd.Parameters.AddWithValue("@AddedBy", addToCart.AddedBy);
                         insertCmd.Parameters.AddWithValue("@AddedPC", addToCart.AddedPC);
-                        insertCmd.Parameters.AddWithValue("@UpdatedDate", DateTime.UtcNow);
-                        insertCmd.Parameters.AddWithValue("@UpdatedBy", addToCart.UpdatedBy);
-                        insertCmd.Parameters.AddWithValue("@UpdatedPC", addToCart.UpdatedPC);
 
                         insertCmd.ExecuteNonQuery();
                     }

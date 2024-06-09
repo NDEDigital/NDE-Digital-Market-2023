@@ -30,30 +30,41 @@ namespace NDE_Digital_Market.Services.OrderService
             Model.AddedBy = data.AddedBy;
             Model.AddedPC = data.AddedPC;
 
-            for (int i = 0; i < data.OrderDetailsList.Count; i++)
+            // Initialize the list if it's not already
+            if (Model.OrderDetailsList == null)
             {
-
-                Model.OrderDetailsList[i].CompanyCode = CommonServices.DecryptPassword(data.OrderDetailsList[i].CompanyCode);
-                Model.OrderDetailsList[i].OrderMasterId = int.Parse(CommonServices.DecryptPassword(data.OrderDetailsList[i].OrderMasterId));
-                Model.OrderDetailsList[i].UserId = int.Parse(CommonServices.DecryptPassword(data.OrderDetailsList[i].UserId));
-                Model.OrderDetailsList[i].ProductId = int.Parse(CommonServices.DecryptPassword(data.OrderDetailsList[i].ProductId));
-                Model.OrderDetailsList[i].ProductGroupID = int.Parse(CommonServices.DecryptPassword(data.OrderDetailsList[i].ProductGroupID));
-                Model.OrderDetailsList[i].Specification = data.OrderDetailsList[i].Specification;
-                Model.OrderDetailsList[i].Qty = data.OrderDetailsList[i].Qty;
-                Model.OrderDetailsList[i].UnitId = int.Parse(CommonServices.DecryptPassword(data.OrderDetailsList[i].UnitId));
-                Model.OrderDetailsList[i].DiscountAmount = data.OrderDetailsList[i].DiscountAmount;
-                Model.OrderDetailsList[i].Price = data.OrderDetailsList[i].Price;
-                Model.OrderDetailsList[i].DeliveryCharge = data.OrderDetailsList[i].DeliveryCharge;
-                Model.OrderDetailsList[i].DeliveryDate = data.OrderDetailsList[i].DeliveryDate;
-                Model.OrderDetailsList[i].DiscountPct = data.OrderDetailsList[i].DiscountPct;
-                Model.OrderDetailsList[i].NetPrice = data.OrderDetailsList[i].NetPrice;
-                Model.OrderDetailsList[i].AddedBy = data.OrderDetailsList[i].AddedBy;
-                Model.OrderDetailsList[i].AddedPC = data.OrderDetailsList[i].AddedPC;
+                Model.OrderDetailsList = new List<OrderDetailsModel>();
             }
 
+            // Populate the list with the same number of elements as data.OrderDetailsList
+            for (int i = 0; i < data.OrderDetailsList.Count; i++)
+            {
+                var orderDetails = new OrderDetailsModel();
+
+                orderDetails.CompanyCode = CommonServices.DecryptPassword(data.OrderDetailsList[i].CompanyCode);
+                //orderDetails.OrderMasterId = int.Parse(CommonServices.DecryptPassword(data.OrderDetailsList[i].OrderMasterId));
+                // orderDetails.UserId = int.Parse(CommonServices.DecryptPassword(data.OrderDetailsList[i].UserId));
+                orderDetails.ProductId = int.Parse(CommonServices.DecryptPassword(data.OrderDetailsList[i].ProductId));
+                orderDetails.ProductGroupID = int.Parse(CommonServices.DecryptPassword(data.OrderDetailsList[i].ProductGroupID));
+                orderDetails.Specification = data.OrderDetailsList[i].Specification;
+                orderDetails.Qty = data.OrderDetailsList[i].Qty;
+                orderDetails.UnitId = int.Parse(CommonServices.DecryptPassword(data.OrderDetailsList[i].UnitId));
+                orderDetails.DiscountAmount = data.OrderDetailsList[i].DiscountAmount;
+                orderDetails.Price = data.OrderDetailsList[i].Price;
+                orderDetails.DeliveryCharge = data.OrderDetailsList[i].DeliveryCharge;
+                orderDetails.DeliveryDate = data.OrderDetailsList[i].DeliveryDate;
+                orderDetails.DiscountPct = data.OrderDetailsList[i].DiscountPct;
+                orderDetails.NetPrice = data.OrderDetailsList[i].NetPrice;
+                orderDetails.AddedBy = data.OrderDetailsList[i].AddedBy;
+                orderDetails.AddedPC = data.OrderDetailsList[i].AddedPC;
+
+                // Add the populated orderDetails to the Model's OrderDetailsList
+                Model.OrderDetailsList.Add(orderDetails);
+            }
 
             return await _order_DAL.InsertOrderDateAsync(Model);
         }
+
 
 
 
