@@ -291,8 +291,6 @@ namespace NDE_Digital_Market.Services.GoodsService
 
                 list.Add(obj);
 
-
-                list.Add(obj);
             }
 
             return list;
