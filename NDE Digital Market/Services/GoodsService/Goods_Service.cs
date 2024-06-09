@@ -31,7 +31,7 @@ namespace NDE_Digital_Market.Services.GoodsService
             {
                 GetNavDataDTO modelObj = new GetNavDataDTO
                 {
-                    ProductGroupCode = row["ProductGroupCode"].ToString(),
+                    ProductGroupCode = CommonServices.EncryptPassword(row["ProductGroupCode"].ToString()),
                     ProductGroupName = row["ProductGroupName"].ToString(),
                     //ProductGroupPrefix = reader["ProductGroupPrefix"].ToString(),
                     //ProductGroupDetails = reader["ProductGroupDetails"].ToString(),
