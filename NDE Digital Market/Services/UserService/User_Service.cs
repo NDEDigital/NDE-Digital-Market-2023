@@ -85,8 +85,8 @@ namespace NDE_Digital_Market.Services.UserService
             foreach (DataRow row in dataTable.Rows)
             {
 
-                user.UserId = (int)row["UserId"];
-                user.UserCode = row["UserCode"].ToString();
+                user.UserId = CommonServices.EncryptPassword(row["UserId"].ToString());
+                user.UserCode = CommonServices.EncryptPassword(row["UserCode"].ToString());
                 user.FullName = row["FullName"].ToString();
                 user.IsAdmin = row["IsAdmin"] as bool?;
                 user.IsBuyer = row["IsBuyer"] as bool?;
@@ -100,9 +100,9 @@ namespace NDE_Digital_Market.Services.UserService
                     user.YearsInBusiness = (int)row["YearsInBusiness"];
                     user.BusinessRegistrationNumber = row["BusinessRegistrationNumber"].ToString();
                     user.TaxIdentificationNumber = row["TaxIdentificationNumber"].ToString();
-                    user.PreferredPaymentMethodID = row["PreferredPaymentMethodID"] as int?;
+                    user.PreferredPaymentMethodID = CommonServices.EncryptPassword(row["PreferredPaymentMethodID"].ToString());
                     user.PMName = row["PMName"].ToString();
-                    user.BankNameID = row["BankNameID"] as int?;
+                    user.BankNameID = CommonServices.EncryptPassword(row["BankNameID"].ToString());
                     user.PMBankName = row["PMBankName"].ToString();
                     user.AccountNumber = row["AccountNumber"].ToString();
                     user.AccountHolderName = row["AccountHolderName"].ToString();

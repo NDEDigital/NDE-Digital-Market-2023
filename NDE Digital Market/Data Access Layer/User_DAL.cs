@@ -503,7 +503,7 @@ namespace NDE_Digital_Market.Data_Access_Layer
 
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 {
-                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandType = CommandType.Text;
                     cmd.Parameters.AddWithValue("@UserId", userId);
 
                     using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))

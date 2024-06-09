@@ -2,7 +2,7 @@
 {
     public class GetSingleUserDetailsDTO
     {
-        public int? UserId { get; set; }
+        public string? UserId { get; set; }
         public string? UserCode { get; set; }
         public string? FullName { get; set; }
         public bool? IsAdmin { get; set; }
@@ -15,9 +15,9 @@
         public int? YearsInBusiness { get; set; }
         public string? BusinessRegistrationNumber { get; set; }
         public string? TaxIdentificationNumber { get; set; }
-        public int? PreferredPaymentMethodID { get; set; }
+        public string? PreferredPaymentMethodID { get; set; }
         public string? PMName { get; set; }
-        public int? BankNameID { get; set; }
+        public string? BankNameID { get; set; }
         public string? PMBankName { get; set; }
         public string? AccountNumber { get; set; }
         public string? AccountHolderName { get; set; }
