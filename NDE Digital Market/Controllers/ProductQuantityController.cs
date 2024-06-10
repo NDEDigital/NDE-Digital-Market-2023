@@ -62,12 +62,19 @@ namespace NDE_Digital_Market.Controllers
         [Authorize(Roles ="seller")]
         public async Task<IActionResult> InsertPortalReceivedAsync(InsertPortalReceivedMasterDTO portaldata)
         {
-
-            if (portaldata == null)
+            try
             {
-                return BadRequest(new { message = "Give Proper portalreceived Data." });
+                if (portaldata == null)
+                {
+                    return BadRequest(new { message = "Give Proper portalreceived Data." });
+                }
+                return Ok(await _productQuantity_Service.InsertPortalReceivedAsync(portaldata));
             }
-            return Ok(await _productQuantity_Service.InsertPortalReceivedAsync(portaldata));
+            catch(Exception ex)
+            {
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
+            }
+
         }
 
 
