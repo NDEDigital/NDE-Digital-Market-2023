@@ -3,6 +3,7 @@
     public class PortalReceivedMasterModel
     {
         public int? PortalReceivedId { get; set; }
+        public string? Id { get; set; }
         public string? PortalReceivedCode { get; set; }
         public DateTime? MaterialReceivedDate { get; set; }
         public string? ChallanNo { get; set; }

@@ -86,24 +86,34 @@ namespace NDE_Digital_Market.Services.ProductQuantityService
             Model.ChallanDate = portaldata.ChallanDate;
             Model.Remarks = portaldata.Remarks;
             Model.UserId = int.Parse(CommonServices.DecryptPassword(portaldata.UserId));
-            Model.CompanyCode = CommonServices.DecryptPassword(portaldata.CompanyCode);
+            //Model.CompanyCode = CommonServices.DecryptPassword(portaldata.CompanyCode);
             Model.AddedBy = portaldata.AddedBy;
             Model.AddedPC = portaldata.AddedPC;
 
-            for(int i=0; i < portaldata.PortalReceivedDetailslist.Count; i++)
+            // Initialize the list if it's not already
+            if (Model.PortalReceivedDetailslist == null)
             {
+                Model.PortalReceivedDetailslist = new List<PortalReceivedDetailsModel>();
+            }
 
-                Model.PortalReceivedDetailslist[i].ProductGroupId = int.Parse(CommonServices.DecryptPassword(portaldata.PortalReceivedDetailslist[i].ProductGroupId));
-                Model.PortalReceivedDetailslist[i].ProductId = int.Parse(CommonServices.DecryptPassword(portaldata.PortalReceivedDetailslist[i].ProductId));
-                Model.PortalReceivedDetailslist[i].Specification = portaldata.PortalReceivedDetailslist[i].Specification;
-                Model.PortalReceivedDetailslist[i].ReceivedQty = portaldata.PortalReceivedDetailslist[i].ReceivedQty;
-                Model.PortalReceivedDetailslist[i].UnitId = int.Parse(CommonServices.DecryptPassword(portaldata.PortalReceivedDetailslist[i].UnitId));
-                Model.PortalReceivedDetailslist[i].Price = portaldata.PortalReceivedDetailslist[i].Price;
-                Model.PortalReceivedDetailslist[i].TotalPrice = portaldata.PortalReceivedDetailslist[i].TotalPrice;
-                Model.PortalReceivedDetailslist[i].UserId = int.Parse(CommonServices.DecryptPassword(portaldata.PortalReceivedDetailslist[i].UserId));
-                Model.PortalReceivedDetailslist[i].Remarks = portaldata.PortalReceivedDetailslist[i].Remarks;
-                Model.PortalReceivedDetailslist[i].AddedBy = portaldata.PortalReceivedDetailslist[i].AddedBy;
-                Model.PortalReceivedDetailslist[i].AddedPC = portaldata.PortalReceivedDetailslist[i].AddedPC;
+            for (int i=0; i < portaldata.PortalReceivedDetailslist.Count; i++)
+            {
+                var Details = new PortalReceivedDetailsModel();
+
+                Details.ProductGroupId = int.Parse(CommonServices.DecryptPassword(portaldata.PortalReceivedDetailslist[i].ProductGroupId));
+                Details.ProductId = int.Parse(CommonServices.DecryptPassword(portaldata.PortalReceivedDetailslist[i].ProductId));
+                Details.Specification = portaldata.PortalReceivedDetailslist[i].Specification;
+                Details.ReceivedQty = portaldata.PortalReceivedDetailslist[i].ReceivedQty;
+                Details.UnitId = int.Parse(CommonServices.DecryptPassword(portaldata.PortalReceivedDetailslist[i].UnitId));
+                Details.Price = portaldata.PortalReceivedDetailslist[i].Price;
+                Details.TotalPrice = portaldata.PortalReceivedDetailslist[i].TotalPrice;
+                Details.UserId = int.Parse(CommonServices.DecryptPassword(portaldata.PortalReceivedDetailslist[i].UserId));
+                Details.Remarks = portaldata.PortalReceivedDetailslist[i].Remarks;
+                Details.AddedBy = portaldata.PortalReceivedDetailslist[i].AddedBy;
+                Details.AddedPC = portaldata.PortalReceivedDetailslist[i].AddedPC;
+
+                // Add the populated orderDetails to the Model's OrderDetailsList
+                Model.PortalReceivedDetailslist.Add(Details);
             }
 
 

@@ -8,7 +8,7 @@
         public DateTime? ChallanDate { get; set; }
         public string? Remarks { get; set; }
         public string? UserId { get; set; }
-        public string? CompanyCode { get; set; }
+        //public string? CompanyCode { get; set; }
         //public DateTime AddedDate { get; set; }
         public string? AddedBy { get; set; }
         public string? AddedPC { get; set; }

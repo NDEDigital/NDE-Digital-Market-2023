@@ -149,6 +149,7 @@ namespace NDE_Digital_Market.Data_Access_Layer
                 }
                 // If everything is fine, commit the transaction
                 await transaction.CommitAsync();
+                portaldata.Id = CommonServices.EncryptPassword(PortalReceivedId.ToString());
                 return (portaldata);
             }
             catch (Exception ex)

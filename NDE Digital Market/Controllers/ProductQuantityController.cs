@@ -45,16 +45,24 @@ namespace NDE_Digital_Market.Controllers
         [Authorize(Roles = "seller")]
         public async Task<IActionResult> GetProductForAddQtyByUserId(string UserId, string productGroupId)
         {
-            if (UserId == null || productGroupId == null)
+            try
             {
-                return BadRequest(new { message = "Give Proper Data." });
+                if (UserId == null || productGroupId == null)
+                {
+                    return BadRequest(new { message = "Give Proper Data." });
+                }
+                object res = await _productQuantity_Service.GetProductForAddQtyByUserId(UserId, productGroupId);
+                if (res == null)
+                {
+                    return NotFound(new { message = "Data not Found." });
+                }
+                return Ok(res);
             }
-            object res = await _productQuantity_Service.GetProductForAddQtyByUserId(UserId, productGroupId);
-            if (res == null)
+            catch(Exception ex)
             {
-                return NotFound(new { message = "Data not Found." });
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
             }
-            return Ok(res);
+
         }
 
 
