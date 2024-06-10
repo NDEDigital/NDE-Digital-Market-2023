@@ -22,8 +22,18 @@ public class ReviewAndRating_Service : IReviewAndRating_Service
 
     public async Task<object> AddReview(ReviewsAndRatings review)
     {
+        ReviewAndRatingModel model = new ReviewAndRatingModel();
+        model.ImageFile = review.ImageFile;
+        model.AddedBy = review.AddedBy;
+        model.AddedPc = review.AddedPc;
+        model.BuyerId = int.Parse(CommonServices.DecryptPassword(review.BuyerId));
+        model.OrderDetailId = int.Parse(CommonServices.DecryptPassword(review.OrderDetailId));
+        model.ReviewText = review.ReviewText;
 
-        return await _ReviewAndRating_DAL.AddReview(review);
+        model.RatingValue = review.RatingValue;
+
+
+        return await _ReviewAndRating_DAL.AddReview(model);
     }
 
 

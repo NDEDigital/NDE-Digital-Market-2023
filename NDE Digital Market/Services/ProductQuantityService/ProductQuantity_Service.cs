@@ -248,44 +248,51 @@ namespace NDE_Digital_Market.Services.ProductQuantityService
 
         public async Task<GetPortalReceivedMasterDataAfterInsertDTO> GetPortalData(string PortalReceivedId)
         {
-
             int DecryptPortalReceivedId = int.Parse(CommonServices.DecryptPassword(PortalReceivedId));
-            DataTable dataTable = await _productQuantity_DAL.GetPortalData(DecryptPortalReceivedId);
+            DataSet dataSet = await _productQuantity_DAL.GetPortalData(DecryptPortalReceivedId);
 
             GetPortalReceivedMasterDataAfterInsertDTO portalAfterInsert = new GetPortalReceivedMasterDataAfterInsertDTO();
 
-            foreach (DataRow row in dataTable.Rows)
+            if (dataSet != null && dataSet.Tables.Count > 0)
             {
-                portalAfterInsert.PortalReceivedId = CommonServices.EncryptPassword(row["PortalReceivedId"].ToString());
-                portalAfterInsert.PortalReceivedCode = CommonServices.EncryptPassword(row["PortalReceivedCode"].ToString());
-                portalAfterInsert.MaterialReceivedDate = Convert.ToDateTime(row["MaterialReceivedDate"].ToString());
-                portalAfterInsert.ChallanNo = row["ChallanNo"].ToString();
-                portalAfterInsert.ChallanDate = row["ChallanDate"] != DBNull.Value ? Convert.ToDateTime(row["ChallanDate"]) : (DateTime?)null;
-                portalAfterInsert.Remarks = row["Remarks"].ToString();
-            }
-            foreach (DataRow row in dataTable.Rows)
-            {
-                GetPortalReceivedDetailsDataAfterInsertDTO portalReceivedDetailAfterInsert = new GetPortalReceivedDetailsDataAfterInsertDTO
+                // Processing the first result set (PortalReceivedMaster)
+                DataTable masterTable = dataSet.Tables[0];
+                if (masterTable.Rows.Count > 0)
                 {
-                    PortalReceivedId = CommonServices.EncryptPassword(row["PortalReceivedId"].ToString()),
-                    PortalDetailsId = CommonServices.EncryptPassword(row["PortalDetailsId"].ToString()),
-                    ProductGroupId = CommonServices.EncryptPassword(row["ProductGroupId"].ToString()),
-                    ProductGroupName = row["ProductGroupName"].ToString(),
-                    ProductId = CommonServices.EncryptPassword(row["ProductId"].ToString()),
-                    ProductName = row["ProductName"].ToString(),
-                    Specification = row["Specification"].ToString(),
-                    ReceivedQty = Convert.ToDecimal(row["ReceivedQty"].ToString()),
-                    UnitId = CommonServices.EncryptPassword(row["UnitId"].ToString()),
-                    Unit = row["Unit"].ToString(),
-                    Price = Convert.ToDecimal(row["Price"].ToString()),
-                    TotalPrice = Convert.ToDecimal(row["TotalPrice"].ToString()),
-                    AvailableQty = Convert.ToDecimal(row["AvailableQty"].ToString()),
-                    Remarks = row["Remarks"].ToString(),
-                };
-                portalAfterInsert.PortalReceivedDetailAfterInsertlList.Add(portalReceivedDetailAfterInsert);
-            }
-            return portalAfterInsert;
+                    DataRow row = masterTable.Rows[0];
+                    portalAfterInsert.PortalReceivedId = CommonServices.EncryptPassword(row["PortalReceivedId"].ToString());
+                    portalAfterInsert.PortalReceivedCode = CommonServices.EncryptPassword(row["PortalReceivedCode"].ToString());
+                    portalAfterInsert.MaterialReceivedDate = Convert.ToDateTime(row["MaterialReceivedDate"].ToString());
+                    portalAfterInsert.ChallanNo = row["ChallanNo"].ToString();
+                    portalAfterInsert.ChallanDate = row["ChallanDate"] != DBNull.Value ? Convert.ToDateTime(row["ChallanDate"]) : (DateTime?)null;
+                    portalAfterInsert.Remarks = row["Remarks"].ToString();
+                }
 
+                // Processing the second result set (PortalReceivedDetails)
+                DataTable detailsTable = dataSet.Tables[1];
+                foreach (DataRow row in detailsTable.Rows)
+                {
+                    GetPortalReceivedDetailsDataAfterInsertDTO portalReceivedDetailAfterInsert = new GetPortalReceivedDetailsDataAfterInsertDTO();
+                    portalReceivedDetailAfterInsert.PortalReceivedId = CommonServices.EncryptPassword(row["PortalReceivedId"].ToString());
+                    portalReceivedDetailAfterInsert.PortalDetailsId = CommonServices.EncryptPassword(row["PortalDetailsId"].ToString());
+                    portalReceivedDetailAfterInsert.ProductGroupId = CommonServices.EncryptPassword(row["ProductGroupId"].ToString());
+                    portalReceivedDetailAfterInsert.ProductGroupName = row["ProductGroupName"].ToString();
+                    portalReceivedDetailAfterInsert.ProductId = CommonServices.EncryptPassword(row["ProductId"].ToString());
+                    portalReceivedDetailAfterInsert.ProductName = row["ProductName"].ToString();
+                    portalReceivedDetailAfterInsert.Specification = row["Specification"].ToString();
+                    portalReceivedDetailAfterInsert.ReceivedQty = Convert.ToDecimal(row["ReceivedQty"].ToString());
+                    portalReceivedDetailAfterInsert.UnitId = CommonServices.EncryptPassword(row["UnitId"].ToString());
+                    portalReceivedDetailAfterInsert.Unit = row["Unit"].ToString();
+                    portalReceivedDetailAfterInsert.Price = Convert.ToDecimal(row["Price"].ToString());
+                    portalReceivedDetailAfterInsert.TotalPrice = Convert.ToDecimal(row["TotalPrice"].ToString());
+                    portalReceivedDetailAfterInsert.AvailableQty = Convert.ToDecimal(row["AvailableQty"].ToString());
+                    portalReceivedDetailAfterInsert.Remarks = row["Remarks"].ToString();
+
+                    portalAfterInsert.PortalReceivedDetailAfterInsertlList.Add(portalReceivedDetailAfterInsert);
+                }
+            }
+
+            return portalAfterInsert;
         }
 
 

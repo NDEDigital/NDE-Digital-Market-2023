@@ -445,7 +445,7 @@ namespace NDE_Digital_Market.Data_Access_Layer
                 await con.OpenAsync();
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 {
-                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandType = CommandType.Text;
                     cmd.Parameters.AddWithValue("@UserId", userId);
 
                     using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
@@ -465,12 +465,12 @@ namespace NDE_Digital_Market.Data_Access_Layer
 
 
 
-        public async Task<DataTable> GetPortalData(int PortalReceivedId)
+        public async Task<DataSet> GetPortalData(int PortalReceivedId)
         {
             SqlConnection con = new SqlConnection(_healthCareConnection);
             try
             {
-                DataTable dataTable = new DataTable();
+                DataSet dataSet = new DataSet();
                 string query = @"GetPortalDataAfterInsertByPortalReceivedId";
                 await con.OpenAsync();
                 using (SqlCommand cmd = new SqlCommand(query, con))
@@ -480,13 +480,11 @@ namespace NDE_Digital_Market.Data_Access_Layer
 
                     using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
                     {
-                        adapter.Fill(dataTable);
+                        adapter.Fill(dataSet);
                     }
                 }
                 await con.CloseAsync();
-
-
-                return null;
+                return dataSet;
             }
             catch (Exception ex)
             {
@@ -500,6 +498,7 @@ namespace NDE_Digital_Market.Data_Access_Layer
                 }
             }
         }
+
 
 
     }

@@ -230,15 +230,23 @@ namespace NDE_Digital_Market.Controllers
         [Authorize]
         public async Task<IActionResult> UpdatePasss(UserPasswordUpdateDTO user)
         {
-            if (user == null)
+            try
             {
-                return BadRequest(new { message = "Give Valid Inputs!" });
+                if (user == null)
+                {
+                    return BadRequest(new { message = "Give Valid Inputs!" });
+                }
+                else
+                {
+                    object result = _user_Service.UpdatePasss(user);
+                    return Ok(result);
+                }
             }
-            else
+            catch(Exception ex)
             {
-                object result = _user_Service.UpdatePasss(user);
-                return Ok(result);
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
             }
+
 
         }
 
@@ -251,12 +259,20 @@ namespace NDE_Digital_Market.Controllers
         [Authorize]
         public async Task<IActionResult> UpdateUserProfileAsync([FromBody] UserInfoUpdateDTO userModel)
         {
-            if(userModel == null)
+            try
             {
-                return BadRequest(new { message = "Send a Valid User Information!" });
+                if (userModel == null)
+                {
+                    return BadRequest(new { message = "Send a Valid User Information!" });
+                }
+                object res = _user_Service.UpdateUserProfileAsync(userModel);
+                return Ok(res);
             }
-            object res = _user_Service.UpdateUserProfileAsync(userModel);
-            return Ok(res);
+            catch(Exception ex)
+            {
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
+            }
+
         }
 
     }

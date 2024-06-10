@@ -189,7 +189,7 @@ namespace NDE_Digital_Market.Data_Access_Layer
 
 
 
-        public async Task<object> AddReview(ReviewsAndRatings review)
+        public async Task<object> AddReview(ReviewAndRatingModel review)
         {
             try
             {
@@ -218,8 +218,8 @@ namespace NDE_Digital_Market.Data_Access_Layer
                         {
                             if (reader.Read())
                             {
-                                review.ProductId = reader["ProductId"] as int?;
-                                review.SellerId = reader["SellerId"] as int?;
+                                review.ProductId = Convert.ToInt32(reader["ProductId"]);
+                                review.SellerId = Convert.ToInt32(reader["SellerId"]);
                             }
                         }
                         con.Close();
@@ -231,10 +231,10 @@ namespace NDE_Digital_Market.Data_Access_Layer
 
                     string query = @"
                     INSERT INTO ReviewRatings
-                        (OrderDetailId, ReviewText, RatingValue, BuyerId, ProductGroupID, ProductId, 
+                        (OrderDetailId, ReviewText, RatingValue, BuyerId, ProductId, 
                          SellerId, ReviewDate, ImagePath, AddedDate, AddedBy, AddedPc)
                     VALUES
-                        (@OrderDetailId, @ReviewText, @RatingValue, @BuyerId, @ProductGroupID, @ProductId, 
+                        (@OrderDetailId, @ReviewText, @RatingValue, @BuyerId, @ProductId, 
                          @SellerId, @ReviewDate, @ImagePath, @AddedDate, @AddedBy, @AddedPc);";
 
                     using (SqlCommand cmd = new SqlCommand(query, con))
@@ -243,7 +243,7 @@ namespace NDE_Digital_Market.Data_Access_Layer
                         cmd.Parameters.AddWithValue("@ReviewText", review.ReviewText ?? (object)DBNull.Value);
                         cmd.Parameters.AddWithValue("@RatingValue", review.RatingValue ?? (object)DBNull.Value);
                         cmd.Parameters.AddWithValue("@BuyerId", review.BuyerId ?? (object)DBNull.Value);
-                        cmd.Parameters.AddWithValue("@ProductGroupID", review.ProductGroupID ?? (object)DBNull.Value);
+                        //cmd.Parameters.AddWithValue("@ProductGroupID", review.ProductGroupID ?? (object)DBNull.Value);
                         cmd.Parameters.AddWithValue("@ProductId", review.ProductId ?? (object)DBNull.Value);
                         cmd.Parameters.AddWithValue("@SellerId", review.SellerId ?? (object)DBNull.Value);
                         cmd.Parameters.AddWithValue("@ReviewDate", DateTime.Now);

@@ -119,17 +119,24 @@ namespace NDE_Digital_Market.Controllers
         [Authorize(Roles = "seller")]
         public async Task<ActionResult> GetPortalReceivedByUserId(string userId)
         {
+            try
+            {
+                if (userId == null)
+                {
+                    return BadRequest(new { message = "Give Proper Data." });
+                }
+                object res = await _productQuantity_Service.GetPortalReceivedByUserId(userId);
+                if (res == null)
+                {
+                    return NotFound(new { message = "Data not Found." });
+                }
+                return Ok(res);
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
+            }
 
-            if (userId == null)
-            {
-                return BadRequest(new { message = "Give Proper Data." });
-            }
-            object res = await _productQuantity_Service.GetPortalReceivedByUserId(userId);
-            if (res == null)
-            {
-                return NotFound(new { message = "Data not Found." });
-            }
-            return Ok(res);
         }
 
 
@@ -138,16 +145,24 @@ namespace NDE_Digital_Market.Controllers
         [Route("GetPortalData")]
         public async Task<IActionResult> GetPortalData(string PortalReceivedId)
         {
-            if (PortalReceivedId == null)
+            try
             {
-                return BadRequest(new { message = "Give Proper Data." });
+                if (PortalReceivedId == null)
+                {
+                    return BadRequest(new { message = "Give Proper Data." });
+                }
+                object res = await _productQuantity_Service.GetPortalData(PortalReceivedId);
+                if (res == null)
+                {
+                    return NotFound(new { message = "Data not Found." });
+                }
+                return Ok(res);
             }
-            object res = await _productQuantity_Service.GetPortalData(PortalReceivedId);
-            if (res == null)
+            catch(Exception ex)
             {
-                return NotFound(new { message = "Data not Found." });
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
             }
-            return Ok(res);
+
         }
 
 

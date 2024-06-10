@@ -131,7 +131,7 @@ namespace NDE_Digital_Market.Services.UserService
 
         public async Task<object> UpdateUserProfileAsync(UserInfoUpdateDTO user)
         {
-            CommonServices.createPasswordHash(user.Password, out byte[] passwordHash, out byte[] passwordSalt);
+            //CommonServices.createPasswordHash(user.Password, out byte[] passwordHash, out byte[] passwordSalt);
             UserModel userModel = new UserModel();
             userModel.UserId = int.Parse(CommonServices.DecryptPassword(user.UserId));
 
@@ -142,12 +142,12 @@ namespace NDE_Digital_Market.Services.UserService
             userModel.CompanyCode = user.CompanyCode ?? string.Empty;
             userModel.IsBuyer = user.IsBuyer;
             userModel.IsSeller = user.IsSeller;
-            userModel.PasswordHash = passwordHash;
-            userModel.PasswordSalt = passwordSalt;
+            //userModel.PasswordHash = passwordHash;
+            //userModel.PasswordSalt = passwordSalt;
 
             userModel.AddedDate = DateTime.UtcNow;
 
-            return await _user_DAL.CreateUser(userModel);
+            return await _user_DAL.UpdateUserProfileAsync(userModel);
         }
 
     }
