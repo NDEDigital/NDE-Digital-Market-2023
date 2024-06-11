@@ -1,9 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NDE_Digital_Market.Model;
-using System.Data.SqlClient;
-using System.Data;
 using Microsoft.AspNetCore.Authorization;
-using NDE_Digital_Market.DTOs;
 using NDE_Digital_Market.Model.DTO;
 using NDE_Digital_Market.Services.ProductReturnService;
 

@@ -1,17 +1,7 @@
 ﻿
 using Microsoft.AspNetCore.Mvc;
-using NDE_Digital_Market.Model;
-using NDE_Digital_Market.DTOs;
 using System.Data.SqlClient;
-using System.Data;
-
-using System.Security.Cryptography;
-using System.Text;
 using NDE_Digital_Market.SharedServices;
-
-using System.Security.Claims;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authorization;
 using NDE_Digital_Market.Model.DTO;
 using NDE_Digital_Market.Services.UserService;

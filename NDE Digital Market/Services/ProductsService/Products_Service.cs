@@ -1,63 +1,67 @@
-﻿namespace NDE_Digital_Market.Services.ProductsService;
+﻿using NDE_Digital_Market.Data_Access_Layer;
+using NDE_Digital_Market.DTOs;
+using NDE_Digital_Market.Model;
+using NDE_Digital_Market.Model.DTO;
+using NDE_Digital_Market.SharedServices;
 
-public class Products_Service
+namespace NDE_Digital_Market.Services.ProductsService;
+
+public class Products_Service : IProducts_Service
 {
-    public Products_Service()
+    private readonly Products_DAL _product_DAL;
+    public Products_Service(Products_DAL products_DAL)
     {
+        _product_DAL = products_DAL;
+    }
 
+    public async Task<object> UpdateProduct(GoodsQuantityModel product)
+    {
+        return await _product_DAL.UpdateProduct(product);
     }
 
 
-    //public IActionResult UpdateProduct( GoodsQuantityModel product)
-    //{
- 
-    //}
-
-    //// ======================= GET Dashboard Contents ================== 
+    public async Task<object> GetDashboardContents(string sellerCode, String? status = null, String? productName = null, String? companyName = null, DateTime? addedDate = null)
+    {
+        return await _product_DAL.GetDashboardContents(sellerCode, status, productName, companyName, addedDate);
+    }
 
 
-    //public IActionResult GetDashboardContents(string sellerCode, String? status = null, String? productName = null, String? companyName = null, DateTime? addedDate = null)
-    //{
-
-    //}
-
-
-
-    //public async Task<IActionResult> GetSellerProductForAdminApproval(string status)
-    //{
-
-    //}
-
-    //// ======================= DELETE Product ==================
-
-    //public IActionResult DeleteProcuct(string sellerCode, int ProductId)
-    //{
-
-    //}
+    public async Task<List<GetSellerProductListForAdminApprovalDTO>> GetSellerProductForAdminApproval(string status)
+    {
+        return await _product_DAL.GetSellerProductForAdminApproval(status);
+    }
 
 
-    ////================== SellerProductPriceAndOffer status Update by Tushar ==================
-
-    //public async Task<object> UpdateSellerProductStatusAsync(List<ProductStatusDto> productStatusList)
-    //{
-
-    //}
-
+    public async Task<object> DeleteProcuct(string sellerCode, string ProductId)
+    {
+        int decryptedProductId = int.Parse(CommonServices.DecryptPassword(ProductId));
+        return await _product_DAL.DeleteProcuct(sellerCode, decryptedProductId);
+    }
 
 
-    //public class EditedUserInfoModel
-    //{
+    public async Task<object> UpdateSellerProductStatusAsync(List<UpdateSellerProductStatusDTO> productStatusList)
+    {
+        List<SellerProductsModel> modellist = new List<SellerProductsModel>();
+        for (int i=0; i < productStatusList.Count; i++)
+        {
+            SellerProductsModel model = new SellerProductsModel();
 
-    //    public string? FullName { get; set; }
-    //    public string? SupplierCode { get; set; }
-    //    public string? Email { get; set; }
-    //    public string? ProductName { get; set; }
-    //}
+            model.ProductId = int.Parse(CommonServices.DecryptPassword(productStatusList[i].ProductId));
+            model.CompanyCode = CommonServices.DecryptPassword(productStatusList[i].CompanyCode);
+            model.Status = productStatusList[i].Status;
+            model.UserId = int.Parse(CommonServices.DecryptPassword(productStatusList[i].UserId));
+
+            modellist.Add(model);
+        }
+        return await _product_DAL.UpdateSellerProductStatusAsync(modellist);
+    }
 
 
 
-    //public void comapreEditedProduct(int productId)
-    //{
+    public async Task<object> comapreEditedProduct(string productId)
+    {
+        int DecryptProductId = int.Parse(CommonServices.DecryptPassword(productId));
+        return await _product_DAL.comapreEditedProduct(DecryptProductId);
+    }
 
-    //}
 }

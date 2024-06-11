@@ -25,6 +25,8 @@
         public int? StatusBit { get; set; }
         //public bool? IsAdmin { get; set;}
         public string? companyName { get; set; }
+        public int? UserId { get; set; }
+        public string? CompanyCode { get; set; }
         public DateTime? AddedDate { get; set; }
     }
 }

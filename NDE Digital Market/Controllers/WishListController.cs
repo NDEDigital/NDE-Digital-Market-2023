@@ -1,14 +1,6 @@
-﻿using System;
-using System.Data;
-using System.Data.SqlClient;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using NDE_Digital_Market.DTOs;
+﻿using Microsoft.AspNetCore.Mvc;
 using NDE_Digital_Market.Model.DTO;
 using NDE_Digital_Market.Services.WishListService;
-using NDE_Digital_Market.SharedServices;
 
 namespace NDE_Digital_Market.Controllers
 {

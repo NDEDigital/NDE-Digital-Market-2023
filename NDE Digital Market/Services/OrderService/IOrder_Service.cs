@@ -1,4 +1,5 @@
 ﻿using NDE_Digital_Market.Model.DTO;
+using static NDE_Digital_Market.Data_Access_Layer.Order_DAL;
 
 namespace NDE_Digital_Market.Services.OrderService
 {
@@ -17,7 +18,7 @@ namespace NDE_Digital_Market.Services.OrderService
 
         Task<object> UpdateOrderStatusAsync(string orderMasterId, string? detailsCancelledId, string status);
 
-
+        Task<object> SellerOrderDetailsStatusChangedAsync(updateOrderClass updateOrder);
 
         Task<GetSingleUserInfoDTO> getUserInfo(string UserId);
 

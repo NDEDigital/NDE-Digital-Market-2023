@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration; // Make sure to import this namespace
-using NDE_Digital_Market.DTOs;
 using NDE_Digital_Market.Services.CompanyAdminService;
 using NDE_Digital_Market.SharedServices;
 using System;

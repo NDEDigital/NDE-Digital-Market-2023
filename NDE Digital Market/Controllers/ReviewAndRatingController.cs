@@ -1,14 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ViewEngines;
-using NDE_Digital_Market.DTOs;
 using NDE_Digital_Market.Model;
 using NDE_Digital_Market.Services.ReviewAndRatingService;
-using NDE_Digital_Market.SharedServices;
-using Newtonsoft.Json;
-using System.Data;
-using System.Data.SqlClient;
 
 namespace NDE_Digital_Market.Controllers
 {

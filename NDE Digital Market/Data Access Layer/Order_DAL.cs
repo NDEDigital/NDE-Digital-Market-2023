@@ -388,20 +388,33 @@ namespace NDE_Digital_Market.Data_Access_Layer
 
 
 
-        public async Task<object> SellerOrderDetailsStatusChangedAsync(UpdateOrderDTO updateOrder)
+        public class updateOrderClass
+        {
+            public string? orderdetailsIds { get; set; }
+            public string? status { get; set; }
+            public InsertSellerSalesMasterDTO? sellerSalesMasterModel { get; set; }
+        }
+
+
+        public async Task<object> SellerOrderDetailsStatusChangedAsync(updateOrderClass updateOrder)
         {
 
-            SqlConnection con = new SqlConnection(_healthCareConnection);
             // Start a transaction
             SqlTransaction transaction = null;
 
             try
             {
+                using (SqlConnection con = new SqlConnection(_healthCareConnection))
+                {
                     if (!string.IsNullOrEmpty(updateOrder.orderdetailsIds))
                     {
                         string orderdetailsIdString = "''";
 
-                        List<int> DetailsIds = updateOrder.orderdetailsIds.Split(',').Select(int.Parse).ToList();
+                        List<int> DetailsIds = updateOrder.orderdetailsIds
+                                                                        .Split(',')
+                                                                        .Select(id => int.Parse(CommonServices.DecryptPassword(id)))
+                                                                        .ToList();
+
                         orderdetailsIdString = string.Join(",", DetailsIds);
 
                         for (int i = 0; i < DetailsIds.Count; i++)
@@ -442,10 +455,10 @@ namespace NDE_Digital_Market.Data_Access_Layer
                         {
                             if (updateOrder.status == "Processing")
                             {
-                                var detailsResult = await InsertSellerSalesDataAsync(updateOrder.sellerSalesMasterModel, con, transaction);
-                                if (detailsResult is BadRequestObjectResult)
+                                bool detailsResult = await InsertSellerSalesDataAsync(updateOrder.sellerSalesMasterModel, con, transaction);
+                                if (detailsResult is false)
                                 {
-                                    throw new Exception((detailsResult as BadRequestObjectResult).Value.ToString());
+                                    return (new { message = "SellerSales data Insertion Unsuccessfully." });
                                 }
                             }
 
@@ -464,6 +477,7 @@ namespace NDE_Digital_Market.Data_Access_Layer
                         return (new { message = "Send A Valid OrderDetail Id." });
 
                     }
+                }
 
             }
             catch (Exception ex)
@@ -475,18 +489,10 @@ namespace NDE_Digital_Market.Data_Access_Layer
                 }
                 return (new { message = ex.Message });
             }
-            finally
-            {
-                // Finally block to ensure the connection is always closed
-                if (con.State == ConnectionState.Open)
-                {
-                    await con.CloseAsync();
-                }
-            }
 
         }
 
-        private async Task<object> InsertSellerSalesDataAsync(SellerSalesMasterModel sellerSalesMasterDto, SqlConnection con, SqlTransaction transaction)
+        private async Task<bool> InsertSellerSalesDataAsync(InsertSellerSalesMasterDTO sellerSalesMasterDto, SqlConnection con, SqlTransaction transaction)
         {
 
 
@@ -514,11 +520,11 @@ namespace NDE_Digital_Market.Data_Access_Layer
                 cmdMaster.Parameters.AddWithValue("@SSMId", SSMId);
                 cmdMaster.Parameters.AddWithValue("@SSMCode", SSMCode);
                 cmdMaster.Parameters.AddWithValue("@SSMDate", DateTime.Now);
-                cmdMaster.Parameters.AddWithValue("@UserId", sellerSalesMasterDto.UserId);
+                cmdMaster.Parameters.AddWithValue("@UserId", int.Parse(CommonServices.DecryptPassword(sellerSalesMasterDto.UserId)));
                 cmdMaster.Parameters.AddWithValue("@TotalPrice", sellerSalesMasterDto.TotalPrice);
                 cmdMaster.Parameters.AddWithValue("@Challan", sellerSalesMasterDto.Challan ?? (object)DBNull.Value);
                 cmdMaster.Parameters.AddWithValue("@Remarks", sellerSalesMasterDto.Remarks ?? (object)DBNull.Value);
-                cmdMaster.Parameters.AddWithValue("@BUserId", sellerSalesMasterDto.BUserId);
+                cmdMaster.Parameters.AddWithValue("@BUserId", int.Parse(CommonServices.DecryptPassword(sellerSalesMasterDto.BUserId)));
                 cmdMaster.Parameters.AddWithValue("@AddedBy", sellerSalesMasterDto.AddedBy);
                 cmdMaster.Parameters.AddWithValue("@DateAdded", DateTime.Now);
                 cmdMaster.Parameters.AddWithValue("@AddedPC", sellerSalesMasterDto.AddedPC);
@@ -537,14 +543,14 @@ namespace NDE_Digital_Market.Data_Access_Layer
 
                         cmdDetails.Parameters.AddWithValue("@SSMId", SSMId);
                         cmdDetails.Parameters.AddWithValue("@OrderNo", sellerSalesMasterDto.SellerSalesDetailsList[i].OrderNo);
-                        cmdDetails.Parameters.AddWithValue("@ProductId", sellerSalesMasterDto.SellerSalesDetailsList[i].ProductId);
+                        cmdDetails.Parameters.AddWithValue("@ProductId", int.Parse(CommonServices.DecryptPassword(sellerSalesMasterDto.SellerSalesDetailsList[i].ProductId)));
                         cmdDetails.Parameters.AddWithValue("@Specification", sellerSalesMasterDto.SellerSalesDetailsList[i].Specification);
                         cmdDetails.Parameters.AddWithValue("@StockQty", sellerSalesMasterDto.SellerSalesDetailsList[i].StockQty);
                         cmdDetails.Parameters.AddWithValue("@SaleQty", sellerSalesMasterDto.SellerSalesDetailsList[i].SaleQty);
-                        cmdDetails.Parameters.AddWithValue("@UnitId", sellerSalesMasterDto.SellerSalesDetailsList[i].UnitId);
+                        cmdDetails.Parameters.AddWithValue("@UnitId", int.Parse(CommonServices.DecryptPassword(sellerSalesMasterDto.SellerSalesDetailsList[i].UnitId)));
                         cmdDetails.Parameters.AddWithValue("@NetPrice", sellerSalesMasterDto.SellerSalesDetailsList[i].NetPrice);
                         cmdDetails.Parameters.AddWithValue("@Address", sellerSalesMasterDto.SellerSalesDetailsList[i].Address);
-                        cmdDetails.Parameters.AddWithValue("@ProductGroupID", sellerSalesMasterDto.SellerSalesDetailsList[i].ProductGroupID);
+                        cmdDetails.Parameters.AddWithValue("@ProductGroupID", int.Parse(CommonServices.DecryptPassword(sellerSalesMasterDto.SellerSalesDetailsList[i].ProductGroupID)));
                         cmdDetails.Parameters.AddWithValue("@Remarks", sellerSalesMasterDto.SellerSalesDetailsList[i].Remarks ?? (object)DBNull.Value);
 
                         cmdDetails.Parameters.AddWithValue("@AddedBy", sellerSalesMasterDto.SellerSalesDetailsList[i].AddedBy);
@@ -554,22 +560,25 @@ namespace NDE_Digital_Market.Data_Access_Layer
                         int detailsRes = await cmdDetails.ExecuteNonQueryAsync();
                         if (detailsRes <= 0)
                         {
-                            return (new { message = "SellerSales details data isn't Inserted." });
+                            return false;
                         }
                     }
                 }
                 else
                 {
-                    return (new { message = "SellerSales Master data isn't Inserted Successfully." });
+                    return false;
                 }
-                return (new { message = "SellerSale data Inserted Successfully." });
+                return true;
 
             }
             catch (Exception ex)
             {
-                return (ex.Message);
+                return false;
             }
         }
+
+
+
 
 
 

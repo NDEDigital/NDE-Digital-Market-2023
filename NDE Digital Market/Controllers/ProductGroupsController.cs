@@ -1,11 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using NDE_Digital_Market.Model;
-using NDE_Digital_Market.DTOs;
-using System.Data;
-using System.Data.SqlClient;
-using NDE_Digital_Market.SharedServices;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using NDE_Digital_Market.Services.ProductGroupService;
 using NDE_Digital_Market.Model.DTO;

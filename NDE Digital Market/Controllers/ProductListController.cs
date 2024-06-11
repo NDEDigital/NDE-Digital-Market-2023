@@ -1,13 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using NDE_Digital_Market.DTOs;
-using NDE_Digital_Market.Model;
 using NDE_Digital_Market.Model.DTO;
 using NDE_Digital_Market.Services.ProductListService;
-using NDE_Digital_Market.SharedServices;
-using System.Data;
-using System.Data.SqlClient;
 
 namespace NDE_Digital_Market.Controllers;
 

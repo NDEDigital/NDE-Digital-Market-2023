@@ -4,7 +4,6 @@ using NDE_Digital_Market.Model;
 using NDE_Digital_Market.Services.AddBanner;
 using NDE_Digital_Market.SharedServices;
 using System.Data.SqlClient;
-using NDE_Digital_Market.DTOs;
 using NDE_Digital_Market.Model.DTO;
 
 namespace NDE_Digital_Market.Controllers

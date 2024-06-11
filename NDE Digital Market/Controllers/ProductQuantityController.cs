@@ -1,9 +1,4 @@
-﻿ using Microsoft.AspNetCore.Mvc;
-using NDE_Digital_Market.SharedServices;
-using NDE_Digital_Market.Model;
-using NDE_Digital_Market.DTOs;
-using System.Data.SqlClient;
-using System.Data;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using NDE_Digital_Market.Services.ProductQuantityService;
 using NDE_Digital_Market.Model.DTO;

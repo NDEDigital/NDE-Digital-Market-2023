@@ -1,10 +1,8 @@
-﻿using NDE_Digital_Market.Services;
-using NDE_Digital_Market.Model;
-using NDE_Digital_Market.DTOs;
-using NDE_Digital_Market.Data_Access_Layer;
+﻿using NDE_Digital_Market.Data_Access_Layer;
 using NDE_Digital_Market.SharedServices;
 using System.Data;
 using NDE_Digital_Market.Model.DTO;
+using NDE_Digital_Market.Model;
 
 namespace NDE_Digital_Market.Services.CompanyRegistrationServices;
 
@@ -18,14 +16,14 @@ public class CompanyRegistration : ICompanyRegistration
     }
 
 
-    public async Task<Boolean> CompanyexistsCheckAsync(CompanyDto companyDto)
+    public async Task<Boolean> CompanyexistsCheckAsync(CompanyModel companyDto)
     {
         Boolean res = await _CompanyRegistration_DAL.CompanyExistAsync(companyDto);
         return res;
     }
 
 
-    public async Task<string> CompanyRegistrationPostAsync(CompanyDto companyDto)
+    public async Task<string> CompanyRegistrationPostAsync(CompanyModel companyDto)
     {
         string res = await _CompanyRegistration_DAL.CompanyRegistrationPostAsync(companyDto);
         return res;
@@ -71,7 +69,7 @@ public class CompanyRegistration : ICompanyRegistration
         return list;
 
     }
-    public async Task<string> UpdateCompanyAsync(CompanyDto companyDto)
+    public async Task<string> UpdateCompanyAsync(CompanyModel companyDto)
     {
         var res = await _CompanyRegistration_DAL.UpdateCompanyAsync(companyDto);
         return res;

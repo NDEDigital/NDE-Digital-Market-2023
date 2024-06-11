@@ -1,10 +1,6 @@
-﻿
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using NDE_Digital_Market.DTOs;
 using NDE_Digital_Market.Services.GetBuyerInAdminService;
-using NDE_Digital_Market.SharedServices;
-using System.Data.SqlClient;
 
 namespace NDE_Digital_Market.Controllers
 {

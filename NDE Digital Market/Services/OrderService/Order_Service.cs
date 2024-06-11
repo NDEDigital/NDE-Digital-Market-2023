@@ -3,6 +3,7 @@ using NDE_Digital_Market.Model;
 using NDE_Digital_Market.Model.DTO;
 using NDE_Digital_Market.SharedServices;
 using System.Data;
+using static NDE_Digital_Market.Data_Access_Layer.Order_DAL;
 
 namespace NDE_Digital_Market.Services.OrderService
 {
@@ -219,6 +220,12 @@ namespace NDE_Digital_Market.Services.OrderService
         }
 
 
+
+
+        public async Task<object> SellerOrderDetailsStatusChangedAsync(updateOrderClass updateOrder)
+        {
+            return await _order_DAL.SellerOrderDetailsStatusChangedAsync(updateOrder);
+        }
 
 
         //public async Task<object> SellerOrderDetailsStatusChangedAsync(UpdateOrderDTO updateOrder)

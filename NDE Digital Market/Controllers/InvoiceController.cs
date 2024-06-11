@@ -1,11 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using NDE_Digital_Market.Model.OrderModel;
-using NDE_Digital_Market.SharedServices;
-using System.Data.SqlClient;
-using System.Data;
 using Microsoft.AspNetCore.Authorization;
-using NDE_Digital_Market.DTOs;
-using NDE_Digital_Market.Model;
 using NDE_Digital_Market.Services.InvoiceService;
 
 namespace NDE_Digital_Market.Controllers

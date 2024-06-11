@@ -1,12 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using NDE_Digital_Market.DTOs;
 using NDE_Digital_Market.Services.PermissionToDashboardService;
-using NDE_Digital_Market.SharedServices;
-using System;
-using System.Data.SqlClient;
-using System.Threading.Tasks;
 
 namespace NDE_Digital_Market.Controllers
 {

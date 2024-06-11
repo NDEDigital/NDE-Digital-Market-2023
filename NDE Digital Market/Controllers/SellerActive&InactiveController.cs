@@ -1,13 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualBasic;
-using NDE_Digital_Market.DTOs;
 using NDE_Digital_Market.Services.SellerActiveAndInactiveService;
-using NDE_Digital_Market.SharedServices;
-using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
 
 namespace NDE_Digital_Market.Controllers
 {

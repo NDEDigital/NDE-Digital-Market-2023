@@ -1,7 +1,4 @@
-﻿using NDE_Digital_Market.Model;
-using NDE_Digital_Market.DTOs;
-using NDE_Digital_Market.Data_Access_Layer;
-using Microsoft.AspNetCore.Mvc;
+﻿
 using NDE_Digital_Market.Model.DTO;
 
 namespace NDE_Digital_Market.Services.AddBanner

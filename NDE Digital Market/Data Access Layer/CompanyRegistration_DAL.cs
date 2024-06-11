@@ -1,10 +1,7 @@
-﻿using NDE_Digital_Market.Data_Access_Layer;
-using NDE_Digital_Market.Model;
-using NDE_Digital_Market.DTOs;
-using System.Data;
+﻿using System.Data;
 using System.Data.SqlClient;
+using NDE_Digital_Market.Model;
 using NDE_Digital_Market.SharedServices;
-using NDE_Digital_Market.Controllers;
 
 namespace NDE_Digital_Market.Data_Access_Layer;
 
@@ -31,7 +28,7 @@ public class CompanyRegistration_DAL
         _healthCareConnection = commonServices.HealthCareConnection;
 
     }
-    public async Task<Boolean> CompanyExistAsync(CompanyDto companyDto)
+    public async Task<Boolean> CompanyExistAsync(CompanyModel companyDto)
     {
         SqlCommand cmd = new SqlCommand("CheckCompanyExistence", connection);
         cmd.CommandType = CommandType.StoredProcedure;
@@ -50,7 +47,7 @@ public class CompanyRegistration_DAL
         //   return BadRequest(new { message = "User does not exist" , userExist });
     }
 
-    public async Task<string> CompanyRegistrationPostAsync(CompanyDto companyDto)
+    public async Task<string> CompanyRegistrationPostAsync(CompanyModel companyDto)
     {
         Boolean companyNameExist = await CompanyExistAsync(companyDto);
 
@@ -164,7 +161,7 @@ public class CompanyRegistration_DAL
         }
     }
 
-    public async Task<string> UpdateCompanyAsync(CompanyDto companyDto)
+    public async Task<string> UpdateCompanyAsync(CompanyModel companyDto)
     {
 
 

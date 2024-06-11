@@ -1,16 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualBasic;
-using NDE_Digital_Market.Model;
-using NDE_Digital_Market.Model.MaterialStock;
-using NDE_Digital_Market.Model.OrderModel;
-using NDE_Digital_Market.SharedServices;
-using NDE_Digital_Market.DTOs;
-using System.Data;
-using System.Data.SqlClient;
-using System.Diagnostics.Metrics;
 using NDE_Digital_Market.Services.OrderService;
 using NDE_Digital_Market.Model.DTO;
+using static NDE_Digital_Market.Data_Access_Layer.Order_DAL;
 
 namespace NDE_Digital_Market.Controllers
 {
@@ -134,200 +126,29 @@ namespace NDE_Digital_Market.Controllers
 
 
 
-        //Under Construction tushar
-       //public class updateOrderClass{
-       //     public string? orderdetailsIds { get; set; }
-       //     public string? status { get; set; }
-       //     public SellerSalesMasterDto? sellerSalesMasterDto { get; set; }
-       // }
+        ////Under Construction tushar
 
 
-       // [HttpPut("UpdateSellerOrderDetailsStatus")]
-       // [Authorize(Roles ="seller")]
-       // public async Task<IActionResult> SellerOrderDetailsStatusChangedAsync(updateOrderClass updateOrder)
-       // {
+        [HttpPut("UpdateSellerOrderDetailsStatus")]
+        [Authorize(Roles = "seller")]
+        public async Task<IActionResult> SellerOrderDetailsStatusChangedAsync(updateOrderClass updateOrder)
+        {
 
-       //     // Start a transaction
-       //     SqlTransaction transaction = null;
+            try
+            {
+                if (updateOrder == null || updateOrder.orderdetailsIds == null)
+                {
+                    return NotFound(new { message = "No Data Found." });
+                }
+                object res = await _order_Service.SellerOrderDetailsStatusChangedAsync(updateOrder);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
+            }
 
-       //     try
-       //     {
-       //         using (SqlConnection con = new SqlConnection(_healthCareConnection))
-       //         {
-       //             if (!string.IsNullOrEmpty(updateOrder.orderdetailsIds))
-       //             {
-       //                 string orderdetailsIdString = "''";
-
-       //                 List<int> DetailsIds = updateOrder.orderdetailsIds.Split(',').Select(int.Parse).ToList();
-       //                 orderdetailsIdString = string.Join(",", DetailsIds);
-
-       //                 for(int i = 0; i < DetailsIds.Count; i++)
-       //                 {
-
-       //                     await con.OpenAsync();
-       //                     SqlCommand cmdcheck = new SqlCommand("CheckAvailableQuantity", con);
-       //                     cmdcheck.CommandType = CommandType.StoredProcedure;
-       //                     //cmd1.Parameters.AddWithValue("@orderMasterId", orderMasterId);
-       //                     cmdcheck.Parameters.AddWithValue("@OrderDetailId", DetailsIds[i]);
-
-       //                     SqlDataReader reader = cmdcheck.ExecuteReader();
-       //                     bool result = false;
-       //                     if (reader.Read())
-       //                     {
-       //                         result = Convert.ToBoolean(reader["Result"]);
-
-       //                     }
-       //                     await con.CloseAsync();
-       //                     if (!result)
-       //                     {
-       //                         return BadRequest(new { message = "You don't have enough quantity." });
-       //                     }
-
-       //                 }
-
-       //                 string masterStatusChangeQuery = "UPDATE OrderDetails SET Status = @value  WHERE OrderDetailId IN (" + orderdetailsIdString + ") ;";
-
-
-       //                 await con.OpenAsync();
-       //                 transaction = con.BeginTransaction();
-       //                 SqlCommand cmd1 = new SqlCommand(masterStatusChangeQuery, con, transaction);
-       //                 //cmd1.Parameters.AddWithValue("@orderMasterId", orderMasterId);
-       //                 cmd1.Parameters.AddWithValue("@value", updateOrder.status);
-
-       //                 int masteRES = await cmd1.ExecuteNonQueryAsync();
-       //                 if (masteRES > 0)
-       //                 {
-       //                     if (updateOrder.status == "Processing")
-       //                     {
-       //                         var detailsResult = await InsertSellerSalesDataAsync(updateOrder.sellerSalesMasterDto, con, transaction);
-       //                         if (detailsResult is BadRequestObjectResult)
-       //                         {
-       //                             throw new Exception((detailsResult as BadRequestObjectResult).Value.ToString());
-       //                         }
-       //                     }
-
-       //                     // If everything is fine, commit the transaction
-       //                     transaction.Commit();
-       //                     return Ok(new { message = "Order Status Changed Successfully." });
-       //                 }
-       //                 else
-       //                 {
-       //                     return BadRequest(new { message = "Order Details not found." });
-       //                 }
-
-       //             }
-       //             else
-       //             {
-       //                 return BadRequest(new { message = "Send A Valid OrderDetail Id." });
-
-       //             }
-       //         }
-
-       //     }
-       //     catch (Exception ex)
-       //     {
-       //         // If there is any error, rollback the transaction
-       //         if (transaction != null)
-       //         {
-       //             transaction.Rollback();
-       //         }
-       //         return BadRequest(new { message = ex.Message });
-       //     }
-       //     finally
-       //     {
-       //         // Finally block to ensure the connection is always closed
-       //         if (con.State == ConnectionState.Open)
-       //         {
-       //             await con.CloseAsync();
-       //         }
-       //     }
-
-       // }
-
-       // private async Task<IActionResult> InsertSellerSalesDataAsync(SellerSalesMasterDto sellerSalesMasterDto, SqlConnection con,  SqlTransaction transaction)
-       // {
-
-
-       //     try
-       //     {
-       //         string systemCode = string.Empty;
-
-       //         // Execute the stored procedure to generate the system code
-       //         SqlCommand cmdSP = new SqlCommand("spMakeSystemCode", con, transaction);
-       //         {
-       //             cmdSP.CommandType = CommandType.StoredProcedure;
-       //             cmdSP.Parameters.AddWithValue("@TableName", "SellerSalesMaster");
-       //             cmdSP.Parameters.AddWithValue("@Date", DateTime.Now.ToString("yyyy-MM-dd"));
-       //             cmdSP.Parameters.AddWithValue("@AddNumber", 1);
-       //             var tempSystem = await cmdSP.ExecuteScalarAsync();
-       //             systemCode = tempSystem?.ToString() ?? string.Empty;
-       //         }
-       //         int SSMId = int.Parse(systemCode.Split('%')[0]);
-       //         string SSMCode = systemCode.Split('%')[1];
-       //         // SP END
-
-       //         SqlCommand cmdMaster = new SqlCommand("InsertSellerSalesMaster", con, transaction);
-       //         cmdMaster.CommandType = CommandType.StoredProcedure;
-
-       //         cmdMaster.Parameters.AddWithValue("@SSMId", SSMId);
-       //         cmdMaster.Parameters.AddWithValue("@SSMCode", SSMCode);
-       //         cmdMaster.Parameters.AddWithValue("@SSMDate", DateTime.Now);
-       //         cmdMaster.Parameters.AddWithValue("@UserId", sellerSalesMasterDto.UserId);
-       //         cmdMaster.Parameters.AddWithValue("@TotalPrice", sellerSalesMasterDto.TotalPrice);
-       //         cmdMaster.Parameters.AddWithValue("@Challan", sellerSalesMasterDto.Challan ?? (object)DBNull.Value);
-       //         cmdMaster.Parameters.AddWithValue("@Remarks", sellerSalesMasterDto.Remarks ?? (object)DBNull.Value);
-       //         cmdMaster.Parameters.AddWithValue("@BUserId", sellerSalesMasterDto.BUserId);
-       //         cmdMaster.Parameters.AddWithValue("@AddedBy", sellerSalesMasterDto.AddedBy);
-       //         cmdMaster.Parameters.AddWithValue("@DateAdded", DateTime.Now);
-       //         cmdMaster.Parameters.AddWithValue("@AddedPC", sellerSalesMasterDto.AddedPC);
-
-       //         int a = await cmdMaster.ExecuteNonQueryAsync();
-       //         if (a > 0)
-       //         {
-       //             for (int i = 0; i < sellerSalesMasterDto.SellerSalesDetailsList.Count; i++)
-       //             {
-       //                 string detailsQuery = "InsertSellerSalesDetail";
-       //                 //checking if user already exect for not.
-       //                 SqlCommand cmdDetails = new SqlCommand(detailsQuery, con, transaction);
-       //                 cmdDetails.CommandType = CommandType.StoredProcedure;
-
-       //                 cmdDetails.Parameters.Clear();
-
-       //                 cmdDetails.Parameters.AddWithValue("@SSMId", SSMId);
-       //                 cmdDetails.Parameters.AddWithValue("@OrderNo", sellerSalesMasterDto.SellerSalesDetailsList[i].OrderNo);
-       //                 cmdDetails.Parameters.AddWithValue("@ProductId", sellerSalesMasterDto.SellerSalesDetailsList[i].ProductId);
-       //                 cmdDetails.Parameters.AddWithValue("@Specification", sellerSalesMasterDto.SellerSalesDetailsList[i].Specification);
-       //                 cmdDetails.Parameters.AddWithValue("@StockQty", sellerSalesMasterDto.SellerSalesDetailsList[i].StockQty);
-       //                 cmdDetails.Parameters.AddWithValue("@SaleQty", sellerSalesMasterDto.SellerSalesDetailsList[i].SaleQty);
-       //                 cmdDetails.Parameters.AddWithValue("@UnitId", sellerSalesMasterDto.SellerSalesDetailsList[i].UnitId);
-       //                 cmdDetails.Parameters.AddWithValue("@NetPrice", sellerSalesMasterDto.SellerSalesDetailsList[i].NetPrice);
-       //                 cmdDetails.Parameters.AddWithValue("@Address", sellerSalesMasterDto.SellerSalesDetailsList[i].Address);
-       //                 cmdDetails.Parameters.AddWithValue("@ProductGroupID", sellerSalesMasterDto.SellerSalesDetailsList[i].ProductGroupID);
-       //                 cmdDetails.Parameters.AddWithValue("@Remarks", sellerSalesMasterDto.SellerSalesDetailsList[i].Remarks ?? (object)DBNull.Value);
-
-       //                 cmdDetails.Parameters.AddWithValue("@AddedBy", sellerSalesMasterDto.SellerSalesDetailsList[i].AddedBy);
-       //                 cmdDetails.Parameters.AddWithValue("@AddedDate", DateTime.Now);
-       //                 cmdDetails.Parameters.AddWithValue("@AddedPC", sellerSalesMasterDto.SellerSalesDetailsList[i].AddedPC);
-
-       //                 int detailsRes = await cmdDetails.ExecuteNonQueryAsync();
-       //                 if (detailsRes<=0)
-       //                 {
-       //                     return BadRequest(new { message = "SellerSales details data isn't Inserted." });
-       //                 }
-       //             }
-       //         }
-       //         else
-       //         {
-       //             return BadRequest(new { message = "SellerSales Master data isn't Inserted Successfully." });
-       //         }
-       //         return Ok(new { message = "SellerSale data Inserted Successfully." });
-
-       //     }
-       //     catch (Exception ex)
-       //     {
-       //         return BadRequest(ex.Message);
-       //     }
-       // }
+        }
 
 
 
@@ -335,151 +156,149 @@ namespace NDE_Digital_Market.Controllers
 
 
 
+        //    [HttpPost]
+        //    [Authorize(Roles = "admin")]
+        //    [Route("getReturnDataForAdmin/{pageNumber}/{pageSize}")]
+
+        //    public IActionResult getReturnDataForAdmin([FromForm] string status, int pageNumber, int pageSize, [FromForm] string searchby, [FromForm] string searchValue, [FromForm] string? fromDate = null, [FromForm] string? toDate = null)
+        //    {
+        //        int PendingCount = 0, ApprovedCount = 0, DeliveredCount = 0, ReturnedCount = 0, CancelledCount = 0, TotalRowCount = 0, ToReturnCount = 0;
+        //        List<ProductReturnModel> returnData = new List<ProductReturnModel>();
+        //        using SqlConnection con = new SqlConnection(_prominentConnection);
+        //        con.Open();
+        //        string condition = "FROM  [ProductReturn] r  LEFT JOIN  [ReturnType] t ON r.[TypeId] = t.[TypeId]" +
+        //                     " JOIN  OrderDetails od ON r.[DetailsId] = od.[OrderDetailId] AND od.[Status] = @status";
 
 
-    //    [HttpPost]
-    //    [Authorize(Roles = "admin")]
-    //    [Route("getReturnDataForAdmin/{pageNumber}/{pageSize}")]
+        //        if (searchValue != "All")
+        //        {
+        //            condition += " AND ";
 
-    //    public IActionResult getReturnDataForAdmin([FromForm] string status, int pageNumber, int pageSize, [FromForm] string searchby, [FromForm] string searchValue, [FromForm] string? fromDate = null, [FromForm] string? toDate = null)
-    //    {
-    //        int PendingCount = 0, ApprovedCount = 0, DeliveredCount = 0, ReturnedCount = 0, CancelledCount = 0, TotalRowCount = 0, ToReturnCount = 0;
-    //        List<ProductReturnModel> returnData = new List<ProductReturnModel>();
-    //        using SqlConnection con = new SqlConnection(_prominentConnection);
-    //        con.Open();
-    //        string condition = "FROM  [ProductReturn] r  LEFT JOIN  [ReturnType] t ON r.[TypeId] = t.[TypeId]" +
-    //                     " JOIN  OrderDetails od ON r.[DetailsId] = od.[OrderDetailId] AND od.[Status] = @status";
+        //            if (searchby == "OrderNo")
+        //            {
+        //                condition += " r.[OrderNo] LIKE @searchValue";
+        //            }
+        //            else if (searchby == "GroupName")
+        //            {
+        //                condition += "  r.[GroupName] LIKE @searchValue";
+        //            }
+        //            else if (searchby == "GoodsName")
+        //            {
+        //                condition += "r.[GoodsName] LIKE @searchValue";
+        //            }
+        //            else if (searchby == "ReturnType")
+        //            {
+        //                condition += " t.[ReturnType] LIKE @searchValue";
+        //            }
+        //        }
 
-
-    //        if (searchValue != "All")
-    //        {
-    //            condition += " AND ";
-
-    //            if (searchby == "OrderNo")
-    //            {
-    //                condition += " r.[OrderNo] LIKE @searchValue";
-    //            }
-    //            else if (searchby == "GroupName")
-    //            {
-    //                condition += "  r.[GroupName] LIKE @searchValue";
-    //            }
-    //            else if (searchby == "GoodsName")
-    //            {
-    //                condition += "r.[GoodsName] LIKE @searchValue";
-    //            }
-    //            else if (searchby == "ReturnType")
-    //            {
-    //                condition += " t.[ReturnType] LIKE @searchValue";
-    //            }
-    //        }
-
-    //        if (!string.IsNullOrEmpty(fromDate))
-    //        {
-                
-
-    //            condition += " And r.[ApplyDate] BETWEEN  @fromDate AND  @toDate";
-    //        }
-
-    //        string query = $@"
-    //    DECLARE @TotalRow AS INT;
-    //    SET @TotalRow = (SELECT COUNT(*) FROM  OrderMaster);
-
-    //    SELECT 
-    //        @TotalRow AS TotalRowCount,
-    //        (SELECT COUNT(*) FROM  OrderMaster WHERE Status = 'Pending') AS PendingCount,
-    //        (SELECT COUNT(*) FROM  OrderMaster WHERE Status = 'Approved') AS ApprovedCount,
-    //        (SELECT COUNT(*) FROM  OrderDetails WHERE Status = 'Returned') AS ReturnedCount,
-    //(SELECT COUNT(*) FROM  OrderDetails WHERE Status = 'to Return') AS ToReturnCount,
-    //        (SELECT COUNT(*) FROM  OrderMaster WHERE Status = 'Cancelled') AS CancelledCount,
-    //        (SELECT COUNT(*) FROM  OrderMaster WHERE Status = 'Delivered') AS DeliveredCount
- 
-    //    FROM  OrderMaster;"+
-    //            " SELECT r.[ReturnId], r.[GroupName],r.[GoodsName], r.[GroupCode], r.[GoodsId],r.[TypeId],r.[Remarks],r.[OrderNo],r.[DeliveryDate],r.[Price],r.[DetailsId],r.[SellerCode],r.[ApplyDate] ,t.[TypeId]," +
-    //            "t.[ReturnType], od.[OrderDetailId],od.[Status] , ( SELECT COUNT(*) " + @condition + ") AS TotalRowCount " + condition + " ORDER BY OrderNo DESC" +
-    //            " OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
+        //        if (!string.IsNullOrEmpty(fromDate))
+        //        {
 
 
-    //        SqlCommand cmd = new SqlCommand(query, con);
+        //            condition += " And r.[ApplyDate] BETWEEN  @fromDate AND  @toDate";
+        //        }
 
-    //        cmd.Parameters.AddWithValue("@status", status);
-    //        cmd.Parameters.AddWithValue("@PageSize", pageSize);
-    //        cmd.Parameters.AddWithValue("@Offset", (pageNumber - 1) * pageSize);
-    //        if (!string.IsNullOrEmpty(searchValue))
-    //        {
-    //            cmd.Parameters.AddWithValue("@searchValue", "%" + searchValue + "%");
-    //        }
-    //        if (!string.IsNullOrEmpty(fromDate))
-    //        {
-    //            cmd.Parameters.AddWithValue("@FromDate", fromDate);
-    //            cmd.Parameters.AddWithValue("@ToDate", toDate);
-    //        }
+        //        string query = $@"
+        //    DECLARE @TotalRow AS INT;
+        //    SET @TotalRow = (SELECT COUNT(*) FROM  OrderMaster);
 
-    //        SqlDataAdapter adapter = new SqlDataAdapter(cmd);
-    //        DataSet ds = new DataSet();
-    //        adapter.Fill(ds);
+        //    SELECT 
+        //        @TotalRow AS TotalRowCount,
+        //        (SELECT COUNT(*) FROM  OrderMaster WHERE Status = 'Pending') AS PendingCount,
+        //        (SELECT COUNT(*) FROM  OrderMaster WHERE Status = 'Approved') AS ApprovedCount,
+        //        (SELECT COUNT(*) FROM  OrderDetails WHERE Status = 'Returned') AS ReturnedCount,
+        //(SELECT COUNT(*) FROM  OrderDetails WHERE Status = 'to Return') AS ToReturnCount,
+        //        (SELECT COUNT(*) FROM  OrderMaster WHERE Status = 'Cancelled') AS CancelledCount,
+        //        (SELECT COUNT(*) FROM  OrderMaster WHERE Status = 'Delivered') AS DeliveredCount
 
-  
-    //        // Check if the dataset contains the tables you need
-    //        if (ds.Tables.Count >= 1)
-    //        {
-    //            DataTable dataTable1st = ds.Tables[0]; // Get the 1st table from the dataset
-    //            DataTable dataTable = ds.Tables[1]; // Get the 2nd table from the dataset
-    //            foreach (DataRow row in dataTable1st.Rows)
-    //            {
+        //    FROM  OrderMaster;"+
+        //            " SELECT r.[ReturnId], r.[GroupName],r.[GoodsName], r.[GroupCode], r.[GoodsId],r.[TypeId],r.[Remarks],r.[OrderNo],r.[DeliveryDate],r.[Price],r.[DetailsId],r.[SellerCode],r.[ApplyDate] ,t.[TypeId]," +
+        //            "t.[ReturnType], od.[OrderDetailId],od.[Status] , ( SELECT COUNT(*) " + @condition + ") AS TotalRowCount " + condition + " ORDER BY OrderNo DESC" +
+        //            " OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
 
-    //                PendingCount = int.Parse(row["PendingCount"].ToString());
-    //                ApprovedCount = int.Parse(row["ApprovedCount"].ToString());
-    //                DeliveredCount = int.Parse(row["DeliveredCount"].ToString());
-    //                ReturnedCount = int.Parse(row["ReturnedCount"].ToString());
-    //                TotalRowCount = int.Parse(row["TotalRowCount"].ToString());
-    //                CancelledCount = int.Parse(row["CancelledCount"].ToString());
-    //                ToReturnCount = int.Parse(row["ToReturnCount"].ToString());
-    //                // Other status counts...
-    //            }
-    //            List<ProductReturnModel> ordersData = new List<ProductReturnModel>();
-    //            foreach (DataRow row in dataTable.Rows)
-    //            {
-    //                ProductReturnModel modelObj = new ProductReturnModel();
-    //                // int
-    //                modelObj.TypeId = int.Parse(row["TypeId"].ToString());
-    //                modelObj.Price = int.Parse(row["Price"].ToString());
-    //                modelObj.ReturnId = int.Parse(row["ReturnId"].ToString());
-    //                modelObj.DetailsId = int.Parse(row["DetailsId"].ToString());
-    //                modelObj.totalRowsCount = int.Parse(row["TotalRowCount"].ToString());
-    //                // string
-    //                modelObj.ReturnType = row["ReturnType"].ToString();
-    //                modelObj.OrderNo = row["OrderNo"].ToString();
-    //                modelObj.GroupName = row["GroupName"].ToString();
-    //                modelObj.GoodsName = row["GoodsName"].ToString();
-    //                modelObj.ApplyDate = DateTime.Parse(row["ApplyDate"].ToString());
-    //                modelObj.DeliveryDate = DateTime.Parse(row["DeliveryDate"].ToString());
-    //                modelObj.Remarks = row["Remarks"].ToString();
-    //                modelObj.Status = row["Status"].ToString();
 
-    //                // Add other properties here...
-    //                ordersData.Add(modelObj);
-    //            }
-    //            // Create an anonymous object to hold the data in the desired format
-    //            var result = new
-    //            {
-    //                statusCount = new
-    //                {
-    //                    PendingCount,
-    //                    ApprovedCount,
-    //                    CancelledCount,
-    //                    ReturnedCount,
-    //                    DeliveredCount,
-    //                    TotalRowCount,
-    //                    ToReturnCount
-    //                },
-    //                ordersData
-    //            };
-    //            return Ok(result);
-    //        }
+        //        SqlCommand cmd = new SqlCommand(query, con);
 
-    //        return null;
+        //        cmd.Parameters.AddWithValue("@status", status);
+        //        cmd.Parameters.AddWithValue("@PageSize", pageSize);
+        //        cmd.Parameters.AddWithValue("@Offset", (pageNumber - 1) * pageSize);
+        //        if (!string.IsNullOrEmpty(searchValue))
+        //        {
+        //            cmd.Parameters.AddWithValue("@searchValue", "%" + searchValue + "%");
+        //        }
+        //        if (!string.IsNullOrEmpty(fromDate))
+        //        {
+        //            cmd.Parameters.AddWithValue("@FromDate", fromDate);
+        //            cmd.Parameters.AddWithValue("@ToDate", toDate);
+        //        }
 
-    //    }
+        //        SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+        //        DataSet ds = new DataSet();
+        //        adapter.Fill(ds);
+
+
+        //        // Check if the dataset contains the tables you need
+        //        if (ds.Tables.Count >= 1)
+        //        {
+        //            DataTable dataTable1st = ds.Tables[0]; // Get the 1st table from the dataset
+        //            DataTable dataTable = ds.Tables[1]; // Get the 2nd table from the dataset
+        //            foreach (DataRow row in dataTable1st.Rows)
+        //            {
+
+        //                PendingCount = int.Parse(row["PendingCount"].ToString());
+        //                ApprovedCount = int.Parse(row["ApprovedCount"].ToString());
+        //                DeliveredCount = int.Parse(row["DeliveredCount"].ToString());
+        //                ReturnedCount = int.Parse(row["ReturnedCount"].ToString());
+        //                TotalRowCount = int.Parse(row["TotalRowCount"].ToString());
+        //                CancelledCount = int.Parse(row["CancelledCount"].ToString());
+        //                ToReturnCount = int.Parse(row["ToReturnCount"].ToString());
+        //                // Other status counts...
+        //            }
+        //            List<ProductReturnModel> ordersData = new List<ProductReturnModel>();
+        //            foreach (DataRow row in dataTable.Rows)
+        //            {
+        //                ProductReturnModel modelObj = new ProductReturnModel();
+        //                // int
+        //                modelObj.TypeId = int.Parse(row["TypeId"].ToString());
+        //                modelObj.Price = int.Parse(row["Price"].ToString());
+        //                modelObj.ReturnId = int.Parse(row["ReturnId"].ToString());
+        //                modelObj.DetailsId = int.Parse(row["DetailsId"].ToString());
+        //                modelObj.totalRowsCount = int.Parse(row["TotalRowCount"].ToString());
+        //                // string
+        //                modelObj.ReturnType = row["ReturnType"].ToString();
+        //                modelObj.OrderNo = row["OrderNo"].ToString();
+        //                modelObj.GroupName = row["GroupName"].ToString();
+        //                modelObj.GoodsName = row["GoodsName"].ToString();
+        //                modelObj.ApplyDate = DateTime.Parse(row["ApplyDate"].ToString());
+        //                modelObj.DeliveryDate = DateTime.Parse(row["DeliveryDate"].ToString());
+        //                modelObj.Remarks = row["Remarks"].ToString();
+        //                modelObj.Status = row["Status"].ToString();
+
+        //                // Add other properties here...
+        //                ordersData.Add(modelObj);
+        //            }
+        //            // Create an anonymous object to hold the data in the desired format
+        //            var result = new
+        //            {
+        //                statusCount = new
+        //                {
+        //                    PendingCount,
+        //                    ApprovedCount,
+        //                    CancelledCount,
+        //                    ReturnedCount,
+        //                    DeliveredCount,
+        //                    TotalRowCount,
+        //                    ToReturnCount
+        //                },
+        //                ordersData
+        //            };
+        //            return Ok(result);
+        //        }
+
+        //        return null;
+
+        //    }
 
 
         ////------------ get return data for SELLER --------
@@ -543,9 +362,9 @@ namespace NDE_Digital_Market.Controllers
 
 
         //================================== Added By Rey ==============================
-        
-        
-        
+
+
+
         [HttpGet("getOrderUserInfo")]
         public async Task<IActionResult> getUserInfo(string UserId)
         {
