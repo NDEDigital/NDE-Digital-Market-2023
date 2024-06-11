@@ -5,7 +5,9 @@
         public string? CompanyCode { get; set; }
         public string? CompanyName { get; set; }
         public string? ProductGroupName { get; set; }
+        public string? ProductGroupCode { get; set; }
         public int? ProductId { get; set; }
+
         public string? ProductName { get; set; }
         public int? ProductGroupID { get; set; }
         public string? Specification { get; set; }

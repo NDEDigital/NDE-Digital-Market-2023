@@ -132,6 +132,7 @@ namespace NDE_Digital_Market.Controllers
                                 modelObj.CompanyCode = reader["CompanyCode"].ToString();
                                 modelObj.CompanyName = reader["CompanyName"].ToString();
                                 modelObj.ProductGroupName = reader["ProductGroupName"].ToString();
+                                modelObj.ProductGroupCode = reader["ProductGroupCode"].ToString();
                                 modelObj.ProductId = Convert.ToInt32(reader["ProductId"]);
                                 modelObj.ProductName = reader["ProductName"].ToString();
                                 modelObj.ProductGroupID = Convert.ToInt32(reader["ProductGroupID"]);
@@ -288,7 +289,7 @@ namespace NDE_Digital_Market.Controllers
 
         [HttpGet]
         [Route("GetProductList")]
-        public async Task<IActionResult> GetProductList(string CompanyCode, string ProductGroupCode)
+        public async Task<IActionResult> GetProductList(string? CompanyCode, string ProductGroupCode)
         {
             var goodsQuantitys = new List<CompanyProductListDto>();
             try
@@ -298,7 +299,9 @@ namespace NDE_Digital_Market.Controllers
                     using (var command = new SqlCommand("GetProductDetailsByCompanyAndGroup", connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
+                        
                         command.Parameters.Add(new SqlParameter("@CompanyCode", CompanyCode));
+                        
                         command.Parameters.Add(new SqlParameter("@ProductGroupCode", ProductGroupCode));
                         await connection.OpenAsync();
                         using (var reader = await command.ExecuteReaderAsync())
