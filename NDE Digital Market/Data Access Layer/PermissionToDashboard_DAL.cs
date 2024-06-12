@@ -62,13 +62,11 @@ namespace NDE_Digital_Market.Data_Access_Layer
                 DataTable dataTable = new DataTable();  
                 using (SqlConnection con = new SqlConnection(_healthCareConnection))
                 {
-                    string query = @"SELECT P.UserId,M.MenuId,P.PermissionId,M.MenuName,U.FullName,U.CompanyCode,U.FUllName
-                               FROM Permission P 
-                               JOIN MenuList M ON P.MenuId=M.MenuId
-                               JOIN UserRegistration U ON P.UserId=U.UserId
-                               WHERE M.IsAdmin!=1 AND M.IsActive=1 AND U.CompanyCode=(select CompanyCode from UserRegistration    WHERE UserId=@UserId) AND
-                                                P.UserId!=@UserId AND P.UserId!=(select C.CompanyAdminId from UserRegistration U JOIN CompanyRegistration C ON U.CompanyCode=C.CompanyCode 
-                                                WHERE UserId=@UserId) ;";
+                    string query = @" SELECT P.UserId,M.MenuId,P.PermissionId,M.MenuName,U.FullName,U.CompanyCode,U.FUllName
+                                      FROM Permission P 
+                                      left JOIN MenuList M ON P.MenuId = M.MenuId
+                                      left JOIN UserRegistration U ON P.UserId = U.UserId
+                                      WHERE p.UserId = @UserId and M.IsAdmin = 0 AND M.IsActive=1 AND U.CompanyCode=(select CompanyCode from UserRegistration WHERE UserId= @UserId);";
 
                     await con.OpenAsync();
 
