@@ -29,6 +29,7 @@ using NDE_Digital_Market.Services.CompanyAdminService;
 using NDE_Digital_Market.Services.UserControllOfDashboardService;
 using NDE_Digital_Market.Services.AddToCartService;
 using NDE_Digital_Market.Services.ReviewAndRatingService;
+using NDE_Digital_Market.Services.DashboardService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -97,6 +98,9 @@ builder.Services.AddScoped<PermissionToDashboard_DAL>();
 
 builder.Services.AddScoped<IDashboardGetData_Service, DashboardGetData_Service>();
 builder.Services.AddScoped<DashboardGetData_DAL>();
+
+builder.Services.AddScoped<IDashboard_Service, Dashboard_Service>();
+builder.Services.AddScoped<Dashboard_DAL>();
 
 builder.Services.AddScoped<IBrands_Service, Brands_Service>();
 builder.Services.AddScoped<Brands_DAL>();
