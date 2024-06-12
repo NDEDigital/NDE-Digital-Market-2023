@@ -135,7 +135,7 @@ namespace NDE_Digital_Market.Services.ProductQuantityService
             Model.EndDate = sellerproductdata.EndDate;
             Model.ImageFile = sellerproductdata.ImageFile;
             Model.TotalPrice = sellerproductdata.TotalPrice;
-            Model.CompanyCode = CommonServices.DecryptPassword(sellerproductdata.CompanyCode);
+            //Model.CompanyCode = CommonServices.DecryptPassword(sellerproductdata.CompanyCode);
             Model.AddedBy = sellerproductdata.AddedBy;
             Model.AddedPC = sellerproductdata.AddedPC;
 
@@ -158,7 +158,7 @@ namespace NDE_Digital_Market.Services.ProductQuantityService
             Model.EndDate = sellerproductdata.EndDate;
             Model.ImageFile = sellerproductdata.ImageFile;
             Model.TotalPrice = sellerproductdata.TotalPrice;
-            Model.CompanyCode = CommonServices.DecryptPassword(sellerproductdata.CompanyCode);
+            //Model.CompanyCode = CommonServices.DecryptPassword(sellerproductdata.CompanyCode);
 
             Model.UpdatedPC = sellerproductdata.UpdatedPC;
             Model.UpdatedBy = sellerproductdata.UpdatedBy;

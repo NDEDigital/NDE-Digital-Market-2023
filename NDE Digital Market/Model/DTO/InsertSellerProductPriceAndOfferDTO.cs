@@ -13,7 +13,7 @@
         //public string? ImagePath { get; set; }
         //public string? Status { get; set; }
         public decimal? TotalPrice { get; set; }
-        public string? CompanyCode { get; set; }
+        //public string? CompanyCode { get; set; }
         //public Boolean? IsActive { get; set; }
         //public DateTime? AddedDate { get; set; } 
         public string? AddedBy { get; set; }

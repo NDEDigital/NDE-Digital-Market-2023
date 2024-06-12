@@ -85,12 +85,19 @@ namespace NDE_Digital_Market.Controllers
         [Authorize(Roles = "seller")]
         public async Task<IActionResult> CreateSellerProductPriceAndOfferAsync([FromForm] InsertSellerProductPriceAndOfferDTO sellerproductdata)
         {
-
-            if (sellerproductdata == null)
+            try
             {
-                return BadRequest(new { message = "Give Proper price and offer Data." });
+                if (sellerproductdata == null)
+                {
+                    return BadRequest(new { message = "Give Proper price and offer Data." });
+                }
+                return Ok(await _productQuantity_Service.CreateSellerProductPriceAndOfferAsync(sellerproductdata));
             }
-            return Ok(await _productQuantity_Service.CreateSellerProductPriceAndOfferAsync(sellerproductdata));
+            catch(Exception ex)
+            {
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
+            }
+
         }
 
 
@@ -98,11 +105,18 @@ namespace NDE_Digital_Market.Controllers
         [Authorize(Roles = "seller")]
         public async Task<IActionResult> UpdateSellerProductPriceAndOffer([FromForm] UpdateSellerProductPriceAndOfferDTO sellerproductdata)
         {
-            if (sellerproductdata == null)
+            try
             {
-                return BadRequest(new { message = "No product IDs provided." });
+                if (sellerproductdata == null)
+                {
+                    return BadRequest(new { message = "No product IDs provided." });
+                }
+                return Ok(await _productQuantity_Service.UpdateSellerProductPriceAndOffer(sellerproductdata));
             }
-            return Ok(await _productQuantity_Service.UpdateSellerProductPriceAndOffer(sellerproductdata));
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
+            }
         }
 
 

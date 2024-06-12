@@ -244,8 +244,8 @@ namespace NDE_Digital_Market.Data_Access_Layer
 
         public async Task<object> CreateSellerProductPriceAndOfferAsync(SellerProductPriceAndOfferModel sellerproductdata)
         {
-            try
-            {
+            //try
+            //{
                 SqlConnection con = new SqlConnection(_healthCareConnection);
                 Boolean ProductPriceAndOfferExist = await SellerProductPriceAndOfferCheck(sellerproductdata.ProductId, sellerproductdata.UserId);
                 if (ProductPriceAndOfferExist)
@@ -294,11 +294,11 @@ namespace NDE_Digital_Market.Data_Access_Layer
 
 
 
-            }
-            catch (Exception ex)
-            {
-                return (new { message = ex.Message });
-            }
+            //}
+            //catch (Exception ex)
+            //{
+            //    return (new { message = ex.Message });
+            //}
         }
 
 
