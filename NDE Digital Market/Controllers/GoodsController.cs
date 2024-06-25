@@ -138,6 +138,7 @@ namespace NDE_Digital_Market.Controllers
         {
             try
             {
+
                 if (ProductGroupCode == null)
                 {
                     return NotFound(new { message = "Give Valid Data." });
