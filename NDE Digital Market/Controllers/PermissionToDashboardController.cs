@@ -1,11 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using NDE_Digital_Market.DTOs;
-using NDE_Digital_Market.SharedServices;
-using System;
-using System.Data.SqlClient;
-using System.Threading.Tasks;
+using NDE_Digital_Market.Services.PermissionToDashboardService;
 
 namespace NDE_Digital_Market.Controllers
 {
@@ -13,111 +8,55 @@ namespace NDE_Digital_Market.Controllers
     [Authorize]
     public class PermissionToDashboardController : ControllerBase
     {
-        private readonly string _healthCareConnection;
+        private readonly IPermissionToDashboard_Service _permissionToDashboard_Service;
 
-        public PermissionToDashboardController(IConfiguration config)
+        public PermissionToDashboardController(IPermissionToDashboard_Service permissionToDashboard_Service)
         {
-            CommonServices commonServices = new CommonServices(config);
-            _healthCareConnection = commonServices.HealthCareConnection;
+            _permissionToDashboard_Service = permissionToDashboard_Service;
         }
 
         [HttpPost]
         [Authorize(Roles = "seller")]
         [Route("GiveAcessDashboard/{UserId}/{MenuId}")]
-        public async Task<IActionResult> InsertPermissionToDashboard(int UserId, int MenuId)
+        public async Task<IActionResult> InsertPermissionToDashboard(string UserId, string MenuId)
         {
             try
             {
-                using (SqlConnection con = new SqlConnection(_healthCareConnection))
+                if (UserId == null || MenuId == null)
                 {
-                    string query = @"INSERT INTO Permission (UserId, MenuId, IsActive, PermissionId) VALUES (@UserId,@MenuId, 1, (select Max(PermissionId) from Permission)+1);";
-
-                    await con.OpenAsync();
-
-                    using (SqlCommand cmd = new SqlCommand(query, con))
-                    {
-                        cmd.Parameters.AddWithValue("@UserId", UserId);
-                        cmd.Parameters.AddWithValue("@MenuId", MenuId);
-
-
-                        // ExecuteScalarAsync is used for queries that return a single value
-                        var insertedItemId = await cmd.ExecuteScalarAsync();
-
-                        // If needed, you can return the inserted ItemID
-                        return Ok(new
-                        {
-                            Message = "item insert  successful",
-
-                        });
-                    }
+                    return BadRequest(new { message = "Give Proper Data." });
                 }
+                return Ok(await _permissionToDashboard_Service.InsertPermissionToDashboard(UserId, MenuId));
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error: {ex.Message}");
-                return StatusCode(500, $"Error: {ex.Message}");
+                return BadRequest(new { message = "Give Proper Data." });
             }
         }
-      [HttpGet]
+
+
+        [HttpGet]
         [Authorize(Roles = "seller")]
-[Route("GetPermissionData/{UserId}")]
-public async Task<IActionResult> GetPermissionData(int UserId)
-{
-    try
-    {
-        using (SqlConnection con = new SqlConnection(_healthCareConnection))
+        [Route("GetPermissionData/{UserId}")]
+        public async Task<IActionResult> GetPermissionData(string UserId)
         {
-            string query = @"SELECT P.UserId,M.MenuId,P.PermissionId,M.MenuName,U.FullName,U.CompanyCode,U.FUllName
-                       FROM Permission P 
-                       JOIN MenuList M ON P.MenuId=M.MenuId
-                       JOIN UserRegistration U ON P.UserId=U.UserId
-                       WHERE M.IsAdmin!=1 AND M.IsActive=1 AND U.CompanyCode=(select CompanyCode from UserRegistration    WHERE UserId=@UserId) AND
-                                        P.UserId!=@UserId AND P.UserId!=(select C.CompanyAdminId from UserRegistration U JOIN CompanyRegistration C ON U.CompanyCode=C.CompanyCode 
-                                        WHERE UserId=@UserId) ;";
-
-            await con.OpenAsync();
-
-            using (SqlCommand cmd = new SqlCommand(query, con))
+            try
             {
-                // Add the @UserId parameter
-                cmd.Parameters.AddWithValue("@UserId", UserId);
-
-                using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                object res = await _permissionToDashboard_Service.GetPermissionData(UserId);
+                if (res == null)
                 {
-                    var result = new Dictionary<int, List<PermissionToDashDto>>();
-
-                    while (reader.Read())
-                    {
-                        var userId = Convert.ToInt32(reader["UserId"]);
-
-                        var permission = new PermissionToDashDto
-                        {
-                            UserId = userId,
-                            MenuId = Convert.ToInt32(reader["MenuId"]),
-                            MenuName = reader["MenuName"].ToString(),
-                            FullName = reader["FullName"].ToString(),
-                            PermissionId = reader.GetInt32(reader.GetOrdinal("PermissionId")),
-                        };
-
-                        if (!result.ContainsKey(userId))
-                        {
-                            result[userId] = new List<PermissionToDashDto>();
-                        }
-
-                        result[userId].Add(permission);
-                    }
-
-                    return Ok(result);
+                    return NotFound(new { message = "Data not Found." });
                 }
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions appropriately (logging, returning an error response, etc.)
+                return StatusCode(500, "Internal Server Error");
             }
         }
-    }
-    catch (Exception ex)
-    {
-        // Handle exceptions appropriately (logging, returning an error response, etc.)
-        return StatusCode(500, "Internal Server Error");
-    }
-}
+
 
     }
 }

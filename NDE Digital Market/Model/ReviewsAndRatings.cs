@@ -14,20 +14,16 @@ namespace NDE_Digital_Market.Model
         public string? GroupCode { get; set; }
         public DateTime? DateTime { get; set; }
 
-
-
         public string? EmptyRatingArray { get; set; }
         public string? RatingArray { get; set; }
         public string? BuyerCode { get; set; }
         public int? ReviewId { get; set; }
 
-        public int? OrderDetailId { get; set; }
 
-        public string? ReviewText { get; set; }
 
-        public int? RatingValue { get; set; }
 
-        public int? BuyerId { get; set; }
+
+
 
 
         public int? ProductGroupID { get; set; }
@@ -38,7 +34,7 @@ namespace NDE_Digital_Market.Model
 
         public DateTime? ReviewDate { get; set; }
 
-        public IFormFile? ImageFile { get; set; }
+
 
         //public byte[]? ImageFileBite { get; set; }
 
@@ -46,9 +42,21 @@ namespace NDE_Digital_Market.Model
 
         public DateTime? AddedDate { get; set; }
         public DateTime? UpdateDate { get; set; }
-        public string? AddedBy { get; set; }
+
         public string? UpdatedBy { get; set; }
-        public string? AddedPc { get; set; }
+
         public string? UpdatedPC { get; set; }
+
+
+
+
+        public IFormFile? ImageFile { get; set; }
+        public string? AddedBy { get; set; }
+        public string? AddedPc { get; set; }
+        public string? BuyerId { get; set; }
+        public string? OrderDetailId { get; set; }
+        public string? ReviewText { get; set; }
+
+        public int? RatingValue { get; set; }
     }
 }

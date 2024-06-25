@@ -4,6 +4,8 @@ using NDE_Digital_Market.Model;
 using System.Data.SqlClient;
 using System.Data;
 using NDE_Digital_Market.SharedServices;
+using NDE_Digital_Market.Services.UnitService;
+using NDE_Digital_Market.Model.DTO;
 
 namespace NDE_Digital_Market.Controllers
 {
@@ -11,219 +13,59 @@ namespace NDE_Digital_Market.Controllers
     [ApiController]
     public class UnitController : ControllerBase
     {
-        private readonly IConfiguration _configuration;
-        private readonly SqlConnection con;
-        public UnitController(IConfiguration configuration)
+        private readonly IUnit_Service _unit_Service;
+        public UnitController( IUnit_Service unit_Service)
         {
-            CommonServices commonServices = new CommonServices(configuration);
-            _configuration = configuration;
-            con = new SqlConnection(commonServices.HealthCareConnection);
-
+            _unit_Service = unit_Service;
         }
 
         [HttpGet]
         [Route("GetUnitList")]
-        public async Task<List<UnitModel>> GetUnitListAsync(bool? isActive)
+        public async Task<IActionResult> GetUnitListAsync(bool? isActive)
         {
-            List<UnitModel> lst = new List<UnitModel>();
-
-            try
+            object res = await _unit_Service.GetUnitListAsync(isActive);
+            if(res == null)
             {
-                await con.OpenAsync();
-                string query;
-                if (isActive.HasValue)
-                {
-                    query = "SELECT * FROM Units WHERE isActive = @IsActive;";
-                }
-                else
-                {
-                    query = "SELECT * FROM Units WHERE DATEDIFF(hour, DateAdded, GETDATE()) <= 24;";
-                }
-
-                using (SqlCommand cmd = new SqlCommand(query, con))
-                {
-                    if (isActive.HasValue)
-                    {
-                        cmd.Parameters.AddWithValue("@IsActive", isActive.Value);
-                    }
-
-                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
-                    {
-                        while (await reader.ReadAsync())
-                        {
-                            UnitModel modelObj = new UnitModel
-                            {
-                                UnitId = Convert.ToInt32(reader["UnitId"]),
-                                Name = reader["Name"].ToString(),
-                                Description = reader["Description"].ToString(),
-                                IsActive = reader.GetBoolean(reader.GetOrdinal("IsActive")),
-                                IsConversion = reader.GetBoolean(reader.GetOrdinal("IsConversion"))
-                            };
-
-                            lst.Add(modelObj);
-                        }
-                    }
-                }
+                return NotFound(new { message = "Unit not Found." });
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                throw;
-            }
-            finally
-            {
-                if (con.State == ConnectionState.Open)
-                {
-                    await con.CloseAsync();
-                }
-            }
-            return lst;
+            return Ok(res);
+
         }
+
         [HttpPost]
         [Route("AddUnit")]
-        public async Task<IActionResult> PostUnit([FromForm] UnitModel unit)
+        public async Task<IActionResult> PostUnit(UnitCreationDTO unit)
         {
-            try
+            if (unit == null)
             {
-                await con.OpenAsync();
-                string query = @"INSERT INTO Units (Name, Description, isActive, isConversion, AddedBy, AddedPC, DateAdded)
-                         VALUES (@Name, @Description, @IsActive, @IsConversion, @AddedBy, @AddedPC, @DateAdded);";
-
-                using (SqlCommand cmd = new SqlCommand(query, con))
-                {
-                    cmd.Parameters.AddWithValue("@Name", unit.Name);
-                    cmd.Parameters.AddWithValue("@Description", unit.Description ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@IsActive", true);
-                    cmd.Parameters.AddWithValue("@IsConversion", true);
-                    cmd.Parameters.AddWithValue("@AddedBy", unit.AddedBy);
-                    cmd.Parameters.AddWithValue("@AddedPC", unit.AddedPC);
-                    cmd.Parameters.AddWithValue("@DateAdded", DateTime.UtcNow);
-
-                    await cmd.ExecuteNonQueryAsync();
-                }
-
-                return Ok(new { message = "Unit added successfully" });
+                return BadRequest(new { message = "Give Proper Unit Data." });
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                // Log the exception
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Error adding the unit" });
-            }
-            finally
-            {
-                if (con.State == ConnectionState.Open)
-                {
-                    await con.CloseAsync();
-                }
-            }
+            return Ok(await _unit_Service.PostUnit(unit));
         }
+
         [HttpPut]
         [Route("UpdateUnit")]
-        public async Task<IActionResult> PutUnit([FromForm] UnitModel unit)
+        public async Task<IActionResult> PutUnit([FromForm] UpdateUnitDTO unit)
         {
             if (unit == null || unit.UnitId == null)
             {
                 return BadRequest(new { message = "Invalid unit data." });
             }
-
-            try
-            {
-                await con.OpenAsync();
-                string query = @"UPDATE Units 
-                         SET Name = @Name, 
-                             Description = @Description, 
-                            
-                             isConversion = @IsConversion,
-                             UpdatedBy = @UpdatedBy,
-                             UpdatedPC = @UpdatedPC, 
-                             DateUpdated = @DateUpdated
-                         WHERE UnitId = @UnitId;";
-
-                using (SqlCommand cmd = new SqlCommand(query, con))
-                {
-                    cmd.Parameters.AddWithValue("@UnitId", unit.UnitId);
-                    cmd.Parameters.AddWithValue("@Name", unit.Name);
-                    cmd.Parameters.AddWithValue("@Description", unit.Description ?? (object)DBNull.Value);
-                    // cmd.Parameters.AddWithValue("@IsActive", unit.IsActive);
-                    cmd.Parameters.AddWithValue("@IsConversion", unit.IsConversion);
-                    cmd.Parameters.AddWithValue("@UpdatedBy", unit.UpdatedBy);
-                    cmd.Parameters.AddWithValue("@UpdatedPC", unit.UpdatedPC);
-                    cmd.Parameters.AddWithValue("@DateUpdated", DateTime.UtcNow);
-
-                    int rowsAffected = await cmd.ExecuteNonQueryAsync();
-                    if (rowsAffected > 0)
-                    {
-                        return Ok(new { message = "Unit updated successfully." });
-                    }
-                    else
-                    {
-                        return NotFound(new { message = "Unit not found." });
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                // Log the exception
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Error updating the unit." });
-            }
-            finally
-            {
-                if (con.State == ConnectionState.Open)
-                {
-                    await con.CloseAsync();
-                }
-            }
+            return Ok(await _unit_Service.PutUnit(unit));
         }
+
         [HttpPut]
         [Route("UpdateUnitByID")]
         public async Task<IActionResult> UpdateUnitByUnitID(string unitID, bool isActive)
         {
-            if (unitID == null)
+            if (unitID == null || isActive == null)
             {
                 return BadRequest(new { message = "Invalid unit data." });
             }
-
-            try
-            {
-                await con.OpenAsync();
-                string query = @"UPDATE Units 
-                         SET
-                             isActive = @IsActive
-                         WHERE UnitId = @UnitId;";
-
-                using (SqlCommand cmd = new SqlCommand(query, con))
-                {
-                    cmd.Parameters.AddWithValue("@UnitId", unitID);
-                    cmd.Parameters.AddWithValue("@IsActive", isActive);
-
-
-                    int rowsAffected = await cmd.ExecuteNonQueryAsync();
-                    if (rowsAffected > 0)
-                    {
-                        return Ok(new { message = "Unit updated successfully." });
-                    }
-                    else
-                    {
-                        return NotFound(new { message = "Unit not found." });
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                // Log the exception
-                return BadRequest(new { message = "Error updating the unit." });
-            }
-            finally
-            {
-                if (con.State == ConnectionState.Open)
-                {
-                    await con.CloseAsync();
-                }
-            }
+            return Ok(await _unit_Service.UpdateUnitByUnitID(unitID, isActive));
         }
+
+
         [HttpPut]
         [Route("UpdateUnitsByID")]
         public async Task<IActionResult> UpdateUnitsByUnitID(string unitIDs, bool isActive)
@@ -232,53 +74,7 @@ namespace NDE_Digital_Market.Controllers
             {
                 return BadRequest(new { message = "No unit IDs provided." });
             }
-
-            try
-            {
-                await con.OpenAsync();
-                string[] ids = unitIDs.Split(',');
-
-                string query = @"UPDATE Units 
-                        SET isActive = @IsActive 
-                        WHERE UnitId IN ({0});";
-
-                // Construct the SQL parameter placeholders dynamically
-                string parameterPlaceholders = string.Join(",", ids.Select((s, i) => $"@UnitId{i}"));
-                query = string.Format(query, parameterPlaceholders);
-
-                using (SqlCommand cmd = new SqlCommand(query, con))
-                {
-                    // Add parameters for each unit ID
-                    for (int i = 0; i < ids.Length; i++)
-                    {
-                        cmd.Parameters.AddWithValue($"@UnitId{i}", ids[i]);
-                    }
-                    cmd.Parameters.AddWithValue("@IsActive", isActive);
-
-                    int rowsAffected = await cmd.ExecuteNonQueryAsync();
-                    if (rowsAffected > 0)
-                    {
-                        return Ok(new { message = "Units updated successfully." });
-                    }
-                    else
-                    {
-                        return NotFound(new { message = "No units found." });
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                // Log the exception
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Error updating the units." });
-            }
-            finally
-            {
-                if (con.State == ConnectionState.Open)
-                {
-                    await con.CloseAsync();
-                }
-            }
+            return Ok(await _unit_Service.UpdateUnitsByUnitID(unitIDs, isActive));
         }
 
 

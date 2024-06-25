@@ -1,12 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using NDE_Digital_Market.Model;
-using NDE_Digital_Market.DTOs;
+﻿using Microsoft.AspNetCore.Mvc;
 using NDE_Digital_Market.Services.CompanyRegistrationServices;
-using Newtonsoft.Json;
 using Microsoft.AspNetCore.Authorization;
 
 using System.Data;
+using NDE_Digital_Market.DTOs;
+using NDE_Digital_Market.Model;
 
 namespace NDE_Digital_Market.Controllers
 {
@@ -25,7 +23,7 @@ namespace NDE_Digital_Market.Controllers
 
 
         [HttpPost("Companyexists")]
-        public async Task<IActionResult> CompanyexistsCheckAsync(CompanyDto companyDto)
+        public async Task<IActionResult> CompanyexistsCheckAsync(CompanyModel companyDto)
         {
             var res = await _CompanyRegistration.CompanyexistsCheckAsync(companyDto);
             //return Ok(res);
@@ -33,7 +31,7 @@ namespace NDE_Digital_Market.Controllers
         }
 
         [HttpPost("CreateCompany")]
-        public async Task<IActionResult> CompanyRegistrationPostAsync([FromForm] CompanyDto companyDto)
+        public async Task<IActionResult> CompanyRegistrationPostAsync([FromForm] CompanyModel companyDto)
         {
             var res = await _CompanyRegistration.CompanyRegistrationPostAsync(companyDto);
             if (res != null)
@@ -54,7 +52,7 @@ namespace NDE_Digital_Market.Controllers
 
         [HttpPut("UpdateCompany")]
         [Authorize(Roles = "seller,admin")]
-        public async Task<IActionResult> UpdateCompany(CompanyDto companyDto)
+        public async Task<IActionResult> UpdateCompany(CompanyModel companyDto)
         {
             //CompanyModel companyModel = JsonConvert.DeserializeObject<CompanyModel>(data);
             var res = await _CompanyRegistration.UpdateCompanyAsync(companyDto);

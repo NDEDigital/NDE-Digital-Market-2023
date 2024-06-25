@@ -1,10 +1,7 @@
-﻿using NDE_Digital_Market.Data_Access_Layer;
-using NDE_Digital_Market.Model;
-using NDE_Digital_Market.DTOs;
-using System.Data;
+﻿using System.Data;
 using System.Data.SqlClient;
+using NDE_Digital_Market.Model;
 using NDE_Digital_Market.SharedServices;
-using NDE_Digital_Market.Controllers;
 
 namespace NDE_Digital_Market.Data_Access_Layer;
 
@@ -17,6 +14,9 @@ public class CompanyRegistration_DAL
     private readonly SqlConnection connection;
     private readonly string foldername;
     private readonly string filename = "companyfiles";
+
+    private readonly string _healthCareConnection;
+
     public CompanyRegistration_DAL(IConfiguration configuration)
     {
         _configuration = configuration;
@@ -24,8 +24,11 @@ public class CompanyRegistration_DAL
         connection = new SqlConnection(commonServices.HealthCareConnection);
        
         foldername = commonServices.FilesPath + "CompanyFiles";
+
+        _healthCareConnection = commonServices.HealthCareConnection;
+
     }
-    public async Task<Boolean> CompanyExistAsync(CompanyDto companyDto)
+    public async Task<Boolean> CompanyExistAsync(CompanyModel companyDto)
     {
         SqlCommand cmd = new SqlCommand("CheckCompanyExistence", connection);
         cmd.CommandType = CommandType.StoredProcedure;
@@ -44,7 +47,7 @@ public class CompanyRegistration_DAL
         //   return BadRequest(new { message = "User does not exist" , userExist });
     }
 
-    public async Task<string> CompanyRegistrationPostAsync(CompanyDto companyDto)
+    public async Task<string> CompanyRegistrationPostAsync(CompanyModel companyDto)
     {
         Boolean companyNameExist = await CompanyExistAsync(companyDto);
 
@@ -124,42 +127,41 @@ public class CompanyRegistration_DAL
 
     }
 
-    public async Task<List<CompanyModel>> GetCompaniesAsync(int status)
+    public async Task<DataTable> GetCompaniesAsync(int status)
     {
-        List<CompanyModel> companies = new List<CompanyModel>();
-        SqlCommand command = new SqlCommand("GetCompaniesByStatus", connection);
-        command.CommandType = CommandType.StoredProcedure;
-        command.Parameters.AddWithValue("@IsActive",status);
-        await connection.OpenAsync();
-        SqlDataReader reader = await command.ExecuteReaderAsync();
 
-        while (await reader.ReadAsync())
+        try
         {
-            CompanyModel company = new CompanyModel();
-            company.CompanyID = Convert.ToInt32(reader["CompanyID"]);
-            company.MaxUser = Convert.ToInt32(reader["MaxUser"]);
-            company.CompanyCode = reader["CompanyCode"].ToString();
-            company.CompanyName = reader["CompanyName"].ToString();
-            company.Email = reader["Email"].ToString();
-            company.CompanyAdminId = Convert.IsDBNull(reader["CompanyAdminId"]) ? (int?)null : Convert.ToInt32(reader["CompanyAdminId"]);
-            company.CompanyImage = reader["CompanyImage"].ToString();
-            company.CompanyFoundationDate = Convert.ToDateTime(reader["CompanyFoundationDate"]);
-            company.BusinessRegistrationNumber = reader["BusinessRegistrationNumber"].ToString();
-            company.TaxIdentificationNumber = reader["TaxIdentificationNumber"].ToString();
-            company.TradeLicense = reader["TradeLicense"].ToString();
-            company.PreferredPaymentMethodID = Convert.ToInt32(reader["PreferredPaymentMethodID"].ToString());
-            company.PreferredPaymentMethodName = reader["PreferredPaymentMethodName"].ToString();
-            company.BankNameID = Convert.ToInt32(reader["BankNameID"]);
-            company.BankName = reader["BankName"].ToString();
-            company.AccountNumber = reader["AccountNumber"].ToString();
-            company.AccountHolderName = reader["AccountHolderName"].ToString();
-            companies.Add(company);
+
+            DataTable dataTable = new DataTable();
+            using (SqlConnection con = new SqlConnection(_healthCareConnection))
+            {
+                string query = @"GetCompaniesByStatus";
+
+                await con.OpenAsync();
+
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@IsActive", status);
+                    using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
+                    {
+                        adapter.Fill(dataTable);
+                    }
+
+                }
+            }
+            return dataTable;
         }
-        connection.Close();
-        return companies;
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+            // You might want to handle errors more gracefully
+            return null;
+        }
     }
 
-    public async Task<string> UpdateCompanyAsync(CompanyDto companyDto)
+    public async Task<string> UpdateCompanyAsync(CompanyModel companyDto)
     {
 
 

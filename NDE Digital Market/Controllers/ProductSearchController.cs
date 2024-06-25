@@ -1,12 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using NDE_Digital_Market.DTOs;
-using NDE_Digital_Market.Model;
 using System.Data;
 using System.Data.SqlClient;
 using NDE_Digital_Market.SharedServices;
-using Microsoft.AspNetCore.Authorization;
-
+using NDE_Digital_Market.DTOs;
 
 namespace NDE_Digital_Market.Controllers
 {

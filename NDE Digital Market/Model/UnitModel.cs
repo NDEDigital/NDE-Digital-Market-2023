@@ -13,7 +13,6 @@
         public string? UpdatedPC { get; set; }
         public bool IsActive { get; set; }
         public bool IsConversion { get; set; }
-        
 
     }
 }

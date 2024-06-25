@@ -9,6 +9,27 @@ using NDE_Digital_Market.Data_Access_Layer;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using NDE_Digital_Market.Services.AddBanner;
 using NDE_Digital_Market.Services.WishListService;
+using NDE_Digital_Market.Services.UserService;
+using NDE_Digital_Market.Services.UnitService;
+using NDE_Digital_Market.Services.TopSellerService;
+using NDE_Digital_Market.Services.SellerInventoryService;
+using NDE_Digital_Market.Services.SellerActiveAndInactiveService;
+using NDE_Digital_Market.Services.ProductReturnService;
+using NDE_Digital_Market.Services.ProductListService;
+using NDE_Digital_Market.Services.ProductGroupService;
+using NDE_Digital_Market.Services.ProductQuantityService;
+using NDE_Digital_Market.Services.PermissionToDashboardService;
+using NDE_Digital_Market.Services.DashboardGetDataService;
+using NDE_Digital_Market.Services.BrandsService;
+using NDE_Digital_Market.Services.GetBuyerInAdminService;
+using NDE_Digital_Market.Services.OrderService;
+using NDE_Digital_Market.Services.InvoiceService;
+using NDE_Digital_Market.Services.GoodsService;
+using NDE_Digital_Market.Services.CompanyAdminService;
+using NDE_Digital_Market.Services.UserControllOfDashboardService;
+using NDE_Digital_Market.Services.AddToCartService;
+using NDE_Digital_Market.Services.ReviewAndRatingService;
+using NDE_Digital_Market.Services.DashboardService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,8 +63,71 @@ builder.Services.AddScoped<CompanyRegistration_DAL>();
 builder.Services.AddScoped<IAddBanner, Addbanners>();
 builder.Services.AddScoped<AddBanner_DAL>();
 
-builder.Services.AddScoped<IWishList, WishList>();
+builder.Services.AddScoped<IWishList_Service, WishList_Service>();
 builder.Services.AddScoped<WishList_DAL>();
+
+builder.Services.AddScoped<IUser_Service, User_Service>();
+builder.Services.AddScoped<User_DAL>();
+
+builder.Services.AddScoped<IUnit_Service, Unit_Service>();
+builder.Services.AddScoped<Unit_DAL>();
+
+builder.Services.AddScoped<ITopSeller_Service, TopSeller_Service>();
+builder.Services.AddScoped<TopSeller_DAL>();
+
+builder.Services.AddScoped<ISellerInventory_Service, SellerInventory_Service>();
+builder.Services.AddScoped<SellerInventory_DAL>();
+
+builder.Services.AddScoped<ISellerActiveAndInactive_Service, SellerActiveAndInactive_Service>();
+builder.Services.AddScoped<SellerActiveAndInactive_DAL>();
+
+builder.Services.AddScoped<IProductReturn_Service, ProductReturn_Service>();
+builder.Services.AddScoped<ProductReturn_DAL>();
+
+builder.Services.AddScoped<IProductList_Service, ProductList_Service>();
+builder.Services.AddScoped<ProductList_DAL>();
+
+builder.Services.AddScoped<IProductGroup_Service, ProductGroup_Service>();
+builder.Services.AddScoped<ProductGroup_DAL>();
+
+builder.Services.AddScoped<IProductQuantity_Service, ProductQuantity_Service>();
+builder.Services.AddScoped<ProductQuantity_DAL>();
+
+builder.Services.AddScoped<IPermissionToDashboard_Service, PermissionToDashboard_Service>();
+builder.Services.AddScoped<PermissionToDashboard_DAL>();
+
+builder.Services.AddScoped<IDashboardGetData_Service, DashboardGetData_Service>();
+builder.Services.AddScoped<DashboardGetData_DAL>();
+
+builder.Services.AddScoped<IDashboard_Service, Dashboard_Service>();
+builder.Services.AddScoped<Dashboard_DAL>();
+
+builder.Services.AddScoped<IBrands_Service, Brands_Service>();
+builder.Services.AddScoped<Brands_DAL>();
+
+builder.Services.AddScoped<IGetBuyerInAdmin_Service, GetBuyerInAdmin_Service>();
+builder.Services.AddScoped<GetBuyerInAdmin_DAL>();
+
+builder.Services.AddScoped<IOrder_Service, Order_Service>();
+builder.Services.AddScoped<Order_DAL>();
+
+builder.Services.AddScoped<IInvoice_Service, Invoice_Service>();
+builder.Services.AddScoped<Invoice_DAL>();
+
+builder.Services.AddScoped<IGoods_Service, Goods_Service>();
+builder.Services.AddScoped<Goods_DAL>();
+
+builder.Services.AddScoped<ICompanyAdmin_Service, CompanyAdmin_Service>();
+builder.Services.AddScoped<CompanyAdmin_DAL>();
+
+builder.Services.AddScoped<IUserControllOfDashboard_Service, UserControllOfDashboard_Service>();
+builder.Services.AddScoped<UserControllOfDashboard_DAL>();
+
+builder.Services.AddScoped<IAddToCart_Service, AddToCart_Service>();
+builder.Services.AddScoped<AddToCart_DAL>();
+
+builder.Services.AddScoped<IReviewAndRating_Service, ReviewAndRating_Service>();
+builder.Services.AddScoped<ReviewAndRating_DAL>();
 
 //builder.Services.AddScoped<NDE_Digital_Market.Controllers.UserController>();
 //builder.Services.AddScoped<NDE_Digital_Market.Services.CompanyRegistrationServices.ICompanyRegistration, NDE_Digital_Market.Services.CompanyRegistrationServices.CompanyRegistration>();

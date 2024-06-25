@@ -1,12 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using NDE_Digital_Market.Model;
-using NDE_Digital_Market.DTOs;
-using System.Data;
-using System.Data.SqlClient;
-using NDE_Digital_Market.SharedServices;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using NDE_Digital_Market.Services.ProductGroupService;
+using NDE_Digital_Market.Model.DTO;
 
 namespace NDE_Digital_Market.Controllers
 {
@@ -15,209 +10,39 @@ namespace NDE_Digital_Market.Controllers
     [Authorize]
     public class ProductGroupsController : ControllerBase
     {
-        private readonly IConfiguration _configuration;
-        private readonly SqlConnection con;
-        private readonly string foldername;
-        private readonly string filename = "SellerProductGroup";
-        public ProductGroupsController(IConfiguration configuration)
-        {
-            CommonServices commonServices = new CommonServices(configuration);
-            _configuration = configuration;
-            con = new SqlConnection(_configuration.GetConnectionString("HealthCare"));
-            foldername = commonServices.FilesPath + "SellerProductGroupFiles";
-        }
 
-        private async Task<Boolean> ProductGroupsNameCheck(string productgoodsname)
+
+        private readonly IProductGroup_Service _productGroup_Service;
+        public ProductGroupsController(IProductGroup_Service productGroup_Service)
         {
-            string query = @"SELECT COUNT(*) FROM  [ProductGroups] WHERE ProductGroupName = @productgoodsname";
-            SqlCommand cmd = new SqlCommand(query, con);
-            cmd.CommandType = CommandType.Text;
-            cmd.Parameters.AddWithValue("@productgoodsname", productgoodsname);
-            await con.OpenAsync();
-            int count = (int) await cmd.ExecuteScalarAsync();
-            await con.CloseAsync();
-            Boolean check = false;
-            if (count > 0)
-            {
-                check = true;
-            }
-            return check;
+            _productGroup_Service = productGroup_Service;
         }
 
 
-        private async Task<Boolean> ProductGroupsExist(int? productGroupID)
-        {
-            if (productGroupID.HasValue)
-            {
-                string query = @"SELECT COUNT(*) FROM ProductGroups WHERE ProductGroupID = @ProductGroupID";
-                SqlCommand cmd = new SqlCommand(query, con);
-                cmd.CommandType = CommandType.Text;
-                cmd.Parameters.AddWithValue("@ProductGroupID", productGroupID.Value);
-                await con.OpenAsync();
-                int count = (int)await cmd.ExecuteScalarAsync();
-                await con.CloseAsync();
-                Boolean check = false;
-                if (count > 0)
-                {
-                    check = true;
-                }
-                return check;
-            }
-            else
-            {
-                return false;
-            }
-        }
+
 
 
         [HttpPost("CreateProductGroups")]
-        public async Task<IActionResult> CreateProductGroupsAsync([FromForm]  ProductGroupsDto productGroupsDto)
+        public async Task<IActionResult> CreateProductGroupsAsync([FromForm] InsertProductGroupDTO productGroupsDto)
         {
-            try
+            if (productGroupsDto == null)
             {
-                Boolean check = await ProductGroupsNameCheck(productGroupsDto.ProductGroupName);
-                if (check)
-                {
-                    return BadRequest(new { message = "Product GroupName already exists!" });
-                }
-                else
-                {
-                    string systemCode = string.Empty;
-
-                    // Execute the stored procedure to generate the system code
-                    SqlCommand cmdSP = new SqlCommand("spMakeSystemCode", con);
-                    {
-                        cmdSP.CommandType = CommandType.StoredProcedure;
-                        cmdSP.Parameters.AddWithValue("@TableName", "ProductGroups");
-                        cmdSP.Parameters.AddWithValue("@Date", DateTime.Now.ToString("yyyy-MM-dd"));
-                        cmdSP.Parameters.AddWithValue("@AddNumber", 1);
-
-                        await con.OpenAsync();
-                        var tempSystem = await cmdSP.ExecuteScalarAsync();
-                        systemCode = tempSystem?.ToString() ?? string.Empty;
-                        await con.CloseAsync();
-                    }
-
-                    int ProductGroupsID = int.Parse(systemCode.Split('%')[0]);
-                    string ProductGroupsCode = systemCode.Split('%')[1];
-
-                    //SP END
-
-                    string ImagePath = CommonServices.UploadFiles(foldername, filename, productGroupsDto.ImageFile);
-                    if(ImagePath == null)
-                    {
-                        return BadRequest(new { message = "Image Problem" });
-                    }
-                    string query = @"INSERT INTO ProductGroups (ProductGroupID, ProductGroupCode, ProductGroupName,ImagePath, ProductGroupPrefix, ProductGroupDetails, IsActive, AddedBy, DateAdded, AddedPC)
-                        VALUES(@ProductGroupID, @ProductGroupCode, @ProductGroupName, @ImagePath, @ProductGroupPrefix, @ProductGroupDetails, @IsActive, @AddedBy, @DateAdded, @AddedPC);";
-                    SqlCommand cmd = new SqlCommand(query, con);
-                    cmd.CommandType = CommandType.Text;
-                    cmd.Parameters.AddWithValue("@ProductGroupID", ProductGroupsID);
-                    cmd.Parameters.AddWithValue("@ProductGroupCode", ProductGroupsCode);
-                    cmd.Parameters.AddWithValue("@ProductGroupName", productGroupsDto.ProductGroupName);
-                    cmd.Parameters.AddWithValue("@ImagePath", ImagePath);
-                    cmd.Parameters.AddWithValue("@ProductGroupPrefix", productGroupsDto.ProductGroupPrefix);
-                    cmd.Parameters.AddWithValue("@ProductGroupDetails", productGroupsDto.ProductGroupDetails ?? string.Empty);
-                    cmd.Parameters.AddWithValue("@IsActive", 1);
-                    cmd.Parameters.AddWithValue("@AddedBy", productGroupsDto.AddedBy);
-                    cmd.Parameters.AddWithValue("@DateAdded", DateTime.Now);
-                    cmd.Parameters.AddWithValue("@AddedPC", productGroupsDto.AddedPC);
-
-                    await con.OpenAsync();
-                    await cmd.ExecuteNonQueryAsync();
-                    await con.CloseAsync();
-
-                    return Ok(new { message = "Product Group Create successfully." });
-                }
-
-
+                return BadRequest(new { message = "Give Proper Product Data." });
             }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return Ok(await _productGroup_Service.CreateProductGroupsAsync(productGroupsDto));
 
         }
 
         ///========================================================================================
 
         [HttpPut("UpdateProductGroups")]
-        public async Task<IActionResult> UpdateProductGroupsAsync([FromForm] ProductGroupsDto productGroupsDto)
+        public async Task<IActionResult> UpdateProductGroupsAsync([FromForm] UpdateProductGroupDTO productGroupsDto)
         {
-            try
+            if (productGroupsDto == null || productGroupsDto.ProductGroupID == null)
             {
-                Boolean check = await ProductGroupsExist(productGroupsDto.ProductGroupID);
-
-                if (check)
-                {
-                    await con.OpenAsync(); 
-
-                    using (SqlTransaction transaction = con.BeginTransaction())
-                    {
-                        try
-                        {
-                            string ImagePath = CommonServices.UploadFiles(foldername, filename, productGroupsDto.ImageFile);
-
-                            if (ImagePath != null)
-                            {
-
-
-                                if (string.IsNullOrEmpty(productGroupsDto.ExistingImageFileName))
-                                {
-                                    string query = "UpdateProductGroupWithImage";
-                                    SqlCommand cmd = new SqlCommand(query, con, transaction);
-                                    cmd.CommandType = CommandType.StoredProcedure;
-                                    cmd.Parameters.AddWithValue("@ProductGroupID", productGroupsDto.ProductGroupID);
-                                    cmd.Parameters.AddWithValue("@ProductGroupName", productGroupsDto.ProductGroupName);
-                                    cmd.Parameters.AddWithValue("@ImagePath", ImagePath);
-                                    cmd.Parameters.AddWithValue("@ProductGroupPrefix", productGroupsDto.ProductGroupPrefix);
-                                    cmd.Parameters.AddWithValue("@ProductGroupDetails", productGroupsDto.ProductGroupDetails ?? string.Empty);
-                                    cmd.Parameters.AddWithValue("@UpdatedBy", productGroupsDto.UpdatedBy ?? string.Empty);
-                                    cmd.Parameters.AddWithValue("@DateUpdated", DateTime.Now);
-                                    cmd.Parameters.AddWithValue("@UpdatedPC", productGroupsDto.UpdatedPC ?? string.Empty);
-
-                                    await cmd.ExecuteNonQueryAsync();
-                                }
-                            }
-                            else
-                            {
-                                string query1 = "UpdateProductGroupWithOutImage";
-                                SqlCommand cmdd = new SqlCommand(query1, con, transaction);
-                                cmdd.CommandType = CommandType.StoredProcedure;
-                                cmdd.Parameters.AddWithValue("@ProductGroupID", productGroupsDto.ProductGroupID);
-                                cmdd.Parameters.AddWithValue("@ProductGroupName", productGroupsDto.ProductGroupName);
-                                cmdd.Parameters.AddWithValue("@ProductGroupPrefix", productGroupsDto.ProductGroupPrefix);
-                                cmdd.Parameters.AddWithValue("@ProductGroupDetails", productGroupsDto.ProductGroupDetails ?? string.Empty);
-                                cmdd.Parameters.AddWithValue("@UpdatedBy", productGroupsDto.UpdatedBy ?? string.Empty);
-                                cmdd.Parameters.AddWithValue("@DateUpdated", DateTime.Now);
-                                cmdd.Parameters.AddWithValue("@UpdatedPC", productGroupsDto.UpdatedPC ?? string.Empty);
-
-                                await cmdd.ExecuteNonQueryAsync();
-                            }
-
-                            transaction.Commit();
-                            return Ok(new { message = "Product Group updated successfully." });
-                        }
-                        catch (Exception ex)
-                        {
-                            transaction.Rollback();
-                            return BadRequest(new { message = $"Error updating product group: {ex.Message}" });
-                        }
-                        finally
-                        {
-                            con.Close();  // Close the connection in the finally block
-                        }
-                    }
-                }
-                else
-                {
-                    return NotFound(new { message = "Product Group not found!" });
-                }
+                return BadRequest(new { message = "Invalid Product data." });
             }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = $"Error updating product group: {ex.Message}" });
-            }
+            return Ok(await _productGroup_Service.UpdateProductGroupsAsync(productGroupsDto));
         }
 
         /// =====================================================================
@@ -227,122 +52,30 @@ namespace NDE_Digital_Market.Controllers
         [HttpGet]
         [Authorize(Roles = "admin")]
         [Route("GetProductGroupsList")]
-        public async Task<List<ProductGroupsModel>> GetProductGroupsListAsync()
+        public async Task<IActionResult> GetProductGroupsListAsync()
         {
-            List<ProductGroupsModel> lst = new List<ProductGroupsModel>();
-
-            try
+            object res = await _productGroup_Service.GetProductGroupsListAsync();
+            if (res == null)
             {
-                await con.OpenAsync();
-                string query = @"SELECT [ProductGroupID],[ProductGroupCode],[ProductGroupName],[ProductGroupPrefix],[ProductGroupDetails],
-            [IsActive] FROM ProductGroups WHERE IsActive = 1 ORDER BY [ProductGroupID] DESC;";
-
-                using (SqlCommand cmd = new SqlCommand(query, con))
-                {
-                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
-                    {
-                        while (await reader.ReadAsync())
-                        {
-                            ProductGroupsModel modelObj = new ProductGroupsModel();
-                            modelObj.ProductGroupID = Convert.ToInt32(reader["ProductGroupID"]);
-                            modelObj.ProductGroupCode = reader["ProductGroupCode"].ToString();
-                            modelObj.ProductGroupName = reader["ProductGroupName"].ToString();
-                            modelObj.ProductGroupPrefix = reader["ProductGroupPrefix"].ToString();
-                            modelObj.ProductGroupDetails = reader["ProductGroupDetails"].ToString();
-                            modelObj.IsActive = Convert.ToBoolean(reader["IsActive"]);
-
-                            lst.Add(modelObj);
-                        }
-                    }
-                }
+                return NotFound(new { message = "Products not Found." });
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                // You might want to throw the exception again if you cannot handle it at this level.
-                throw;
-            }
-            finally
-            {
-                // Ensure the connection is closed, even in case of an exception.
-                if (con.State == ConnectionState.Open)
-                {
-                    await con.CloseAsync();
-                }
-            }
-
-            return lst;
+            return Ok(res);
         }
 
 
 
 
         [HttpGet]
-
         [Route("GetProductGroupsListByStatus")]
-
         [Authorize(Roles = "admin")]
-        public async Task<List<ProductGroupByStatusDTO>> GetProductGroupsListByStatus(Int32? status = null)
+        public async Task<IActionResult> GetProductGroupsListByStatus(Int32? status = null)
         {
-            List<ProductGroupByStatusDTO> lst = new List<ProductGroupByStatusDTO>();
-
-            try
+            object res = await _productGroup_Service.GetProductGroupsListByStatus(status);
+            if (res == null)
             {
-                await con.OpenAsync();
-
-                string query = "";
-                if (status != null)
-                {
-                    query = @"SELECT * FROM ProductGroups WHERE IsActive= @IsActive ORDER BY ProductGroupID  DESC;";
-                }
-                else
-                {
-                    query = @"SELECT * FROM ProductGroups WHERE CONVERT(DATE, DateAdded) = CONVERT(DATE, GETDATE()) ORDER BY ProductGroupID  DESC";
-                }
-
-                using (SqlCommand cmd = new SqlCommand(query, con))
-                {
-                    if (status != null)
-                    {
-                        cmd.Parameters.Add(new SqlParameter("@IsActive", status));
-                    }
-
-                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
-                    {
-                        while (await reader.ReadAsync())
-                        {
-                            ProductGroupByStatusDTO modelObj = new ProductGroupByStatusDTO();
-                            modelObj.ProductGroupID = Convert.ToInt32(reader["ProductGroupID"]);
-                            modelObj.ProductGroupCode = reader["ProductGroupCode"].ToString();
-                            modelObj.ProductGroupName = reader["ProductGroupName"].ToString();
-                            modelObj.ProductGroupPrefix = reader["ProductGroupPrefix"].ToString();
-                            modelObj.ProductGroupDetails = reader["ProductGroupDetails"].ToString();
-                            modelObj.IsActive = Convert.ToBoolean(reader["IsActive"]);
-                            modelObj.Imagepath = reader["Imagepath"].ToString();
-                            modelObj.DateAdded = reader.IsDBNull(reader.GetOrdinal("DateAdded")) ? (DateTime?)null : (DateTime?)reader["DateAdded"];
-
-                            lst.Add(modelObj);
-                        }
-                    }
-                }
+                return NotFound(new { message = "Products not Found." });
             }
-            catch (Exception ex)
-            {
-                // Handle the exception here. You can log the exception or perform any other necessary actions.
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                // You might want to throw the exception again if you cannot handle it at this level.
-                throw;
-            }
-            finally
-            {
-                // Ensure the connection is closed, even in case of an exception.
-                if (con.State == ConnectionState.Open)
-                {
-                    await con.CloseAsync();
-                }
-            }
-
-            return lst;
+            return Ok(res);
         }
 
 
@@ -354,27 +87,17 @@ namespace NDE_Digital_Market.Controllers
         {
             try
             {
-                string query = $"UPDATE ProductGroups  SET IsActive = @IsActive WHERE ProductGroupID IN ({groupIds})";
-                using (SqlCommand command = new SqlCommand(query, con))
+                if (groupIds == null)
                 {
-                    command.Parameters.AddWithValue("@IsActive", IsActive);
-                    command.Parameters.AddWithValue("@groupId", groupIds);
-
-                    await con.OpenAsync();
-                    // Execute the command
-                    int Res = await command.ExecuteNonQueryAsync();
-                    if (Res == 0)
-                    {
-                        return BadRequest(new { message = $"Group didnot found." });
-                    }
-                    await con.CloseAsync();
+                    return BadRequest(new { message = "No product IDs provided." });
                 }
-                return Ok(new { message = $"Group IsActive status changed." });
+                return Ok(await _productGroup_Service.MakeGroupActiveOrInactiveAsync(groupIds, IsActive));
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
-                return BadRequest(new { message = $"Group IsActive status not change : {ex.Message}" });
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
             }
+
         }
 
 

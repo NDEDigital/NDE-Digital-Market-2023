@@ -1,16 +1,16 @@
 ﻿
 using NDE_Digital_Market.Model;
-using NDE_Digital_Market.DTOs;
+using NDE_Digital_Market.Model.DTO;
 
 namespace NDE_Digital_Market.Services.CompanyRegistrationServices;
 
 public interface ICompanyRegistration
 {
-    Task<string> CompanyRegistrationPostAsync(CompanyDto companyDto);
-    Task<Boolean> CompanyexistsCheckAsync(CompanyDto companyDto);
+    Task<string> CompanyRegistrationPostAsync(CompanyModel companyDto);
+    Task<Boolean> CompanyexistsCheckAsync(CompanyModel companyDto);
 
-    Task<List<CompanyModel>> GetCompaniesAsync(int status);
+    Task<List<GetCompanyListByStatusDTO>> GetCompaniesAsync(int status);
 
-    Task<string> UpdateCompanyAsync(CompanyDto companyDto);
+    Task<string> UpdateCompanyAsync(CompanyModel companyDto);
 
 }
