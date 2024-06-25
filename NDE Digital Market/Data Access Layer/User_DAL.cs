@@ -275,7 +275,10 @@ namespace NDE_Digital_Market.Data_Access_Layer
 
                     await con.CloseAsync();
                     string role = IsAdmin ? "admin" : IsSeller ? "seller" : IsBuyer ? "buyer" : "";
-
+                    if (role == "admin")
+                    {
+                        companyCode = "admin";
+                    }
                     if (!CommonServices.VerifyPasswordHash(user.Password, storedPasswordHash, storedPasswordSalt))
                     {
                         return new { message = "Invalid password", IsSuccess = false };
