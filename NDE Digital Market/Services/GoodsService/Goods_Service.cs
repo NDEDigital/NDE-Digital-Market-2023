@@ -99,6 +99,7 @@ namespace NDE_Digital_Market.Services.GoodsService
                 obj.ProductId = CommonServices.EncryptPassword(row["ProductId"].ToString());
                 obj.ProductName = row["ProductName"].ToString();
                 obj.ProductGroupID = CommonServices.EncryptPassword(row["ProductGroupID"].ToString());
+                obj.ProductGroupCode = CommonServices.EncryptPassword(row["ProductGroupCode"].ToString());
                 obj.Specification = row["Specification"].ToString();
                 obj.UnitId = CommonServices.EncryptPassword(row["UnitId"].ToString());
                 obj.Unit = row["Unit"].ToString();

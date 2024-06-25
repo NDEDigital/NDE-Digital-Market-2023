@@ -8,6 +8,7 @@
         public string? ProductId { get; set; }
         public string? ProductName { get; set; }
         public string? ProductGroupID { get; set; }
+        public string? ProductGroupCode { get; set; }
         public string? Specification { get; set; }
         public string? UnitId { get; set; }
         public string? Unit { get; set; }
