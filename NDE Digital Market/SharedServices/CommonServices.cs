@@ -13,6 +13,10 @@ namespace NDE_Digital_Market.SharedServices
     public class CommonServices
     {
 
+        private static readonly byte[] Key = Encoding.UTF8.GetBytes("12345678901234567890123456789012"); // 32 bytes for AES-256
+        private static readonly byte[] IV = Encoding.UTF8.GetBytes("1234567890123456"); // 16 bytes for AES
+
+
         // This constant is used to determine the keysize of the encryption algorithm in bits.
         // We divide this by 8 within the code below to get the equivalent number of bytes.
         private const int Keysize = 256;
@@ -48,31 +52,74 @@ namespace NDE_Digital_Market.SharedServices
             return HealthCareConnection = _configuration.GetConnectionString("HealthCare");
         }
 
-        public static string EncryptPassword(string input)
+        public static string EncryptPassword(string plainText)
         {
-            // Encode the string as a byte array using UTF-8 encoding
-            byte[] bytes = Encoding.UTF8.GetBytes(input);
-
-            // Convert the byte array to a hexadecimal string with uppercase characters
-            return BitConverter.ToString(bytes).ToUpper();
-        }
-
-        public static string DecryptPassword(string hex)
-        {
-            // Remove any non-hexadecimal characters
-            string cleanHex = Regex.Replace(hex, "[^0-9A-F]", "");
-
-            // Split the string into byte pairs
-            int length = cleanHex.Length;
-            byte[] bytes = new byte[length / 2];
-            for (int i = 0; i < length; i += 2)
+            using (Aes aes = Aes.Create())
             {
-                bytes[i / 2] = Convert.ToByte(cleanHex.Substring(i, 2), 16);
-            }
+                aes.Key = Key;
+                aes.IV = IV;
 
-            // Decode the byte array back to a string using UTF-8 encoding
-            return Encoding.UTF8.GetString(bytes);
+                ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    using (CryptoStream cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
+                    {
+                        using (StreamWriter sw = new StreamWriter(cs))
+                        {
+                            sw.Write(plainText);
+                        }
+                        return Convert.ToBase64String(ms.ToArray());
+                    }
+                }
+            }
         }
+
+        public static string DecryptPassword(string cipherText)
+        {
+            using (Aes aes = Aes.Create())
+            {
+                aes.Key = Key;
+                aes.IV = IV;
+
+                ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
+                using (MemoryStream ms = new MemoryStream(Convert.FromBase64String(cipherText)))
+                {
+                    using (CryptoStream cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read))
+                    {
+                        using (StreamReader sr = new StreamReader(cs))
+                        {
+                            return sr.ReadToEnd();
+                        }
+                    }
+                }
+            }
+        }
+
+        //public static string EncryptPassword(string input)
+        //{
+        //    // Encode the string as a byte array using UTF-8 encoding
+        //    byte[] bytes = Encoding.UTF8.GetBytes(input);
+
+        //    // Convert the byte array to a hexadecimal string with uppercase characters
+        //    return BitConverter.ToString(bytes).ToUpper();
+        //}
+
+        //public static string DecryptPassword(string hex)
+        //{
+        //    // Remove any non-hexadecimal characters
+        //    string cleanHex = Regex.Replace(hex, "[^0-9A-F]", "");
+
+        //    // Split the string into byte pairs
+        //    int length = cleanHex.Length;
+        //    byte[] bytes = new byte[length / 2];
+        //    for (int i = 0; i < length; i += 2)
+        //    {
+        //        bytes[i / 2] = Convert.ToByte(cleanHex.Substring(i, 2), 16);
+        //    }
+
+        //    // Decode the byte array back to a string using UTF-8 encoding
+        //    return Encoding.UTF8.GetString(bytes);
+        //}
 
 
 

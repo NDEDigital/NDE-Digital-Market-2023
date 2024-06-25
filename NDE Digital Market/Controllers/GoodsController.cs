@@ -134,11 +134,11 @@ namespace NDE_Digital_Market.Controllers
 
         [HttpGet]
         [Route("GetProductList")]
-        public async Task<IActionResult> GetProductList(string CompanyCode, string ProductGroupCode)
+        public async Task<IActionResult> GetProductList(string? CompanyCode, string ProductGroupCode)
         {
             try
             {
-                if (CompanyCode == null || ProductGroupCode == null)
+                if (ProductGroupCode == null)
                 {
                     return NotFound(new { message = "Give Valid Data." });
                 }

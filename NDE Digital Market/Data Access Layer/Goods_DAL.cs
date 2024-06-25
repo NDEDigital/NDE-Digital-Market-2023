@@ -175,7 +175,7 @@ namespace NDE_Digital_Market.Data_Access_Layer
 
 
 
-        public async Task<DataTable> GetProductList(string CompanyCode, string ProductGroupCode)
+        public async Task<DataTable> GetProductList(string? CompanyCode, string ProductGroupCode)
         {
 
             try
@@ -189,7 +189,11 @@ namespace NDE_Digital_Market.Data_Access_Layer
                     using (SqlCommand cmd = new SqlCommand(query, con))
                     {
                         cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.Parameters.Add(new SqlParameter("@CompanyCode", CompanyCode));
+                        if(CompanyCode != null)
+                        {
+                            cmd.Parameters.Add(new SqlParameter("@CompanyCode", CompanyCode));
+                        }
+                        
                         cmd.Parameters.Add(new SqlParameter("@ProductGroupCode", ProductGroupCode));
 
                         using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))

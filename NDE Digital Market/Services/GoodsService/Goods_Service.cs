@@ -212,10 +212,15 @@ namespace NDE_Digital_Market.Services.GoodsService
 
 
 
-        public async Task<List<GetCompanyWiseProductListDTO>> GetProductList(string CompanyCode, string ProductGroupCode)
+        public async Task<List<GetCompanyWiseProductListDTO>> GetProductList(string? CompanyCode, string ProductGroupCode)
         {
+            string decryptCompanyCode = null;
+            if (CompanyCode != null)
+            {
+                decryptCompanyCode = CommonServices.DecryptPassword(CompanyCode);
+            }
             string decryptProductGroupCode = CommonServices.DecryptPassword(ProductGroupCode);
-            string decryptCompanyCode = CommonServices.DecryptPassword(CompanyCode);
+            
             DataTable dataTable = await _Goods_DAL.GetProductList(decryptCompanyCode, decryptProductGroupCode);
 
             List<GetCompanyWiseProductListDTO> list = new List<GetCompanyWiseProductListDTO>();
