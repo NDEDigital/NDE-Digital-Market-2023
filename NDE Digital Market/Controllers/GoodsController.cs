@@ -109,7 +109,7 @@ namespace NDE_Digital_Market.Controllers
 
 
         [HttpGet]
-        [Route("GetProductCompany/{ProductGroupCode}")]
+        [Route("GetProductCompany")]
         public async Task<IActionResult> GetProductCompany(string ProductGroupCode)
         {
             try
