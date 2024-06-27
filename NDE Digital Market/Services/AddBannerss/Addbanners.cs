@@ -164,7 +164,7 @@ namespace NDE_Digital_Market.Services.AddBanner
 
         public async Task<List<GetBannerAndAdsForShowingInHomePageDTO>> GetAddForShowingInHomePage()
         {
-            DataTable dataTable = await _AddBanner_DAL.GetBannerForShowingInHomePage();
+            DataTable dataTable = await _AddBanner_DAL.GetAddForShowingInHomePage();
 
             List<GetBannerAndAdsForShowingInHomePageDTO> list = new List<GetBannerAndAdsForShowingInHomePageDTO>();
             // Check if dataTable is null
@@ -225,13 +225,13 @@ namespace NDE_Digital_Market.Services.AddBanner
         {
             AdsAndBannerModel Model = new AdsAndBannerModel();
 
-            Model.BannerID = int.Parse(CommonServices.DecryptPassword(bannerDto.BannerID));
-            Model.UserId = int.Parse(CommonServices.DecryptPassword(bannerDto.UserId));
+            Model.BannerID = bannerDto.BannerID != null ? int.Parse(CommonServices.DecryptPassword(bannerDto.BannerID)) : (int?)null;
+            Model.UserId = bannerDto.UserId != null ? int.Parse(CommonServices.DecryptPassword(bannerDto.UserId)) : (int?)null;
             Model.IsActive = bannerDto.IsActive;
             Model.IsAds = bannerDto.IsAds;
             Model.UpdatedPC = bannerDto.UpdatedPC;
             Model.UpdatedBy = bannerDto.UpdatedBy;
-            Model.CompanyCode = CommonServices.DecryptPassword(bannerDto.CompanyCode);
+            Model.CompanyCode = bannerDto.CompanyCode != null ? CommonServices.DecryptPassword(bannerDto.CompanyCode) : null;
             Model.BannerDescription = bannerDto.BannerDescription;
             Model.BannerImageFile = bannerDto.BannerImageFile;
             Model.StartDate = bannerDto.StartDate;
@@ -239,6 +239,8 @@ namespace NDE_Digital_Market.Services.AddBanner
             Model.IsPayment = bannerDto.IsPayment;
             Model.PaymentRemarks = bannerDto.PaymentRemarks;
             Model.IsBannerStatus = bannerDto.IsBannerStatus;
+
+
 
             return await _AddBanner_DAL.UpdateBanner(Model);
         }

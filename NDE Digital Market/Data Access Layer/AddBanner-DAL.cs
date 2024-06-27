@@ -573,6 +573,7 @@ namespace NDE_Digital_Market.Data_Access_Layer
                 string query = @"UPDATE AdBanner 
                              SET UserId = COALESCE(@UserId, UserId),
                                  IsActive = COALESCE(@IsActive, IsActive),
+                                 IsBannerStatus = COALESCE(@IsBannerStatus, IsBannerStatus),
                                  IsAds = COALESCE(@IsAds, IsAds),
                                  UpdatedDate = @UpdatedDate,
                                  UpdatedBy = COALESCE(@UpdatedBy, UpdatedBy),
@@ -605,6 +606,7 @@ namespace NDE_Digital_Market.Data_Access_Layer
                         cmd.Parameters.AddWithValue("@EndDate", banner.EndDate ?? (object)DBNull.Value);
                         cmd.Parameters.AddWithValue("@IsPayment", banner.IsPayment ?? (object)DBNull.Value);
                         cmd.Parameters.AddWithValue("@PaymentRemarks", banner.PaymentRemarks ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@IsBannerStatus", banner.IsBannerStatus ?? (object)DBNull.Value);
 
                         await con.OpenAsync();
                         await cmd.ExecuteNonQueryAsync();
