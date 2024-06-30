@@ -91,7 +91,7 @@ namespace NDE_Digital_Market.Controllers
 
 
         [HttpDelete]
-        [Route("DeleteAddToCart/{id}")]
+        [Route("DeleteAddToCart")]
         public async Task<IActionResult> DeleteAddToCart(string id)
         {
             try
