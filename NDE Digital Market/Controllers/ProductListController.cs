@@ -22,11 +22,19 @@ public class ProductListController : ControllerBase
     [HttpPost("CreateProductList")]
     public async Task<IActionResult> CreateProductGroupsAsync([FromForm] InsertProductListDTO productListDto)
     {
-        if (productListDto == null)
+        try
         {
-            return BadRequest(new { message = "Give Proper Product Data." });
+            if (productListDto == null)
+            {
+                return BadRequest(new { message = "Give Proper Product Data." });
+            }
+            return Ok(await _productList_Service.CreateProductGroupsAsync(productListDto));
         }
-        return Ok(await _productList_Service.CreateProductGroupsAsync(productListDto));
+        catch(Exception ex)
+        {
+            return BadRequest(new { message = "Server Error. Try Again!!!" });
+        }
+
 
     }
 
