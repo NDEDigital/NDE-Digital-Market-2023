@@ -23,46 +23,78 @@ namespace NDE_Digital_Market.Controllers
         [Route("GetUnitList")]
         public async Task<IActionResult> GetUnitListAsync(bool? isActive)
         {
-            object res = await _unit_Service.GetUnitListAsync(isActive);
-            if(res == null)
+            try
             {
-                return NotFound(new { message = "Unit not Found." });
+                object res = await _unit_Service.GetUnitListAsync(isActive);
+                if (res == null)
+                {
+                    return NotFound(new { message = "Unit not Found." });
+                }
+                return Ok(res);
             }
-            return Ok(res);
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
+            }
+
 
         }
 
         [HttpPost]
         [Route("AddUnit")]
-        public async Task<IActionResult> PostUnit(UnitCreationDTO unit)
+        public async Task<IActionResult> PostUnit([FromForm] UnitCreationDTO unit)
         {
-            if (unit == null)
+            try
             {
-                return BadRequest(new { message = "Give Proper Unit Data." });
+                if (unit == null)
+                {
+                    return BadRequest(new { message = "Give Proper Unit Data." });
+                }
+                return Ok(await _unit_Service.PostUnit(unit));
             }
-            return Ok(await _unit_Service.PostUnit(unit));
+            catch(Exception ex)
+            {
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
+            }
+
         }
 
         [HttpPut]
         [Route("UpdateUnit")]
         public async Task<IActionResult> PutUnit([FromForm] UpdateUnitDTO unit)
         {
-            if (unit == null || unit.UnitId == null)
+            try
             {
-                return BadRequest(new { message = "Invalid unit data." });
+                if (unit == null || unit.UnitId == null)
+                {
+                    return BadRequest(new { message = "Invalid unit data." });
+                }
+                return Ok(await _unit_Service.PutUnit(unit));
             }
-            return Ok(await _unit_Service.PutUnit(unit));
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
+            }
+
         }
 
         [HttpPut]
         [Route("UpdateUnitByID")]
         public async Task<IActionResult> UpdateUnitByUnitID(string unitID, bool isActive)
         {
-            if (unitID == null || isActive == null)
+            try
             {
-                return BadRequest(new { message = "Invalid unit data." });
+                if (unitID == null || isActive == null)
+                {
+                    return BadRequest(new { message = "Invalid unit data." });
+                }
+                return Ok(await _unit_Service.UpdateUnitByUnitID(unitID, isActive));
             }
-            return Ok(await _unit_Service.UpdateUnitByUnitID(unitID, isActive));
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
+            }
+
         }
 
 
@@ -70,11 +102,19 @@ namespace NDE_Digital_Market.Controllers
         [Route("UpdateUnitsByID")]
         public async Task<IActionResult> UpdateUnitsByUnitID(string unitIDs, bool isActive)
         {
-            if (string.IsNullOrEmpty(unitIDs))
+            try
             {
-                return BadRequest(new { message = "No unit IDs provided." });
+                if (string.IsNullOrEmpty(unitIDs))
+                {
+                    return BadRequest(new { message = "No unit IDs provided." });
+                }
+                return Ok(await _unit_Service.UpdateUnitsByUnitID(unitIDs, isActive));
             }
-            return Ok(await _unit_Service.UpdateUnitsByUnitID(unitIDs, isActive));
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
+            }
+
         }
 
 
