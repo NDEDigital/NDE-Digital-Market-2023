@@ -62,6 +62,7 @@ namespace NDE_Digital_Market.Services.BrandsService
         public async Task<object> PutBrand(UpdateBrandsDTO modelbrand)
         {
             BrandsModel Model = new BrandsModel();
+            Model.BrandId = int.Parse(CommonServices.DecryptPassword(modelbrand.BrandId));
             Model.BrandName = modelbrand.BrandName;
             Model.ShortName = modelbrand.ShortName;
             Model.Description = modelbrand.Description;
@@ -71,7 +72,7 @@ namespace NDE_Digital_Market.Services.BrandsService
             Model.UpdatedDate = DateTime.UtcNow;
 
 
-            return await _Brands_DAL.PostBrandAsync(Model);
+            return await _Brands_DAL.PutBrand(Model);
         }
 
 

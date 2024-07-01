@@ -2,7 +2,7 @@
 {
     public class UpdateBrandsDTO
     {
-        public int? BrandId { get; set; }
+        public string? BrandId { get; set; }
         public string? BrandName { get; set; }
         public string? ShortName { get; set; }
         public string? Description { get; set; }
