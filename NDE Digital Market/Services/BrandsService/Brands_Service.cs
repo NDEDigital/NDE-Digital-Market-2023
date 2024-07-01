@@ -72,8 +72,14 @@ namespace NDE_Digital_Market.Services.BrandsService
             BrandsModel Model = new BrandsModel();
             Model.BrandId = int.Parse(CommonServices.DecryptPassword(modelbrand.BrandId));
             Model.BrandName = modelbrand.BrandName;
-            Model.ShortName = modelbrand.ShortName;
-            Model.Description = modelbrand.Description;
+            if (modelbrand.ShortName != "null")
+            {
+                Model.ShortName = modelbrand.ShortName;
+            }
+            if (modelbrand.Description != "null")
+            {
+                Model.Description = modelbrand.Description;
+            }
             Model.IsActive = modelbrand.IsActive;
             Model.UpdatedBy = modelbrand.UpdatedBy;
             Model.UpdatedPC = modelbrand.UpdatedPC;
