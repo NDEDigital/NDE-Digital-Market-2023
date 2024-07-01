@@ -25,38 +25,69 @@ namespace NDE_Digital_Market.Controllers
         [HttpPost("Companyexists")]
         public async Task<IActionResult> CompanyexistsCheckAsync(CompanyModel companyDto)
         {
-            var res = await _CompanyRegistration.CompanyexistsCheckAsync(companyDto);
-            //return Ok(res);
-            return Ok(new { message = res });
+            try
+            {
+                var res = await _CompanyRegistration.CompanyexistsCheckAsync(companyDto);
+                //return Ok(res);
+                return Ok(new { message = res });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
+            }
+
         }
 
         [HttpPost("CreateCompany")]
         public async Task<IActionResult> CompanyRegistrationPostAsync([FromForm] CompanyModel companyDto)
         {
-            var res = await _CompanyRegistration.CompanyRegistrationPostAsync(companyDto);
-            if (res != null)
+            try
             {
-                return Ok(new { message = res });
+                var res = await _CompanyRegistration.CompanyRegistrationPostAsync(companyDto);
+                if (res != null)
+                {
+                    return Ok(new { message = res });
 
+                }
+                return BadRequest(new { message = "Company already exists!" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
             }
 
-            return BadRequest(new { message = "Company already exists!" });
         }
 
         [HttpGet("GetCompaniesBasedOnStatus")]
         public async Task<IActionResult> GetCompaniesAsync(int status)
         {
-            var res = await _CompanyRegistration.GetCompaniesAsync(status);
-            return Ok(res);
+            try
+            {
+                var res = await _CompanyRegistration.GetCompaniesAsync(status);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
+            }
+
         }
 
         [HttpPut("UpdateCompany")]
         [Authorize(Roles = "seller,admin")]
         public async Task<IActionResult> UpdateCompany(CompanyModel companyDto)
         {
-            //CompanyModel companyModel = JsonConvert.DeserializeObject<CompanyModel>(data);
-            var res = await _CompanyRegistration.UpdateCompanyAsync(companyDto);
-            return Ok(new { message = res });
+            try
+            {
+                //CompanyModel companyModel = JsonConvert.DeserializeObject<CompanyModel>(data);
+                var res = await _CompanyRegistration.UpdateCompanyAsync(companyDto);
+                return Ok(new { message = res });
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
+            }
+
         }
 
     }
