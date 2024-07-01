@@ -1,13 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using NDE_Digital_Market.DTOs;
-using NDE_Digital_Market.SharedServices;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
-using System.Threading.Tasks;
+using NDE_Digital_Market.Services.DashboardGetDataService;
 
 namespace NDE_Digital_Market.Controllers
 {
@@ -15,97 +8,36 @@ namespace NDE_Digital_Market.Controllers
     [Authorize(Roles = "seller,admin")]
     public class DashboardGetDataController : ControllerBase
     {
-        private readonly string _healthCareConnection;
+        private readonly IDashboardGetData_Service _dashboardGetData_Service;
 
-        public DashboardGetDataController(IConfiguration config)
+        public DashboardGetDataController(IDashboardGetData_Service dashboardGetData_Service)
         {
-            CommonServices commonServices = new CommonServices(config);
-            _healthCareConnection = commonServices.HealthCareConnection;
+            _dashboardGetData_Service = dashboardGetData_Service;
         }
 
         [HttpGet]
         [Route("SellerPermissionData/{UserId}/{Status1}")]
-        public async Task<IActionResult> GetPermissionData(int UserId, int Status1)
+        public async Task<IActionResult> GetPermissionData(string UserId, int Status1)
         {
             try
             {
-                using (SqlConnection con = new SqlConnection(_healthCareConnection))
+                if (UserId == null || Status1 == null)
                 {
-                    string query = @"
-                        DECLARE @Status INT = @Status1;
-                        DECLARE @UserId INT = @UserId1;
-
-                         IF @Status = 0
-                        BEGIN
-                            SELECT P.UserId, P.MenuId, M.IsActive, M.MenuName, M.NavigateUrl
-                            FROM Permission P 
-                            JOIN MenuList M ON P.MenuId = M.MenuId
-                            WHERE P.UserId = @UserId AND M.IsActive = 1;
-                        END
-                        ELSE IF @Status = 1
-                        BEGIN
-                            SELECT MenuId, MenuName, NavigateUrl
-                            FROM MenuList
-                            WHERE IsAdmin != 1 AND IsActive = 1;
-                        END
-                    ";
-
-                    await con.OpenAsync();
-
-                    using (SqlCommand cmd = new SqlCommand(query, con))
-                    {
-                        cmd.Parameters.AddWithValue("@UserId1", UserId);
-                        cmd.Parameters.AddWithValue("@Status1", Status1); // Fix: Use @Status instead of status
-
-                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
-                        {
-                            var result = new List<PermissionToDashDto>();
-                            if(Status1 == 1)
-                            {
-                                while (reader.Read())
-                                {
-                                    var permission = new PermissionToDashDto
-                                    {
-                                        MenuId = Convert.ToInt32(reader["MenuId"]),
-                                        MenuName = reader["MenuName"].ToString(),
-                                        NavigateUrl = reader["NavigateUrl"].ToString(),
-
-                                        // Add other properties if needed
-                                    };
-
-                                    result.Add(permission);
-                                }
-                            }
-                            else
-                            {
-                                while (reader.Read())
-                                {
-                                    var permission = new PermissionToDashDto
-                                    {
-                                        UserId = Convert.ToInt32(reader["UserId"]),
-                                        MenuId = Convert.ToInt32(reader["MenuId"]),
-                                        MenuName = reader["MenuName"].ToString(),
-
-                                        NavigateUrl = reader["NavigateUrl"].ToString(),
-                                        // Add other properties if needed
-                                    };
-
-                                    result.Add(permission);
-                                }
-                            }
-
-
-                            return Ok(result);
-                        }
-                    }
+                    return NotFound(new { message = "Give Valid Data." });
                 }
+                object res = await _dashboardGetData_Service.GetPermissionData(UserId, Status1);
+                if (res == null)
+                {
+                    return NotFound(new { message = "No Data Found." });
+                }
+                return Ok(res);
             }
             catch (Exception ex)
             {
-                // Log the exception
-                Console.WriteLine(ex.Message);
-                return StatusCode(500, "Internal Server Error");
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
             }
         }
+
+
     }
 }

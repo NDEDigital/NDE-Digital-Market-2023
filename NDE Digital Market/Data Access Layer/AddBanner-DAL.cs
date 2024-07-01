@@ -1,9 +1,5 @@
-﻿using System;
-using System.Data;
+﻿using System.Data;
 using System.Data.SqlClient;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using NDE_Digital_Market.DTOs;
 using NDE_Digital_Market.Model;
 using NDE_Digital_Market.SharedServices;
 
@@ -11,58 +7,73 @@ namespace NDE_Digital_Market.Data_Access_Layer
 {
 	public class AddBanner_DAL
 	{
-		private readonly IConfiguration _configuration;
-		private readonly SqlConnection _connection;
-		private readonly string _folderName;
-		private readonly string _fileName = "banner";
+		
+        private readonly string foldername;
+        private readonly string filename = "banner";
+        private readonly string _healthCareConnection;
 
-		public AddBanner_DAL(IConfiguration configuration)
+        public AddBanner_DAL(IConfiguration configuration)
 		{
-			_configuration = configuration;
-			var commonServices = new CommonServices(_configuration);
-			_connection = new SqlConnection(commonServices.HealthCareConnection);
-			//_folderName = commonServices.FilesPath;
-
-			_folderName = commonServices.FilesPath + "banner";
+            CommonServices commonServices = new CommonServices(configuration);
+            _healthCareConnection = commonServices.HealthCareConnection;
+            foldername = commonServices.FilesPath + "banner";
 		}
 
-		public async Task<string> AddBanners(BannerDto banner)
+
+        public async Task<object> AddBanners(AdsAndBannerModel banner)
 		{
+            try
+            {
+                string bannerImage = CommonServices.UploadFiles(foldername, filename, banner.BannerImageFile);
 
-
-            string bannerImage = CommonServices.UploadFiles(_folderName, _fileName, banner.BannerImageFile);
-
-            string query = @"INSERT INTO AdBanner (UserId, IsActive, IsAds, AddedDate, AddedBy, UpdatedDate, UpdatedBy, AddedPC, UpdatedPC, CompanyCode, BannerDescription, BannerImage, StartDate, EndDate, IsPayment, PaymentRemarks)
+                string query = @"INSERT INTO AdBanner (UserId, IsActive, IsAds, AddedDate, AddedBy, UpdatedDate, UpdatedBy, AddedPC, UpdatedPC, CompanyCode, BannerDescription, BannerImage, StartDate, EndDate, IsPayment, PaymentRemarks)
 							 VALUES (@UserId, @IsActive, @IsAds, @AddedDate, @AddedBy, @UpdatedDate, @UpdatedBy, @AddedPC, @UpdatedPC, @CompanyCode, @BannerDescription, @BannerImage, @StartDate, @EndDate, @IsPayment, @PaymentRemarks);";
 
-			using (SqlCommand cmd = new SqlCommand(query, _connection))
-			{
-				 cmd.CommandType = CommandType.Text;
-				cmd.Parameters.AddWithValue("@UserId", banner.UserId ?? (object)DBNull.Value);
-				cmd.Parameters.AddWithValue("@IsActive", banner.IsActive ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@IsAds", banner.IsAds ??(object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@AddedDate", DateTime.Now);
-				cmd.Parameters.AddWithValue("@AddedBy", banner.AddedBy ?? (object)DBNull.Value);
-				cmd.Parameters.AddWithValue("@UpdatedDate", banner.UpdatedDate ?? (object)DBNull.Value);
-				cmd.Parameters.AddWithValue("@UpdatedBy", banner.UpdatedBy ?? (object)DBNull.Value);
-				cmd.Parameters.AddWithValue("@AddedPC", banner.AddedPC ?? (object)DBNull.Value);
-				cmd.Parameters.AddWithValue("@UpdatedPC", banner.UpdatedPC ?? (object)DBNull.Value);
-				cmd.Parameters.AddWithValue("@CompanyCode", banner.CompanyCode ?? (object)DBNull.Value);
-				cmd.Parameters.AddWithValue("@BannerDescription", banner.BannerDescription ?? (object)DBNull.Value);
-				cmd.Parameters.AddWithValue("@BannerImage", bannerImage ?? (object)DBNull.Value);
+                using (SqlConnection con = new SqlConnection(_healthCareConnection))
+                {
+                    using (SqlCommand cmd = new SqlCommand(query, con))
+                    {
+                        cmd.CommandType = CommandType.Text;
+                        cmd.Parameters.AddWithValue("@UserId", banner.UserId ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@IsActive", banner.IsActive ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@IsAds", banner.IsAds ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@AddedDate", DateTime.Now);
+                        cmd.Parameters.AddWithValue("@AddedBy", banner.AddedBy ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@UpdatedDate", banner.UpdateDate ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@UpdatedBy", banner.UpdatedBy ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@AddedPC", banner.AddedPC ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@UpdatedPC", banner.UpdatedPC ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@CompanyCode", banner.CompanyCode ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@BannerDescription", banner.BannerDescription ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@BannerImage", bannerImage ?? (object)DBNull.Value);
 
-				cmd.Parameters.AddWithValue("@StartDate", banner.StartDate ?? (object)DBNull.Value);
-				cmd.Parameters.AddWithValue("@EndDate", banner.EndDate ?? (object)DBNull.Value);
-				cmd.Parameters.AddWithValue("@IsPayment", banner.IsPayment ?? (object)DBNull.Value);
-				cmd.Parameters.AddWithValue("@PaymentRemarks", banner.PaymentRemarks ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@StartDate", banner.StartDate ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@EndDate", banner.EndDate ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@IsPayment", banner.IsPayment ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@PaymentRemarks", banner.PaymentRemarks ?? (object)DBNull.Value);
 
 
-				await _connection.OpenAsync();
-				await cmd.ExecuteNonQueryAsync();
-				await _connection.CloseAsync();
-			}
+                        await con.OpenAsync();
+                        await cmd.ExecuteNonQueryAsync();
+                        await con.CloseAsync();
+                    }
+                }
+                return (new { message = "Banner Added Successful!" });
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return (new { message = "Banner Added Unsuccessful!" });
+            }
 
-			return "Banner Added successful!";
+
+
+
+
+
+
+
+
 		}
 
         //public async Task<List<BannerDto>> GetBanners()
@@ -116,155 +127,155 @@ namespace NDE_Digital_Market.Data_Access_Layer
 
 
 
-
-
-
-
-
-
-        public async Task<List<ImageBanner>> GetAddBannerForSeller(string CompanyCode)
+        public async Task<DataTable> GetAddBannerForSeller(string CompanyCode)
         {
-            string query = @"    SELECT AB.BannerID, AB.BannerDescription, AB.BannerImage, CR.CompanyName, AB.AddedDate , AB.IsBannerStatus, AB. IsActive, AB. IsAds
+            try
+            {
+                DataTable dataTable = new DataTable();
+                string query = @"SELECT AB.BannerID, AB.BannerDescription, AB.BannerImage, CR.CompanyName, AB.AddedDate , AB.IsBannerStatus, AB. IsActive, AB. IsAds
                                   FROM AdBanner AB
                                   Left join CompanyRegistration CR on CR.CompanyCode = Ab.CompanyCode
                                   where AB.CompanyCode = @CompanyCode;";
-            
-            
 
-            List<ImageBanner> banners = new List<ImageBanner>();
-            SqlCommand command = new SqlCommand(query, _connection);
-            command.CommandType = CommandType.Text;
-            command.Parameters.AddWithValue("@CompanyCode", CompanyCode); 
-            await _connection.OpenAsync();
-            SqlDataReader reader = await command.ExecuteReaderAsync();
 
-            while (await reader.ReadAsync())
-            {
-                ImageBanner banner = new ImageBanner();
-                //banner.UserId = reader.GetInt32(0);
 
-                banner.BannerID = reader.GetInt32(0);
-                banner.BannerDescription = reader["BannerDescription"].ToString();
-                banner.BannerImage = reader["BannerImage"].ToString();
-                banner.CompanyName = reader["CompanyName"].ToString();
-                banner.IsBannerStatus = reader.IsDBNull(reader.GetOrdinal("IsBannerStatus")) ? (bool?)null : reader.GetBoolean(reader.GetOrdinal("IsBannerStatus"));
-                banner.IsAds = reader.IsDBNull(reader.GetOrdinal("IsAds")) ? (bool?)null : reader.GetBoolean(reader.GetOrdinal("IsAds"));
-                banner.IsActive = reader.GetBoolean(reader.GetOrdinal("IsActive"));
 
-                if (!(reader["AddedDate"] is DBNull))
+
+                using(SqlConnection con = new SqlConnection(_healthCareConnection))
                 {
-                    banner.AddedDate = reader.GetDateTime(4);
+                    using (SqlCommand cmd = new SqlCommand(query, con))
+                    {
+                        cmd.CommandType = CommandType.Text;
+                        cmd.Parameters.AddWithValue("@CompanyCode", CompanyCode);
+
+                        using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
+                        {
+                            adapter.Fill(dataTable);
+                        }
+                    }
                 }
 
-                banners.Add(banner);
+
+
+
+
+
+
+                //while (await reader.ReadAsync())
+                //{
+                //    ImageBanner banner = new ImageBanner();
+                //    //banner.UserId = reader.GetInt32(0);
+
+                //    banner.BannerID = reader.GetInt32(0);
+                //    banner.BannerDescription = reader["BannerDescription"].ToString();
+                //    banner.BannerImage = reader["BannerImage"].ToString();
+                //    banner.CompanyName = reader["CompanyName"].ToString();
+                //    banner.IsBannerStatus = reader.IsDBNull(reader.GetOrdinal("IsBannerStatus")) ? (bool?)null : reader.GetBoolean(reader.GetOrdinal("IsBannerStatus"));
+                //    banner.IsAds = reader.IsDBNull(reader.GetOrdinal("IsAds")) ? (bool?)null : reader.GetBoolean(reader.GetOrdinal("IsAds"));
+                //    banner.IsActive = reader.GetBoolean(reader.GetOrdinal("IsActive"));
+
+                //    if (!(reader["AddedDate"] is DBNull))
+                //    {
+                //        banner.AddedDate = reader.GetDateTime(4);
+                //    }
+
+                //    banners.Add(banner);
+                //}
+
+                return dataTable;
             }
-            _connection.Close();
-            return banners;
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return null;
+            }
+
         }
 
-        public async Task<List<ImageBanner>> GetAddBannerForAdmin(bool? status)
+
+
+        public async Task<DataTable> GetAddBannerForAdmin(bool? status)
         {
-            string query = @"GetAddBannerForAdmin";
-            List<ImageBanner> banners = new List<ImageBanner>();
-            SqlCommand command = new SqlCommand(query, _connection);
-            command.Parameters.AddWithValue("@Status", status);
-            command.CommandType = CommandType.StoredProcedure;
-            await _connection.OpenAsync();
-            SqlDataReader reader = await command.ExecuteReaderAsync();
-
-            while (await reader.ReadAsync())
+            try
             {
-                ImageBanner banner = new ImageBanner();
-                //banner.UserId = reader.GetInt32(0);
+                DataTable dataTable = new DataTable();
+                string query = @"GetAddBannerForAdmin";
 
-                banner.BannerID = reader.GetInt32(0);
-                banner.BannerDescription = reader["BannerDescription"].ToString();
-                banner.BannerImage = reader["BannerImage"].ToString();
-                banner.CompanyName = reader["CompanyName"].ToString();
+                using (SqlConnection con = new SqlConnection(_healthCareConnection))
+                {
+                    using (SqlCommand cmd = new SqlCommand(query, con))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.AddWithValue("@Status", status);
 
-
-                //banner.StartDate =Convert.ToDateTime(reader["StartDate"]);
-                //banner.EndDate =Convert.ToDateTime(reader["EndDate"]);
-
-                if (!reader.IsDBNull(reader.GetOrdinal("IsAds")))
-                {
-                    banner.IsAds = reader.GetBoolean(reader.GetOrdinal("IsAds"));
+                        using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
+                        {
+                            adapter.Fill(dataTable);
+                        }
+                    }
                 }
-                else
-                {
-                    // Handle the case when IsAds is DBNull
-                    banner.IsAds = null;
-                }
-
-                if (!reader.IsDBNull(reader.GetOrdinal("AddedDate")))
-                {
-                    banner.AddedDate = Convert.ToDateTime(reader["AddedDate"]);
-                }
-                else
-                {
-                    // Handle the case when StartDate is DBNull
-                    banner.AddedDate = null;
-                }
-                if (!reader.IsDBNull(reader.GetOrdinal("StartDate")))
-                {
-                    banner.StartDate = Convert.ToDateTime(reader["StartDate"]);
-                }
-                else
-                {
-                    // Handle the case when StartDate is DBNull
-                    banner.StartDate = null;
-                }
-                if (!reader.IsDBNull(reader.GetOrdinal("EndDate")))
-                {
-                    banner.EndDate = Convert.ToDateTime(reader["EndDate"]);
-                }
-                else
-                {
-                    // Handle the case when StartDate is DBNull
-                    banner.EndDate = null;
-                }
-
-                banners.Add(banner);
+                return dataTable;
             }
-            _connection.Close();
-            return banners;
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return null;
+            }
+
         }
 
-        public async Task<List<ImageBanner>> GetBannerForShowingInHomePage()
+
+
+
+
+        public async Task<DataTable> GetBannerForShowingInHomePage()
         {
-            string query = @"SELECT *
-                            FROM AdBanner 
-                            WHERE IsBannerStatus = 1 
+
+            try
+            {
+                DataTable dataTable = new DataTable();
+                string query = @"SELECT * FROM AdBanner WHERE IsBannerStatus = 1 
                               AND IsActive = 1 
                               AND IsAds =0
                               AND StartDate <= DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()), 0)
 							  and EndDate >= DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()), 0);";
 
-            List<ImageBanner> banners = new List<ImageBanner>();
-            SqlCommand command = new SqlCommand(query, _connection);
-            command.CommandType = CommandType.Text;
-            await _connection.OpenAsync();
-            SqlDataReader reader = await command.ExecuteReaderAsync();
+                using (SqlConnection con = new SqlConnection(_healthCareConnection))
+                {
+                    using (SqlCommand cmd = new SqlCommand(query, con))
+                    {
+                        cmd.CommandType = CommandType.Text;
 
-            while (await reader.ReadAsync())
-            {
-                ImageBanner banner = new ImageBanner();
-                //banner.UserId = reader.GetInt32(0);
-
-                banner.BannerImage = reader["BannerImage"].ToString();
-
-                banners.Add(banner);
+                        using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
+                        {
+                            adapter.Fill(dataTable);
+                        }
+                    }
+                }
+                return dataTable;
             }
-            _connection.Close();
-            return banners;
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return null;
+            }
+
+
+
+
+
         }
 
 
 
 
-        public async Task<List<ImageBanner>> GetAddForShowingInHomePage()
+        public async Task<DataTable> GetAddForShowingInHomePage()
         {
-            string query = @"SELECT *
+
+            try
+            {
+                DataTable dataTable = new DataTable();
+                string query = @"SELECT *
                             FROM AdBanner 
                             WHERE IsBannerStatus = 1 
                               AND IsActive = 1 
@@ -272,23 +283,25 @@ namespace NDE_Digital_Market.Data_Access_Layer
                               AND StartDate <= DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()), 0)
 							  and EndDate >= DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()), 0);";
 
-            List<ImageBanner> banners = new List<ImageBanner>();
-            SqlCommand command = new SqlCommand(query, _connection);
-            command.CommandType = CommandType.Text;
-            await _connection.OpenAsync();
-            SqlDataReader reader = await command.ExecuteReaderAsync();
+                using (SqlConnection con = new SqlConnection(_healthCareConnection))
+                {
+                    using (SqlCommand cmd = new SqlCommand(query, con))
+                    {
+                        cmd.CommandType = CommandType.Text;
 
-            while (await reader.ReadAsync())
-            {
-                ImageBanner banner = new ImageBanner();
-                //banner.UserId = reader.GetInt32(0);
-
-                banner.BannerImage = reader["BannerImage"].ToString();
-
-                banners.Add(banner);
+                        using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
+                        {
+                            adapter.Fill(dataTable);
+                        }
+                    }
+                }
+                return dataTable;
             }
-            _connection.Close();
-            return banners;
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return null;
+            }
         }
 
 
@@ -337,42 +350,37 @@ namespace NDE_Digital_Market.Data_Access_Layer
 
 
 
-        public async Task<bool> DeleteBanner(int bannerId)
+        public async Task<object> DeleteBanner(int bannerId)
         {
             try
             {
                 // Create the SQL command to delete the banner with the specified bannerId
                 string query = "DELETE FROM AdBanner WHERE BannerId = @BannerID";
 
-                // Open the connection
-                await _connection.OpenAsync();
 
-                // Create the SQL command object
-                using (SqlCommand cmd = new SqlCommand(query, _connection))
+                using(SqlConnection con = new SqlConnection(_healthCareConnection))
                 {
-                    // Add parameters to the command
-                    cmd.Parameters.AddWithValue("@BannerID", bannerId);
+                    // Create the SQL command object
+                    using (SqlCommand cmd = new SqlCommand(query, con))
+                    {
+                        // Add parameters to the command
+                        cmd.Parameters.AddWithValue("@BannerID", bannerId);
 
-                    // Execute the command
-                    int rowsAffected = await cmd.ExecuteNonQueryAsync();
+                        // Execute the command
+                        int rowsAffected = await cmd.ExecuteNonQueryAsync();
 
-                    // If rowsAffected is greater than 0, deletion was successful
-                    return rowsAffected > 0;
+                        // If rowsAffected is greater than 0, deletion was successful
+                        return rowsAffected > 0;
+                    }
                 }
+                return (new { message = "Banner Deleted Successful!" });
+
             }
             catch (Exception ex)
             {
                 // Log any exceptions
                 Console.WriteLine($"Error deleting banner: {ex.Message}");
-                return false;
-            }
-            finally
-            {
-                // Close the connection
-                if (_connection.State == ConnectionState.Open)
-                {
-                    _connection.Close();
-                }
+                return (new { message = "Banner Deleted Unsuccessful!" });
             }
         }
 
@@ -552,58 +560,169 @@ namespace NDE_Digital_Market.Data_Access_Layer
 
 
 
-        public async Task<string> UpdateBanner(BannerDto banner)
+        public async Task<object> UpdateBanner(AdsAndBannerModel banner)
         {
-            // Check if a new banner image file is provided
-            string bannerImage = banner.BannerImageFile != null ?
-                CommonServices.UploadFiles(_folderName, _fileName, banner.BannerImageFile) :
-                null;
-
-            // Check if a new banner description is provided
-            string bannerDescription = !string.IsNullOrEmpty(banner.BannerDescription) ?
-                banner.BannerDescription : null;
-
-            string query = @"UPDATE AdBanner 
-         SET UserId = COALESCE(@UserId, UserId),
-             IsActive = COALESCE(@IsActive, IsActive),
-             IsAds = COALESCE(@IsAds, IsAds),
-             UpdatedDate = @UpdatedDate,
-             UpdatedBy = COALESCE(@UpdatedBy, UpdatedBy),
-             UpdatedPC = COALESCE(@UpdatedPC, UpdatedPC),
-             CompanyCode = COALESCE(@CompanyCode, CompanyCode),
-             BannerDescription = COALESCE(@BannerDescription, BannerDescription),
-             BannerImage = COALESCE(@BannerImage, BannerImage),
-             StartDate = COALESCE(@StartDate, StartDate),
-             EndDate = COALESCE(@EndDate, EndDate),
-             IsPayment = COALESCE(@IsPayment, IsPayment),
-             PaymentRemarks = COALESCE(@PaymentRemarks, PaymentRemarks)
-         WHERE BannerID = @BannerID;";
-
-            using (SqlCommand cmd = new SqlCommand(query, _connection))
+            try
             {
-                cmd.CommandType = CommandType.Text;
-                cmd.Parameters.AddWithValue("@BannerID", banner.BannerID);
-                cmd.Parameters.AddWithValue("@UserId", banner.UserId ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@IsActive", banner.IsActive ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@IsAds", banner.IsAds ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@UpdatedDate", DateTime.Now);
-                cmd.Parameters.AddWithValue("@UpdatedBy", banner.UpdatedBy ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@UpdatedPC", banner.UpdatedPC ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@CompanyCode", banner.CompanyCode ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@BannerDescription", bannerDescription ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@BannerImage", bannerImage ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@StartDate", banner.StartDate ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@EndDate", banner.EndDate ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@IsPayment", banner.IsPayment ?? (object)DBNull.Value);
-                cmd.Parameters.AddWithValue("@PaymentRemarks", banner.PaymentRemarks ?? (object)DBNull.Value);
+                // Check if a new banner image file is provided
+                string bannerImage = banner.BannerImageFile != null ? CommonServices.UploadFiles(foldername, filename, banner.BannerImageFile) : null;
 
-                await _connection.OpenAsync();
-                await cmd.ExecuteNonQueryAsync();
-                await _connection.CloseAsync();
+                // Check if a new banner description is provided
+                string bannerDescription = !string.IsNullOrEmpty(banner.BannerDescription) ? banner.BannerDescription : null;
+
+                string query = @"UPDATE AdBanner 
+                             SET UserId = COALESCE(@UserId, UserId),
+                                 IsActive = COALESCE(@IsActive, IsActive),
+                                 IsBannerStatus = COALESCE(@IsBannerStatus, IsBannerStatus),
+                                 IsAds = COALESCE(@IsAds, IsAds),
+                                 UpdatedDate = @UpdatedDate,
+                                 UpdatedBy = COALESCE(@UpdatedBy, UpdatedBy),
+                                 UpdatedPC = COALESCE(@UpdatedPC, UpdatedPC),
+                                 CompanyCode = COALESCE(@CompanyCode, CompanyCode),
+                                 BannerDescription = COALESCE(@BannerDescription, BannerDescription),
+                                 BannerImage = COALESCE(@BannerImage, BannerImage),
+                                 StartDate = COALESCE(@StartDate, StartDate),
+                                 EndDate = COALESCE(@EndDate, EndDate),
+                                 IsPayment = COALESCE(@IsPayment, IsPayment),
+                                 PaymentRemarks = COALESCE(@PaymentRemarks, PaymentRemarks)
+                             WHERE BannerID = @BannerID;";
+
+                using (SqlConnection con = new SqlConnection(_healthCareConnection))
+                {
+                    using (SqlCommand cmd = new SqlCommand(query, con))
+                    {
+                        cmd.CommandType = CommandType.Text;
+                        cmd.Parameters.AddWithValue("@BannerID", banner.BannerID);
+                        cmd.Parameters.AddWithValue("@UserId", banner.UserId ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@IsActive", banner.IsActive ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@IsAds", banner.IsAds ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@UpdatedDate", DateTime.Now);
+                        cmd.Parameters.AddWithValue("@UpdatedBy", banner.UpdatedBy ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@UpdatedPC", banner.UpdatedPC ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@CompanyCode", banner.CompanyCode ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@BannerDescription", bannerDescription ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@BannerImage", bannerImage ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@StartDate", banner.StartDate ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@EndDate", banner.EndDate ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@IsPayment", banner.IsPayment ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@PaymentRemarks", banner.PaymentRemarks ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@IsBannerStatus", banner.IsBannerStatus ?? (object)DBNull.Value);
+
+                        await con.OpenAsync();
+                        await cmd.ExecuteNonQueryAsync();
+                        await con.CloseAsync();
+                    }
+                }
+
+
+                return (new { message = "Banner Updated Successful!" });
+            }
+            catch(Exception ex)
+            {
+                // Log any exceptions
+                Console.WriteLine($"Error deleting banner: {ex.Message}");
+                return (new { message = "Banner Updated Unsuccessful!" });
             }
 
-            return "Banner Updated successfully!";
         }
+
+
+
+
+
+        public async Task<object> UpdateBannerStatus(AdsAndBannerModel banner)
+        {
+
+            SqlConnection connection = new SqlConnection(_healthCareConnection);
+
+            try
+            {
+
+
+                await connection.OpenAsync();
+
+
+                if (banner.IsActive == true)
+                {
+                    string checkquery = @"SELECT  Count(BannerID) as count FROM [NDE_Digital_Development].[dbo].[AdBanner]
+                                    where IsAds = 1 and IsActive = 1 and IsBannerStatus = 1 and EndDate >= DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()), 0) and StartDate <= DATEADD(DAY, DATEDIFF(DAY, 0, GETDATE()), 0);";
+
+                    SqlCommand checkcmd = new SqlCommand(checkquery, connection);
+                    using (SqlDataReader reader = await checkcmd.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            int res = Convert.ToInt32(reader["count"]);
+                            if (res == 6)
+                            {
+                                return (new
+                                {
+                                    Message = "Ads Can't be Approved. Max Size Reached."
+                                });
+                            }
+                        }
+                    }
+
+                }
+                string query = @"UPDATE AdBanner 
+                     SET IsActive = @IsActive,
+                         UpdatedDate = @UpdatedDate,
+                         UpdatedBy = @UpdatedBy,
+                         UpdatedPC = @UpdatedPC,
+                         StartDate = @StartDate,
+                         EndDate = @EndDate,
+                         IsBannerStatus = @IsBannerStatus
+                     WHERE BannerID = @BannerID;";
+
+
+                using (SqlCommand cmd = new SqlCommand(query, connection))
+                {
+                    cmd.Parameters.AddWithValue("@BannerID", banner.BannerID);
+                    cmd.Parameters.AddWithValue("@IsActive", banner.IsActive ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@UpdatedDate", DateTime.Now);
+                    cmd.Parameters.AddWithValue("@UpdatedBy", banner.UpdatedBy ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@UpdatedPC", banner.UpdatedPC ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@StartDate", banner.StartDate ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@EndDate", banner.EndDate ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@IsBannerStatus", banner.IsBannerStatus ?? (object)DBNull.Value);
+
+                    var result = await cmd.ExecuteNonQueryAsync();
+                    if (result > 0)
+                    {
+                        return (new
+                        {
+                            Message = "Banner updated successfully."
+                        });
+                    }
+                    else
+                    {
+                        return (new
+                        {
+                            Message = "Failed to update banner."
+                        });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return (new
+                {
+                    Message = "Failed to update banner/Ads."
+                });
+            }
+            finally
+            {
+                connection.CloseAsync();
+            }
+
+
+        }
+
+
+
+
+
 
 
 

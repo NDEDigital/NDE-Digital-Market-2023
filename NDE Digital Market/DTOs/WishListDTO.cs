@@ -20,5 +20,5 @@
         public int? AvailableQty { get; set; }
         public int? UserId { get; set; } 
         public string? GroupCode { get; set; } 
-            }
+    }
 }

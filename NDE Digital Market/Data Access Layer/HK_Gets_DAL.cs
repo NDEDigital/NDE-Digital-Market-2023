@@ -7,83 +7,98 @@ namespace NDE_Digital_Market.Data_Access_Layer;
 
 public class HK_Gets_DAL
 {
-    private readonly IConfiguration _configuration;
-    private readonly SqlConnection con;
+
+    private readonly string _healthCareConnection;
     public HK_Gets_DAL(IConfiguration configuration)
     {
         CommonServices commonServices = new CommonServices(configuration);
-        _configuration = configuration;
-        con = new SqlConnection(commonServices.HealthCareConnection);
+        _healthCareConnection = commonServices.HealthCareConnection;
     }
-    public async Task<List<PaymentMethodModel>> PaymentMethodGetAsync()
+    public async Task<DataTable> PaymentMethodGetAsync()
     {
-        List<PaymentMethodModel> paymentMethods = new List<PaymentMethodModel>();
 
         try
         {
-            SqlCommand command = new SqlCommand("select PMMasterID as PMID, PMName from HK_PaymentMethodMaster;", con);
+            DataTable dataTable = new DataTable();
+            string query = @"select PMMasterID as PMID, PMName from HK_PaymentMethodMaster;";
 
-            await con.OpenAsync();
-            SqlDataReader reader = await command.ExecuteReaderAsync();
-
-            while (await reader.ReadAsync())
+            using (SqlConnection con = new SqlConnection(_healthCareConnection))
             {
-                PaymentMethodModel paymentMethod = new PaymentMethodModel();
-                paymentMethod.PMID = Convert.ToInt32(reader["PMID"]);
-                paymentMethod.PMName = reader["PMName"].ToString();
-                paymentMethods.Add(paymentMethod);
+                await con.OpenAsync();
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
+                    {
+                        adapter.Fill(dataTable);
+                    }
+                }
+                await con.CloseAsync();
             }
+            return dataTable;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"An error occurred: {ex.Message}");
-            throw;
+            return null;
         }
-        finally
-        {
-            if (con.State == ConnectionState.Open)
-            {
-                await con.CloseAsync();
-            }
-        }
-
-        return paymentMethods;
     }
 
 
-    public async Task<List<PaymentMethodModel>> BankNameGetAsync(int preferredPM)
+    public async Task<DataTable> BankNameGetAsync(int preferredPM)
     {
-        List<PaymentMethodModel> paymentMethods = new List<PaymentMethodModel>();
-
         try
         {
-            SqlCommand command = new SqlCommand("select PMDetailsID as PMID, PMBankName as PMName from HK_PaymentMethodDetails where PMMasterID = @preferredPM;", con);
-            command.Parameters.AddWithValue("@preferredPM", preferredPM);
+            DataTable dataTable = new DataTable();
+            string query = @"select PMDetailsID as PMID, PMBankName as PMName from HK_PaymentMethodDetails where PMMasterID = @preferredPM;";
 
-            await con.OpenAsync();
-            SqlDataReader reader = await command.ExecuteReaderAsync();
-
-            while (await reader.ReadAsync())
+            using (SqlConnection con = new SqlConnection(_healthCareConnection))
             {
-                PaymentMethodModel paymentMethod = new PaymentMethodModel();
-                paymentMethod.PMID = Convert.ToInt32(reader["PMID"]);
-                paymentMethod.PMName = reader["PMName"].ToString();
-                paymentMethods.Add(paymentMethod);
+                await con.OpenAsync();
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.AddWithValue("@preferredPM", preferredPM);
+                    using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
+                    {
+                        adapter.Fill(dataTable);
+                    }
+                }
+                await con.CloseAsync();
             }
+            return dataTable;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"An error occurred: {ex.Message}");
-            throw;
+            return null;
         }
-        finally
+    }
+
+
+
+    public async Task<DataTable> GetReturnListAsync()
+    {
+
+        try
         {
-            if (con.State == ConnectionState.Open)
+            DataTable dataTable = new DataTable();
+            string query = @"select ReturnTypeId, ReturnTypeName from HK_ReturnType;";
+
+            using (SqlConnection con = new SqlConnection(_healthCareConnection))
             {
+                await con.OpenAsync();
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
+                    {
+                        adapter.Fill(dataTable);
+                    }
+                }
                 await con.CloseAsync();
             }
+            return dataTable;
         }
-        return paymentMethods;
+        catch (Exception ex)
+        {
+            return null;
+        }
     }
 
 }

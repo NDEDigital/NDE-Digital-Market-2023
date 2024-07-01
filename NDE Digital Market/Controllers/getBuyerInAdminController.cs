@@ -1,9 +1,6 @@
-﻿
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using NDE_Digital_Market.DTOs;
-using NDE_Digital_Market.SharedServices;
-using System.Data.SqlClient;
+using NDE_Digital_Market.Services.GetBuyerInAdminService;
 
 namespace NDE_Digital_Market.Controllers
 {
@@ -11,83 +8,35 @@ namespace NDE_Digital_Market.Controllers
     [Authorize]
     public class getBuyerInAdminController : ControllerBase
     {
-        private readonly string _healthCareConnection;
+        private readonly IGetBuyerInAdmin_Service _getBuyerInAdmin_Service;
 
-        public getBuyerInAdminController(IConfiguration config)
+        public getBuyerInAdminController(IGetBuyerInAdmin_Service getBuyerInAdmin_Service)
         {
-            CommonServices commonServices = new CommonServices(config);
-            _healthCareConnection = commonServices.HealthCareConnection;
+            _getBuyerInAdmin_Service = getBuyerInAdmin_Service;
         }
 
+
         [HttpGet]
-   
         [Route("getBuyerInAdmin/{IsBuyer}")]
         [Authorize(Roles = "seller,admin")]
-        public List<sellerStatus> CompanySellerDetails( bool IsBuyer, bool IsActive)
+        public async Task<IActionResult> CompanySellerDetails( bool IsBuyer, bool IsActive)
         {
-            List<sellerStatus> bidList = new List<sellerStatus>();
-
             try
             {
-                using (SqlConnection con = new SqlConnection(_healthCareConnection))
+                if (IsBuyer == null || IsActive == null)
                 {
-                    con.Open();
-
-                    using (SqlCommand cmd = new SqlCommand(@"SELECT
-                                                UR.UserId,
-                                                UR.FullName,
-                                                UR.PhoneNumber,
-                                                UR.Email,
-                                                UR.Address,
-                                                UR.AddedDate,
-                                                UR.IsActive,
-                                                UR.CompanyCode,
-	                                            UR.IsBuyer
-                                            FROM
-                                                UserRegistration UR
-                                            WHERE
-   
-                                                (UR.IsBuyer = 1 AND UR.IsActive = @IsActive); 
-                                                                    ", con))
-                    {
-                       
-                        cmd.Parameters.AddWithValue("@IsActive", IsActive);
-
-                        cmd.Parameters.AddWithValue("@IsBuyer", IsBuyer);
-
-
-                        using (SqlDataReader reader = cmd.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                sellerStatus bid = new sellerStatus();
-                                bid.UserId = Convert.ToInt32(reader["UserId"]);
-                                //UserId = reader.GetInt32(userId),
-                                bid.FullName = reader["FullName"].ToString();
-                                bid.PhoneNumber = reader["PhoneNumber"].ToString();
-                                bid.Email = reader["Email"].ToString();
-                                bid.Address = reader["Address"].ToString();
-                                bid.AddedDate = (DateTime)(reader["AddedDate"] as DateTime?);
-                                bid.IsActive = reader["IsActive"] as bool? ?? IsActive;
-                                bid.IsBuyer = reader["IsBuyer"] as bool? ?? IsBuyer;
-                             
-
-
-                                bidList.Add(bid);
-                            }
-                        }
-                    }
-
-                    con.Close();
+                    return NotFound(new { message = "Give Valid Data." });
                 }
-
-                return bidList;
+                object res = await _getBuyerInAdmin_Service.CompanySellerDetails(IsBuyer, IsActive);
+                if (res == null)
+                {
+                    return NotFound(new { message = "No Data Found." });
+                }
+                return Ok(res);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error: {ex.Message}");
-                // You might want to handle errors more gracefully
-                return null;
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
             }
         }
        

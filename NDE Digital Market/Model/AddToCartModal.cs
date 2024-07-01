@@ -6,7 +6,7 @@
         public int BuyerUserID { get; set; }
         public string CompanyCode { get; set; }
         public int ProductID { get; set; }
-        public string ProductGroupID { get; set; }
+        public int ProductGroupID { get; set; }
         public int UnitID { get; set; }
         public int ProductCartQuantity { get; set; }
         public DateTime? AddedDate { get; set; }

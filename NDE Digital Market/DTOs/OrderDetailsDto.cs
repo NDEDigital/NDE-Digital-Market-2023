@@ -16,7 +16,6 @@
         public DateTime? DeliveryDate { get; set; }
         public decimal? DiscountPct { get; set; }
         public decimal? NetPrice { get; set; }
-        //public DateTime? AddedDate { get; set; }
         public string? AddedBy { get; set; }
         public string? AddedPC { get; set; }
     }

@@ -15,15 +15,10 @@ namespace NDE_Digital_Market.Controllers
     public class HK_GetsController : ControllerBase
     {
 
-        private readonly IConfiguration _configuration;
-        private readonly SqlConnection con;
         private readonly IHK_Gets _HKGets;
-        public HK_GetsController(IConfiguration configuration, IHK_Gets hK_Gets)
+        public HK_GetsController(IHK_Gets hK_Gets)
         {
-            CommonServices commonServices = new CommonServices(configuration);
             this._HKGets = hK_Gets;
-            _configuration = configuration;
-            con = new SqlConnection(commonServices.HealthCareConnection);
         }
 
         [HttpGet("PreferredPaymentMethods")]
@@ -31,87 +26,83 @@ namespace NDE_Digital_Market.Controllers
         {
             try
             {
-                List<PaymentMethodModel> res = await _HKGets.PaymentMethodGetAsync();
-                if (res.Count > 0)
+                object res = await _HKGets.PaymentMethodGetAsync();
+                if (res == null)
                 {
-                    return Ok(res);
+                    return NotFound(new { message = "No Data Found." });
                 }
-                else
-                {
-                    return BadRequest("No Payment method found.");
-                }
+                return Ok(res);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                return StatusCode(500, "Internal Server Error");
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
             }
         }
 
 
         [HttpGet("PreferredBankNames")]
-        public async Task<IActionResult> BankNameGetAsync(int preferredPM)
+        public async Task<IActionResult> BankNameGetAsync(string preferredPM)
         {
             try
             {
-                List<PaymentMethodModel> res = await _HKGets.BankNameGetAsync(preferredPM);
-                if (res.Count > 0)
+                if (preferredPM == null)
                 {
-                    return Ok(res);
+                    return NotFound(new { message = "Give Valid Data." });
                 }
-                else
+                object res = await _HKGets.BankNameGetAsync(preferredPM);
+                if (res == null)
                 {
-                    return BadRequest(new { message = "No Payment method found." });
+                    return NotFound(new { message = "No Data Found." });
                 }
+                return Ok(res);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                return StatusCode(500, new { message = "Internal Server Error" });
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
             }
         }
 
 
-        [HttpGet]
-        [Route("GetUnitList")]
-        public async Task<List<UnitModel>> GetUnitListAsync()
-        {
-            List<UnitModel> lst = new List<UnitModel>();
+        //[HttpGet]
+        //[Route("GetUnitList")]
+        //public async Task<List<UnitModel>> GetUnitListAsync()
+        //{
+        //    List<UnitModel> lst = new List<UnitModel>();
 
-            try
-            {
-                await con.OpenAsync();
-                string query = "select UnitId, Name from Units;";
+        //    try
+        //    {
+        //        await con.OpenAsync();
+        //        string query = "select UnitId, Name from Units;";
 
-                using (SqlCommand cmd = new SqlCommand(query, con))
-                {
-                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
-                    {
-                        while (await reader.ReadAsync())
-                        {
-                            UnitModel modelObj = new UnitModel();
-                            modelObj.UnitId = Convert.ToInt32(reader["UnitId"]);
-                            modelObj.Name = reader["Name"].ToString();
+        //        using (SqlCommand cmd = new SqlCommand(query, con))
+        //        {
+        //            using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+        //            {
+        //                while (await reader.ReadAsync())
+        //                {
+        //                    UnitModel modelObj = new UnitModel();
+        //                    modelObj.UnitId = Convert.ToInt32(reader["UnitId"]);
+        //                    modelObj.Name = reader["Name"].ToString();
 
-                            lst.Add(modelObj);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                throw;
-            }
-            finally
-            {
-                if (con.State == ConnectionState.Open)
-                {
-                    await con.CloseAsync();
-                }
-            }
-            return lst;
-        }
+        //                    lst.Add(modelObj);
+        //                }
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine($"An error occurred: {ex.Message}");
+        //        throw;
+        //    }
+        //    finally
+        //    {
+        //        if (con.State == ConnectionState.Open)
+        //        {
+        //            await con.CloseAsync();
+        //        }
+        //    }
+        //    return lst;
+        //}
 
 
         [HttpGet("GetReturnList")]
@@ -119,38 +110,16 @@ namespace NDE_Digital_Market.Controllers
         {
             try
             {
-                List<ReturnTypeModel> lst = new List<ReturnTypeModel>();
-                await con.OpenAsync();
-                string query = "select ReturnTypeId, ReturnTypeName from HK_ReturnType;";
-
-                using (SqlCommand cmd = new SqlCommand(query, con))
+                object res = await _HKGets.GetReturnListAsync();
+                if (res == null)
                 {
-                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
-                    {
-                        while (await reader.ReadAsync())
-                        {
-                            ReturnTypeModel modelObj = new ReturnTypeModel();
-                            modelObj.ReturnTypeId = Convert.ToInt32(reader["ReturnTypeId"]);
-                            modelObj.ReturnTypeName = reader["ReturnTypeName"].ToString();
-
-                            lst.Add(modelObj);
-                        }
-                    }
+                    return NotFound(new { message = "No Data Found." });
                 }
-
-                return Ok(lst);
+                return Ok(res);
             }
-
             catch (Exception ex)
             {
-                return BadRequest(new { message = "An error occurred while fetching ReturnTypes." });
-            }
-            finally
-            {
-                if (con.State == ConnectionState.Open)
-                {
-                    con.Close();
-                }
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
             }
         }
 
