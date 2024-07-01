@@ -25,11 +25,19 @@ namespace NDE_Digital_Market.Controllers
         [HttpPost("CreateProductGroups")]
         public async Task<IActionResult> CreateProductGroupsAsync([FromForm] InsertProductGroupDTO productGroupsDto)
         {
-            if (productGroupsDto == null)
+            try
             {
-                return BadRequest(new { message = "Give Proper Product Data." });
+                if (productGroupsDto == null)
+                {
+                    return BadRequest(new { message = "Give Proper Product Data." });
+                }
+                return Ok(await _productGroup_Service.CreateProductGroupsAsync(productGroupsDto));
             }
-            return Ok(await _productGroup_Service.CreateProductGroupsAsync(productGroupsDto));
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
+            }
+
 
         }
 
@@ -38,28 +46,42 @@ namespace NDE_Digital_Market.Controllers
         [HttpPut("UpdateProductGroups")]
         public async Task<IActionResult> UpdateProductGroupsAsync([FromForm] UpdateProductGroupDTO productGroupsDto)
         {
-            if (productGroupsDto == null || productGroupsDto.ProductGroupID == null)
+            try
             {
-                return BadRequest(new { message = "Invalid Product data." });
+                if (productGroupsDto == null || productGroupsDto.ProductGroupID == null)
+                {
+                    return BadRequest(new { message = "Invalid Product data." });
+                }
+                return Ok(await _productGroup_Service.UpdateProductGroupsAsync(productGroupsDto));
             }
-            return Ok(await _productGroup_Service.UpdateProductGroupsAsync(productGroupsDto));
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
+            }
+
         }
 
         /// =====================================================================
-
-
 
         [HttpGet]
         [Authorize(Roles = "admin")]
         [Route("GetProductGroupsList")]
         public async Task<IActionResult> GetProductGroupsListAsync()
         {
-            object res = await _productGroup_Service.GetProductGroupsListAsync();
-            if (res == null)
+            try
             {
-                return NotFound(new { message = "Products not Found." });
+                object res = await _productGroup_Service.GetProductGroupsListAsync();
+                if (res == null)
+                {
+                    return NotFound(new { message = "Products not Found." });
+                }
+                return Ok(res);
             }
-            return Ok(res);
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
+            }
+
         }
 
 
@@ -70,12 +92,20 @@ namespace NDE_Digital_Market.Controllers
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> GetProductGroupsListByStatus(Int32? status = null)
         {
-            object res = await _productGroup_Service.GetProductGroupsListByStatus(status);
-            if (res == null)
+            try
             {
-                return NotFound(new { message = "Products not Found." });
+                object res = await _productGroup_Service.GetProductGroupsListByStatus(status);
+                if (res == null)
+                {
+                    return NotFound(new { message = "Products not Found." });
+                }
+                return Ok(res);
             }
-            return Ok(res);
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
+            }
+
         }
 
 
