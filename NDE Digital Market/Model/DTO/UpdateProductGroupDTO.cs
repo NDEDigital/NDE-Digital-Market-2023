@@ -2,7 +2,7 @@
 {
     public class UpdateProductGroupDTO
     {
-        public int? ProductGroupID { get; set; }
+        public string? ProductGroupID { get; set; }
         public string? ProductGroupName { get; set; }
         public string? ProductGroupPrefix { get; set; }
         public string? ProductGroupDetails { get; set; }
