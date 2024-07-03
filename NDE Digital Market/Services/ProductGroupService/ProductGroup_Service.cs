@@ -37,12 +37,13 @@ namespace NDE_Digital_Market.Services.ProductGroupService
         {
             ProductGroupModel Model = new ProductGroupModel();
 
+            Model.ProductGroupID = int.Parse(CommonServices.DecryptPassword(productGroupsDto.ProductGroupID));
             Model.ProductGroupName = productGroupsDto.ProductGroupName;
             Model.ProductGroupPrefix = productGroupsDto.ProductGroupPrefix;
             Model.ProductGroupDetails = productGroupsDto.ProductGroupDetails;
             Model.ImageFile = productGroupsDto.ImageFile;
             Model.ExistingImageFileName = productGroupsDto.ExistingImageFileName;
-            Model.UpdatedBy = productGroupsDto.UpdatedBy;
+            Model.UpdatedBy = CommonServices.DecryptPassword(productGroupsDto.UpdatedBy);
             Model.UpdatedPC = productGroupsDto.UpdatedPC;
 
             return await _productGroup_DAL.UpdateProductGroupsAsync(Model);
