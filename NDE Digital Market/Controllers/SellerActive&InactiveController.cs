@@ -41,11 +41,19 @@ namespace NDE_Digital_Market.Controllers
         [Route("updateSellerActive&Inactive")]
         public async Task<IActionResult> UpdateSellerProductStatusAsync(string userIds,bool isActive)
         {
-            if (string.IsNullOrEmpty(userIds))
+            try
             {
-                return BadRequest(new { message = "No unit IDs provided." });
+                if (string.IsNullOrEmpty(userIds))
+                {
+                    return BadRequest(new { message = "No unit IDs provided." });
+                }
+                return Ok(await _sellerActiveAndInactive_Service.UpdateSellerProductStatusAsync(userIds, isActive));
             }
-            return Ok(await _sellerActiveAndInactive_Service.UpdateSellerProductStatusAsync(userIds, isActive));
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
+            }
+
 
         }
 

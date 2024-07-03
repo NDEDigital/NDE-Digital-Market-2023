@@ -17,7 +17,7 @@ namespace NDE_Digital_Market.Controllers
 
         [HttpPost]
         [Authorize(Roles = "seller")]
-        [Route("GiveAcessDashboard/{UserId}/{MenuId}")]
+        [Route("GiveAcessDashboard")]
         public async Task<IActionResult> InsertPermissionToDashboard(string UserId, string MenuId)
         {
             try
@@ -38,7 +38,7 @@ namespace NDE_Digital_Market.Controllers
 
         [HttpGet]
         [Authorize(Roles = "seller")]
-        [Route("GetPermissionData/{UserId}")]
+        [Route("GetPermissionData")]
         public async Task<IActionResult> GetPermissionData(string UserId)
         {
             try

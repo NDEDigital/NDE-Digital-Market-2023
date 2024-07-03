@@ -20,7 +20,7 @@ namespace NDE_Digital_Market.Controllers
         }
 
         [HttpGet]
-        [Route("CompanySellerDetails/{userId}/{IsActive}")] //gets company seller list without companyAdmin
+        [Route("CompanySellerDetails")] //gets company seller list without companyAdmin
         public async Task<IActionResult> CompanySellerDetails(string userId,bool IsActive)
         {
             try

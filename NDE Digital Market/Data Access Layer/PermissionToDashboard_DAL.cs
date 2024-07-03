@@ -66,7 +66,9 @@ namespace NDE_Digital_Market.Data_Access_Layer
                                       FROM Permission P 
                                       left JOIN MenuList M ON P.MenuId = M.MenuId
                                       left JOIN UserRegistration U ON P.UserId = U.UserId
-                                      WHERE p.UserId = @UserId and M.IsAdmin = 0 AND M.IsActive=1 AND U.CompanyCode=(select CompanyCode from UserRegistration WHERE UserId= @UserId);";
+                                      WHERE 
+                                      --p.UserId = 26 and 
+                                      M.IsAdmin = 0 AND M.IsActive=1 AND U.CompanyCode=(select CompanyCode from UserRegistration WHERE UserId= @UserId);";
 
                     await con.OpenAsync();
 

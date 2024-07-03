@@ -135,7 +135,7 @@ namespace NDE_Digital_Market.Data_Access_Layer
                 string query = @"SELECT AB.BannerID, AB.BannerDescription, AB.BannerImage, CR.CompanyName, AB.AddedDate , AB.IsBannerStatus, AB. IsActive, AB. IsAds
                                   FROM AdBanner AB
                                   Left join CompanyRegistration CR on CR.CompanyCode = Ab.CompanyCode
-                                  where AB.CompanyCode = @CompanyCode;";
+                                  where AB.CompanyCode = @CompanyCode order by BannerID desc;";
 
 
 

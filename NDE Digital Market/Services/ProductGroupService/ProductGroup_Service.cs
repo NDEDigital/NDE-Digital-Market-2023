@@ -116,14 +116,18 @@ namespace NDE_Digital_Market.Services.ProductGroupService
         public async Task<object> MakeGroupActiveOrInactiveAsync(string groupIds, bool? IsActive)
         {
             List<string> decryptedIds = groupIds.Split(',').ToList();
-            string decryptgroupIds = string.Empty;
+            List<string> decryptgroupIdsList = new List<string>();
+
             for (int i = 0; i < decryptedIds.Count; i++)
             {
-                decryptgroupIds = string.Join(",", CommonServices.DecryptPassword(decryptedIds[i]));
+                decryptgroupIdsList.Add(CommonServices.DecryptPassword(decryptedIds[i]));
             }
+
+            string decryptgroupIds = string.Join(",", decryptgroupIdsList);
 
             return await _productGroup_DAL.MakeGroupActiveOrInactiveAsync(decryptgroupIds, IsActive);
         }
+
 
     }
 }
