@@ -17,7 +17,7 @@ public class UserControllOfDashboardController : ControllerBase
 
 
 
-    [HttpDelete("deleteMenuItems/{UserId}")]
+    [HttpDelete("deleteMenuItems")]
     [Authorize (Roles ="seller")]
     public async Task<IActionResult> DeleteMenuItems(string UserId, [FromBody] List<string> menuIdsToDelete)
     {

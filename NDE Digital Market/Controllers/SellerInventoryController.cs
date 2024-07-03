@@ -17,19 +17,27 @@ namespace NDE_Digital_Market.Controllers
 
         [HttpGet]
 
-        [Route("GetSellerInventoryDataBySellerId/{UserId}")]
+        [Route("GetSellerInventoryDataBySellerId")]
         public async Task<IActionResult> GetSellerInventoryDataBySellerId(string UserId)
         {
-            if(UserId == null)
+            try
             {
-                return BadRequest(new { message = "Give Valid Data." });
+                if (UserId == null)
+                {
+                    return BadRequest(new { message = "Give Valid Data." });
+                }
+                object res = await _sellerInventory_Service.GetSellerInventoryDataBySellerId(UserId);
+                if (res == null)
+                {
+                    return NotFound(new { message = "Unit not Found." });
+                }
+                return Ok(res);
             }
-            object res = await _sellerInventory_Service.GetSellerInventoryDataBySellerId(UserId);
-            if (res == null)
+            catch(Exception ex)
             {
-                return NotFound(new { message = "Unit not Found." });
+                return BadRequest(new { message = "Server Error. Try Again!!!" });
             }
-            return Ok(res);
+
         }
 
     }

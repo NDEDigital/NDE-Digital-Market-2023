@@ -16,7 +16,7 @@ namespace NDE_Digital_Market.Controllers
         }
 
         [HttpGet]
-        [Route("SellerPermissionData/{UserId}/{Status1}")]
+        [Route("SellerPermissionData")]
         public async Task<IActionResult> GetPermissionData(string UserId, int Status1)
         {
             try

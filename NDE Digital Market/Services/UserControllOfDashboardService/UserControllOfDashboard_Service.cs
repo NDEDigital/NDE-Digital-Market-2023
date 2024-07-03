@@ -19,10 +19,12 @@ namespace NDE_Digital_Market.Services.UserControllOfDashboardService
 
             for (int i = 0; i < menuIdsToDelete.Count; i++)
             {
-                demenuIdsToDelete[i] = int.Parse(CommonServices.DecryptPassword(menuIdsToDelete[i]));
+                demenuIdsToDelete.Add(int.Parse(CommonServices.DecryptPassword(menuIdsToDelete[i])));
             }
+
             int decryptUserId = int.Parse(CommonServices.DecryptPassword(UserId));
             return await _UserControllOfDashboard_DAL.DeleteMenuItems(decryptUserId, demenuIdsToDelete);
+
         }
     }
 }
