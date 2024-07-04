@@ -255,7 +255,7 @@ namespace NDE_Digital_Market.Controllers
                 {
                     return BadRequest(new { message = "Send a Valid User Information!" });
                 }
-                object res = _user_Service.UpdateUserProfileAsync(userModel);
+                object res = await _user_Service.UpdateUserProfileAsync(userModel);
                 return Ok(res);
             }
             catch(Exception ex)
