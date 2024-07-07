@@ -70,7 +70,7 @@ namespace NDE_Digital_Market.Services.InvoiceService
                 orderDetails.SelesPerson = row["SelesPerson"].ToString();
                 orderDetails.SelesAddress = row["SelesAddress"].ToString();
                 orderDetails.SellerContact = row["SellerContact"].ToString();
-                orderDetails.Company = row["Company"].ToString();
+                orderDetails.CompanyCode = row["CompanyCode"].ToString();
 
                 invoice.OrderInvoiceDetailList.Add(orderDetails);
             }

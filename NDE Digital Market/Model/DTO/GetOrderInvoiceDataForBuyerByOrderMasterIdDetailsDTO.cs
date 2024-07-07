@@ -19,6 +19,6 @@
         public string SellerId { get; set; }
         public string SelesAddress { get; set; }
         public string SellerContact { get; set; }
-        public string Company { get; set; }
+        public string CompanyCode { get; set; }
     }
 }
