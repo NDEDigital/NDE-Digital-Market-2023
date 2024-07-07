@@ -68,7 +68,7 @@ namespace NDE_Digital_Market.Services.ProductGroupService
                 GetAllProductGroupDTO modelObj = new GetAllProductGroupDTO();
 
                 modelObj.ProductGroupID = CommonServices.EncryptPassword(row["ProductGroupID"].ToString());
-                modelObj.ProductGroupCode = CommonServices.EncryptPassword(row["ProductGroupCode"].ToString());
+                modelObj.ProductGroupCode = row["ProductGroupCode"].ToString();
                 modelObj.ProductGroupName = row["ProductGroupName"].ToString();
                 modelObj.ProductGroupPrefix = row["ProductGroupPrefix"].ToString();
                 modelObj.ProductGroupDetails = row["ProductGroupDetails"].ToString();
@@ -97,7 +97,7 @@ namespace NDE_Digital_Market.Services.ProductGroupService
                 GetProductGroupListByStatusDTO modelObj = new GetProductGroupListByStatusDTO();
 
                 modelObj.ProductGroupID = CommonServices.EncryptPassword(row["ProductGroupID"].ToString());
-                modelObj.ProductGroupCode = CommonServices.EncryptPassword(row["ProductGroupCode"].ToString());
+                modelObj.ProductGroupCode = row["ProductGroupCode"].ToString();
                 modelObj.ProductGroupName = row["ProductGroupName"].ToString();
                 modelObj.ProductGroupPrefix = row["ProductGroupPrefix"].ToString();
                 modelObj.ProductGroupDetails = row["ProductGroupDetails"].ToString();

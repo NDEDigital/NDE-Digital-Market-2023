@@ -311,10 +311,10 @@ namespace NDE_Digital_Market.Data_Access_Layer
 
 
                     //string UserId = userId.ToString();
-                    if(companyCode != null)
-                    {
-                        companyCode = CommonServices.EncryptPassword(companyCode);
-                    }
+                    //if(companyCode != null)
+                    //{
+                    //    companyCode = CommonServices.EncryptPassword(companyCode);
+                    //}
                     string UserId = CommonServices.EncryptPassword(userId.ToString());
 
                     return (new { message = "Login successful",IsSuccess = true, UserId, role, IsSellerAdmin, companyCode, token, newRefreshToken, cookieOptions , cookieOptions2 });

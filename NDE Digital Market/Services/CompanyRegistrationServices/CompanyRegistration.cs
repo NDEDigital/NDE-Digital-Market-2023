@@ -47,7 +47,7 @@ public class CompanyRegistration : ICompanyRegistration
 
             company.CompanyID = CommonServices.EncryptPassword(row["CompanyID"].ToString());
             company.MaxUser = Convert.ToInt32(row["MaxUser"]);
-            company.CompanyCode = CommonServices.EncryptPassword(row["CompanyCode"].ToString());
+            company.CompanyCode = row["CompanyCode"].ToString();
             company.CompanyName = row["CompanyName"].ToString();
             company.Email = row["Email"].ToString();
             company.CompanyAdminId = CommonServices.EncryptPassword(row["CompanyAdminId"].ToString());

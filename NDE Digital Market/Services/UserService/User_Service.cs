@@ -84,7 +84,7 @@ namespace NDE_Digital_Market.Services.UserService
             {
 
                 user.UserId = CommonServices.EncryptPassword(row["UserId"].ToString());
-                user.UserCode = CommonServices.EncryptPassword(row["UserCode"].ToString());
+                user.UserCode = row["UserCode"].ToString();
                 user.FullName = row["FullName"].ToString();
                 user.IsAdmin = row["IsAdmin"] as bool?;
                 user.IsBuyer = row["IsBuyer"] as bool?;

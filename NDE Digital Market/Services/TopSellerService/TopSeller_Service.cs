@@ -27,12 +27,12 @@ namespace NDE_Digital_Market.Services.TopSellerService
             {
                 TopSellerListDTO modelObj = new TopSellerListDTO
                 {
-                    CompanyCode = CommonServices.EncryptPassword(row["CompanyCode"].ToString()),
+                    CompanyCode = row["CompanyCode"].ToString(),
                     CompanyName = row["CompanyName"].ToString(),
                     CompanyImage = row["CompanyImage"].ToString(),
                     ProductGroupID = CommonServices.EncryptPassword(row["ProductGroupID"].ToString()),
                     TotalQty = Convert.ToInt32(row["TotalQty"]),
-                    ProductGroupCode = CommonServices.EncryptPassword(row["ProductGroupCode"].ToString()),
+                    ProductGroupCode = row["ProductGroupCode"].ToString(),
                 };
                 topsellerlist.Add(modelObj);
 

@@ -31,7 +31,8 @@ namespace NDE_Digital_Market.Services.AddToCartService
                 GetAddToCartDataDTO addToCart = new GetAddToCartDataDTO();
                 addToCart.Id = CommonServices.EncryptPassword(row["Id"].ToString());
                 addToCart.BuyerUserID = CommonServices.EncryptPassword(row["BuyerUserID"].ToString());
-                addToCart.CompanyCode = CommonServices.EncryptPassword(row["CompanyCode"].ToString());
+                //addToCart.CompanyCode = CommonServices.EncryptPassword(row["CompanyCode"].ToString());
+                addToCart.CompanyCode = row["CompanyCode"].ToString();
                 addToCart.ProductID = CommonServices.EncryptPassword(row["ProductID"].ToString());
                 addToCart.ProductGroupID = CommonServices.EncryptPassword(row["ProductGroupID"].ToString());
                 addToCart.UnitID = CommonServices.EncryptPassword(row["UnitID"].ToString());
@@ -68,7 +69,7 @@ namespace NDE_Digital_Market.Services.AddToCartService
                 GetAddToCartDataDTO addToCart = new GetAddToCartDataDTO();
                 addToCart.Id = CommonServices.EncryptPassword(row["Id"].ToString());
                 addToCart.BuyerUserID = CommonServices.EncryptPassword(row["BuyerUserID"].ToString());
-                addToCart.CompanyCode = CommonServices.EncryptPassword(row["CompanyCode"].ToString());
+                addToCart.CompanyCode = row["CompanyCode"].ToString();
                 addToCart.ProductID = CommonServices.EncryptPassword(row["ProductID"].ToString());
                 addToCart.ProductGroupID = CommonServices.EncryptPassword(row["ProductGroupID"].ToString());
                 addToCart.UnitID = CommonServices.EncryptPassword(row["UnitID"].ToString());
@@ -94,7 +95,7 @@ namespace NDE_Digital_Market.Services.AddToCartService
         {
             AddToCartModal Model = new AddToCartModal();
             Model.BuyerUserID = int.Parse(CommonServices.DecryptPassword(addToCart.BuyerUserID));
-            Model.CompanyCode = CommonServices.DecryptPassword(addToCart.CompanyCode);
+            Model.CompanyCode =addToCart.CompanyCode;
             Model.ProductID = int.Parse(CommonServices.DecryptPassword(addToCart.ProductID));
             Model.ProductGroupID = int.Parse(CommonServices.DecryptPassword(addToCart.ProductGroupID));
             Model.UnitID = int.Parse(CommonServices.DecryptPassword(addToCart.UnitID));

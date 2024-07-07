@@ -42,7 +42,7 @@ namespace NDE_Digital_Market.Services.OrderService
             {
                 var orderDetails = new OrderDetailsModel();
 
-                orderDetails.CompanyCode = CommonServices.DecryptPassword(data.OrderDetailsList[i].CompanyCode);
+                orderDetails.CompanyCode = data.OrderDetailsList[i].CompanyCode;
                 //orderDetails.OrderMasterId = int.Parse(CommonServices.DecryptPassword(data.OrderDetailsList[i].OrderMasterId));
                 // orderDetails.UserId = int.Parse(CommonServices.DecryptPassword(data.OrderDetailsList[i].UserId));
                 orderDetails.ProductId = int.Parse(CommonServices.DecryptPassword(data.OrderDetailsList[i].ProductId));
@@ -579,7 +579,7 @@ namespace NDE_Digital_Market.Services.OrderService
                         Detail.Qty = Convert.ToInt32(row["Qty"]);
                         Detail.Price = Convert.ToDecimal(row["Price"]) * Detail.Qty;
                         Detail.Status = row["Status"].ToString();
-                        Detail.CompanyCode = CommonServices.EncryptPassword(row["CompanyCode"].ToString());
+                        Detail.CompanyCode = row["CompanyCode"].ToString();
                     }
                     Master.OrderDetailsListForBuyer.Add(Detail);
 
@@ -726,8 +726,8 @@ namespace NDE_Digital_Market.Services.OrderService
         public async Task<List<GetOrderMasterDataForSellerByCompanyCodeDTO>> getAllOrderForSellerAsync(string CompanyCode, string? status)
         {
 
-            string DecryptCompanyCode = CommonServices.DecryptPassword(CompanyCode);
-            DataTable dataTable = await _order_DAL.getAllOrderForSellerAsync(DecryptCompanyCode, status);
+            //string DecryptCompanyCode = CommonServices.DecryptPassword(CompanyCode);
+            DataTable dataTable = await _order_DAL.getAllOrderForSellerAsync(CompanyCode, status);
 
             List<GetOrderMasterDataForSellerByCompanyCodeDTO> MasterList = new List<GetOrderMasterDataForSellerByCompanyCodeDTO>();
 

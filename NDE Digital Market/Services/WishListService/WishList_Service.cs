@@ -32,12 +32,12 @@ namespace NDE_Digital_Market.Services.WishListService
                 GetAllWishListDTO wishListItem = new GetAllWishListDTO();
 
                 //wishListItem.UserId = CommonServices.Encrypt(Convert.ToInt32(row["UserId"]));
-                wishListItem.CompanyCode = CommonServices.EncryptPassword(row["CompanyCode"].ToString());
+                wishListItem.CompanyCode = row["CompanyCode"].ToString();
                 wishListItem.CompanyName = row["CompanyName"].ToString();
                 wishListItem.ProductGroupName = row["ProductGroupName"].ToString();
                 wishListItem.ProductId = CommonServices.EncryptPassword(row["ProductId"].ToString());
                 wishListItem.ProductName = row["ProductName"].ToString();
-                wishListItem.GroupCode = CommonServices.EncryptPassword(row["ProductGroupCode"].ToString());
+                wishListItem.GroupCode = row["ProductGroupCode"].ToString();
                 wishListItem.SellerId = CommonServices.EncryptPassword(row["SellerId"].ToString());
                 wishListItem.ProductGroupID = CommonServices.EncryptPassword((row["ProductGroupID"].ToString()));
                 wishListItem.Specification = row["Specification"].ToString();
@@ -73,17 +73,17 @@ namespace NDE_Digital_Market.Services.WishListService
         {
             int decryptedUserId = int.Parse(CommonServices.DecryptPassword(UserId));
             int decryptedProductId = int.Parse(CommonServices.DecryptPassword(ProductId));
-            string decryptedCompanyCode = CommonServices.DecryptPassword(CompanyCode);
-            return await _wishList_DAL.InsertWishList(decryptedUserId, decryptedProductId, decryptedCompanyCode);
+            //string decryptedCompanyCode = CommonServices.DecryptPassword(CompanyCode);
+            return await _wishList_DAL.InsertWishList(decryptedUserId, decryptedProductId, CompanyCode);
         }
 
         public async Task<object> DeleteWishList(string UserId, string ProductId, string CompanyCode)
         {
             int decryptedUserId = int.Parse(CommonServices.DecryptPassword(UserId));
             int decryptedProductId = int.Parse(CommonServices.DecryptPassword(ProductId));
-            string decryptedCompanyCode = CommonServices.DecryptPassword(CompanyCode);
+            //string decryptedCompanyCode = CommonServices.DecryptPassword(CompanyCode);
 
-            return await _wishList_DAL.DeleteWishList(decryptedUserId, decryptedProductId, decryptedCompanyCode);
+            return await _wishList_DAL.DeleteWishList(decryptedUserId, decryptedProductId, CompanyCode);
         }
     }
 }

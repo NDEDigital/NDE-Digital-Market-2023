@@ -24,7 +24,8 @@ namespace NDE_Digital_Market.Services.AddBanner
             Model.IsAds = bannerDto.IsAds;
             Model.AddedBy = bannerDto.AddedBy;
             Model.AddedPC = bannerDto.AddedPC;
-            Model.CompanyCode = CommonServices.DecryptPassword(bannerDto.CompanyCode);
+            //Model.CompanyCode = CommonServices.DecryptPassword(bannerDto.CompanyCode);
+            Model.CompanyCode = bannerDto.CompanyCode;
             Model.BannerDescription = bannerDto.BannerDescription;
             Model.BannerImageFile = bannerDto.BannerImageFile;
             Model.StartDate = bannerDto.StartDate;
@@ -105,8 +106,8 @@ namespace NDE_Digital_Market.Services.AddBanner
         public async Task<List<GetAdsAndBannerForSellerByCompanyCodeDTO>> GetAddBannerForSeller(string ComapnayCode)
         {
 
-            string decryptcompanycode = CommonServices.DecryptPassword(ComapnayCode);
-            DataTable dataTable = await _AddBanner_DAL.GetAddBannerForSeller(decryptcompanycode);
+            //string decryptcompanycode = CommonServices.DecryptPassword(ComapnayCode);
+            DataTable dataTable = await _AddBanner_DAL.GetAddBannerForSeller(ComapnayCode);
 
             List<GetAdsAndBannerForSellerByCompanyCodeDTO> list = new List<GetAdsAndBannerForSellerByCompanyCodeDTO>();
             // Check if dataTable is null
@@ -208,7 +209,8 @@ namespace NDE_Digital_Market.Services.AddBanner
             Model.IsAds = bannerDto.IsAds;
             Model.UpdatedPC = bannerDto.UpdatedPC;
             Model.UpdatedBy = bannerDto.UpdatedBy;
-            Model.CompanyCode = CommonServices.DecryptPassword(bannerDto.CompanyCode);
+            //Model.CompanyCode = CommonServices.DecryptPassword(bannerDto.CompanyCode);
+            Model.CompanyCode = bannerDto.CompanyCode;
             Model.BannerDescription = bannerDto.BannerDescription;
             Model.BannerImageFile = bannerDto.BannerImageFile;
             Model.StartDate = bannerDto.StartDate;
@@ -231,7 +233,8 @@ namespace NDE_Digital_Market.Services.AddBanner
             Model.IsAds = bannerDto.IsAds;
             Model.UpdatedPC = bannerDto.UpdatedPC;
             Model.UpdatedBy = bannerDto.UpdatedBy;
-            Model.CompanyCode = bannerDto.CompanyCode != null ? CommonServices.DecryptPassword(bannerDto.CompanyCode) : null;
+            //Model.CompanyCode = bannerDto.CompanyCode != null ? CommonServices.DecryptPassword(bannerDto.CompanyCode) : null;
+            Model.CompanyCode = bannerDto.CompanyCode != null ? bannerDto.CompanyCode : null;
             Model.BannerDescription = bannerDto.BannerDescription;
             Model.BannerImageFile = bannerDto.BannerImageFile;
             Model.StartDate = bannerDto.StartDate;
