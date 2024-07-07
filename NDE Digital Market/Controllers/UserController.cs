@@ -228,7 +228,7 @@ namespace NDE_Digital_Market.Controllers
                 }
                 else
                 {
-                    object result = _user_Service.UpdatePasss(user);
+                    object result = await _user_Service.UpdatePasss(user);
                     return Ok(result);
                 }
             }

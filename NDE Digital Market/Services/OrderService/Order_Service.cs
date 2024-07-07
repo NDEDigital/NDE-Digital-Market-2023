@@ -651,7 +651,11 @@ namespace NDE_Digital_Market.Services.OrderService
 
                     SecondMasterDetails.Imagepath = row["Imagepath"].ToString();
                     SecondMasterDetails.ProductName = row["ProductName"].ToString();
-                    SecondMasterDetails.Price = Convert.ToDecimal(row["Price"]);
+                    //SecondMasterDetails.Price = Convert.ToDecimal(row["Price"]);
+                    SecondMasterDetails.Price = row["Price"] != DBNull.Value
+                    ? Convert.ToDecimal(row["Price"])
+                    : (decimal?)null;
+
                     SecondMasterDetails.DeliveryCharge = Convert.ToDecimal(row["DeliveryCharge"]);
                     SecondMasterDetails.ProductTotalPrice = Convert.ToDecimal(row["ProductTotalPrice"]);
                     SecondMasterDetails.TotalQty = Convert.ToInt32(row["TotalQty"]);
@@ -676,7 +680,10 @@ namespace NDE_Digital_Market.Services.OrderService
 
                         SecondMasterDetails.Imagepath = row["Imagepath"].ToString();
                         SecondMasterDetails.ProductName = row["ProductName"].ToString();
-                        SecondMasterDetails.Price = Convert.ToDecimal(row["Price"]);
+                        //SecondMasterDetails.Price = Convert.ToDecimal(row["Price"]);
+                        SecondMasterDetails.Price = row["Price"] != DBNull.Value
+                        ? Convert.ToDecimal(row["Price"])
+                        : (decimal?)null;
                         SecondMasterDetails.DeliveryCharge = Convert.ToDecimal(row["DeliveryCharge"]);
                         SecondMasterDetails.ProductTotalPrice = Convert.ToDecimal(row["ProductTotalPrice"]);
                         SecondMasterDetails.TotalQty = Convert.ToInt32(row["TotalQty"]);
@@ -700,7 +707,10 @@ namespace NDE_Digital_Market.Services.OrderService
 
                         SecondMasterDetails.Imagepath = row["Imagepath"].ToString();
                         SecondMasterDetails.ProductName = row["ProductName"].ToString();
-                        SecondMasterDetails.Price = Convert.ToDecimal(row["Price"]);
+                        //SecondMasterDetails.Price = Convert.ToDecimal(row["Price"]);
+                        SecondMasterDetails.Price = row["Price"] != DBNull.Value
+                        ? Convert.ToDecimal(row["Price"])
+                        : (decimal?)null;
                         SecondMasterDetails.DeliveryCharge = Convert.ToDecimal(row["DeliveryCharge"]);
                         SecondMasterDetails.ProductTotalPrice = Convert.ToDecimal(row["ProductTotalPrice"]);
                         SecondMasterDetails.TotalQty = Convert.ToInt32(row["TotalQty"]);
