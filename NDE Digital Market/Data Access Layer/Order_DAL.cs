@@ -764,7 +764,7 @@ namespace NDE_Digital_Market.Data_Access_Layer
                                 LEFT JOIN OrderDetails OD ON OD.OrderMasterId = OM.OrderMasterId 
                                 LEFT JOIN UserRegistration UR ON UR.UserId = OD.UserId
                                 LEFT JOIN ProductList PL ON PL.ProductId = OD.ProductId 
-                                LEFT JOIN SellerProductPriceAndOffer SPP ON SPP.ProductId = OD.ProductId AND SPP.UserId = OD.UserId
+                                LEFT JOIN SellerProductPriceAndOffer SPP ON SPP.ProductId = OD.ProductId AND SPP.CompanyCode = OD.CompanyCode
                                 LEFT JOIN UserRegistration UR2 ON UR2.UserId = OM.UserId 
                                 WHERE OM.OrderNo = @OrderNo 
                                 GROUP BY 
