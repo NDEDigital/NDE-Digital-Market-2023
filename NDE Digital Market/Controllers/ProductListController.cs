@@ -89,12 +89,20 @@ public class ProductListController : ControllerBase
     [Route("GetProductNameByProductGroupId")]
     public async Task<IActionResult> GetProductNameByProductGroupId(string ProductGroupId)
     {
-        object res = await _productList_Service.GetProductNameByProductGroupId(ProductGroupId);
-        if (res == null)
+        try
         {
-            return NotFound(new { message = "Product not Found." });
+            object res = await _productList_Service.GetProductNameByProductGroupId(ProductGroupId);
+            if (res == null)
+            {
+                return NotFound(new { message = "Product not Found." });
+            }
+            return Ok(res);
         }
-        return Ok(res);
+        catch(Exception ex)
+        {
+            return BadRequest(new { message = "Server Error. Try Again!!!" });
+        }
+
     }
 
 
