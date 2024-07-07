@@ -245,7 +245,7 @@ namespace NDE_Digital_Market.Services.ProductQuantityService
                 GetPortalReceivedListByUserIdDTO obj = new GetPortalReceivedListByUserIdDTO();
                 {
                     obj.PortalReceivedId = CommonServices.EncryptPassword(row["PortalReceivedId"].ToString());
-                    obj.PortalReceivedCode = CommonServices.EncryptPassword(row["PortalReceivedCode"].ToString());
+                    obj.PortalReceivedCode = row["PortalReceivedCode"].ToString();
                     obj.MaterialReceivedDate = row["MaterialReceivedDate"] != DBNull.Value ? Convert.ToDateTime(row["MaterialReceivedDate"]) : (DateTime?)null;
                     obj.UserId = CommonServices.EncryptPassword(row["UserId"].ToString());
                 };
@@ -271,7 +271,7 @@ namespace NDE_Digital_Market.Services.ProductQuantityService
                 {
                     DataRow row = masterTable.Rows[0];
                     portalAfterInsert.PortalReceivedId = CommonServices.EncryptPassword(row["PortalReceivedId"].ToString());
-                    portalAfterInsert.PortalReceivedCode = CommonServices.EncryptPassword(row["PortalReceivedCode"].ToString());
+                    portalAfterInsert.PortalReceivedCode = row["PortalReceivedCode"].ToString();
                     portalAfterInsert.MaterialReceivedDate = Convert.ToDateTime(row["MaterialReceivedDate"].ToString());
                     portalAfterInsert.ChallanNo = row["ChallanNo"].ToString();
                     portalAfterInsert.ChallanDate = row["ChallanDate"] != DBNull.Value ? Convert.ToDateTime(row["ChallanDate"]) : (DateTime?)null;

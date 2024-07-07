@@ -47,7 +47,7 @@ public class Products_Service : IProducts_Service
             SellerProductsModel model = new SellerProductsModel();
 
             model.ProductId = int.Parse(CommonServices.DecryptPassword(productStatusList[i].ProductId));
-            model.CompanyCode = CommonServices.DecryptPassword(productStatusList[i].CompanyCode);
+            model.CompanyCode = productStatusList[i].CompanyCode;
             model.Status = productStatusList[i].Status;
             model.UserId = int.Parse(CommonServices.DecryptPassword(productStatusList[i].UserId));
 

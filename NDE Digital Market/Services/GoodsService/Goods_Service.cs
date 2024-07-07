@@ -31,7 +31,7 @@ namespace NDE_Digital_Market.Services.GoodsService
             {
                 GetNavDataDTO modelObj = new GetNavDataDTO
                 {
-                    ProductGroupCode = CommonServices.EncryptPassword(row["ProductGroupCode"].ToString()),
+                    ProductGroupCode = row["ProductGroupCode"].ToString(),
                     ProductGroupName = row["ProductGroupName"].ToString(),
                     //ProductGroupPrefix = reader["ProductGroupPrefix"].ToString(),
                     //ProductGroupDetails = reader["ProductGroupDetails"].ToString(),
@@ -93,13 +93,13 @@ namespace NDE_Digital_Market.Services.GoodsService
             {
                 GetAllProductListWithAvailableQty obj = new GetAllProductListWithAvailableQty();
 
-                obj.CompanyCode = CommonServices.EncryptPassword(row["CompanyCode"].ToString());
+                obj.CompanyCode = row["CompanyCode"].ToString();
                 obj.CompanyName = row["CompanyName"].ToString();
                 obj.ProductGroupName = row["ProductGroupName"].ToString();
                 obj.ProductId = CommonServices.EncryptPassword(row["ProductId"].ToString());
                 obj.ProductName = row["ProductName"].ToString();
                 obj.ProductGroupID = CommonServices.EncryptPassword(row["ProductGroupID"].ToString());
-                obj.ProductGroupCode = CommonServices.EncryptPassword(row["ProductGroupCode"].ToString());
+                obj.ProductGroupCode = row["ProductGroupCode"].ToString();
                 obj.Specification = row["Specification"].ToString();
                 obj.UnitId = CommonServices.EncryptPassword(row["UnitId"].ToString());
                 obj.Unit = row["Unit"].ToString();
@@ -136,8 +136,8 @@ namespace NDE_Digital_Market.Services.GoodsService
         public async Task<GetAllProductListWithAvailableQty> GetGoodsDetails(string CompanyCode, string ProductId)
         {
             int decryptProductId = int.Parse(CommonServices.DecryptPassword(ProductId));
-            string decryptCompanyCode = CommonServices.DecryptPassword(CompanyCode);
-            DataTable dataTable = await _Goods_DAL.GetGoodsDetails(decryptCompanyCode, decryptProductId);
+            //string decryptCompanyCode = CommonServices.DecryptPassword(CompanyCode);
+            DataTable dataTable = await _Goods_DAL.GetGoodsDetails(CompanyCode, decryptProductId);
 
             GetAllProductListWithAvailableQty obj = new GetAllProductListWithAvailableQty();
             // Check if dataTable is null
@@ -149,7 +149,7 @@ namespace NDE_Digital_Market.Services.GoodsService
             foreach (DataRow row in dataTable.Rows)
             {
 
-                obj.CompanyCode = CommonServices.EncryptPassword(row["CompanyCode"].ToString());
+                obj.CompanyCode = row["CompanyCode"].ToString();
                 obj.CompanyName = row["CompanyName"].ToString();
                 obj.ProductGroupName = row["ProductGroupName"].ToString();
                 obj.ProductId = CommonServices.EncryptPassword(row["ProductId"].ToString());
@@ -186,8 +186,8 @@ namespace NDE_Digital_Market.Services.GoodsService
 
         public async Task<List<GetCompanyListDTO>> GetProductCompany(string ProductGroupCode)
         {
-            string decryptProductGroupCode = CommonServices.DecryptPassword(ProductGroupCode);
-            DataTable dataTable = await _Goods_DAL.GetProductCompany(decryptProductGroupCode);
+            //string decryptProductGroupCode = CommonServices.DecryptPassword(ProductGroupCode);
+            DataTable dataTable = await _Goods_DAL.GetProductCompany(ProductGroupCode);
 
             List<GetCompanyListDTO> list = new List<GetCompanyListDTO>();
             // Check if dataTable is null
@@ -201,7 +201,7 @@ namespace NDE_Digital_Market.Services.GoodsService
                 var companiesByProduct = new GetCompanyListDTO
                 {
                     CompanyName = row["CompanyName"].ToString(),
-                    CompanyCode = CommonServices.EncryptPassword(row["CompanyCode"].ToString()),
+                    CompanyCode = row["CompanyCode"].ToString(),
                     CompanyImage = row["CompanyImage"].ToString()
                 };
                 list.Add(companiesByProduct);
@@ -214,14 +214,14 @@ namespace NDE_Digital_Market.Services.GoodsService
 
         public async Task<List<GetCompanyWiseProductListDTO>> GetProductList(string? CompanyCode, string ProductGroupCode)
         {
-            string decryptCompanyCode = null;
-            if (CompanyCode != null)
-            {
-                decryptCompanyCode = CommonServices.DecryptPassword(CompanyCode);
-            }
-            string decryptProductGroupCode = CommonServices.DecryptPassword(ProductGroupCode);
+            //string decryptCompanyCode = null;
+            //if (CompanyCode != null)
+            //{
+            //    decryptCompanyCode = CommonServices.DecryptPassword(CompanyCode);
+            //}
+            //string decryptProductGroupCode = CommonServices.DecryptPassword(ProductGroupCode);
             
-            DataTable dataTable = await _Goods_DAL.GetProductList(decryptCompanyCode, decryptProductGroupCode);
+            DataTable dataTable = await _Goods_DAL.GetProductList(CompanyCode, ProductGroupCode);
 
             List<GetCompanyWiseProductListDTO> list = new List<GetCompanyWiseProductListDTO>();
             // Check if dataTable is null
@@ -234,7 +234,7 @@ namespace NDE_Digital_Market.Services.GoodsService
             {
                 var obj = new GetCompanyWiseProductListDTO
                 {
-                    CompanyCode = CommonServices.EncryptPassword(row["CompanyCode"].ToString()),
+                    CompanyCode = row["CompanyCode"].ToString(),
                     CompanyName = row["CompanyName"].ToString(),
                     ProductId = CommonServices.EncryptPassword(row["ProductId"].ToString()),
                     ProductName = row["ProductName"].ToString(),
@@ -274,8 +274,8 @@ namespace NDE_Digital_Market.Services.GoodsService
         public async Task<List<GetRecommendedProductListDTO>> GetRecommendedProductList(string CompanyCode, string ProductId)
         {
             int decryptProductId = int.Parse(CommonServices.DecryptPassword(ProductId));
-            string decryptCompanyCode = CommonServices.DecryptPassword(CompanyCode);
-            DataTable dataTable = await _Goods_DAL.GetRecommendedProductList(decryptCompanyCode, decryptProductId);
+            //string decryptCompanyCode = CommonServices.DecryptPassword(CompanyCode);
+            DataTable dataTable = await _Goods_DAL.GetRecommendedProductList(CompanyCode, decryptProductId);
 
             List<GetRecommendedProductListDTO> list = new List<GetRecommendedProductListDTO>();
             // Check if dataTable is null
@@ -290,7 +290,7 @@ namespace NDE_Digital_Market.Services.GoodsService
                 obj.ProductId = CommonServices.EncryptPassword(row["ProductId"].ToString());
                 obj.ProductName = row["ProductName"].ToString();
                 obj.ImagePath = row["ImagePath"].ToString();
-                obj.CompanyCode = CommonServices.EncryptPassword(row["CompanyCode"].ToString());
+                obj.CompanyCode = row["CompanyCode"].ToString();
                 obj.CompanyName = row["CompanyName"].ToString();
                 obj.AvailableQty = Convert.ToDecimal(row["AvailableQty"]);
                 obj.TotalPrice = Convert.ToDecimal(row["TotalPrice"]);

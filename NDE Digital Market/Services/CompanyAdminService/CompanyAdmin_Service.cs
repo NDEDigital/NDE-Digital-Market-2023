@@ -39,7 +39,7 @@ namespace NDE_Digital_Market.Services.CompanyAdminService
                 obj.Address = row["Address"].ToString();
                 obj.AddedDate = (DateTime)(row["AddedDate"] as DateTime?);
                 obj.IsActive = row["IsActive"] as bool? ?? IsActive;
-                obj.CompanyCode = CommonServices.EncryptPassword(row["CompanyCode"].ToString());
+                obj.CompanyCode = row["CompanyCode"].ToString();
                 obj.CompanyName = row["CompanyName"].ToString();
                 obj.CompanyAdminId = row["CompanyAdminId"].ToString();
 

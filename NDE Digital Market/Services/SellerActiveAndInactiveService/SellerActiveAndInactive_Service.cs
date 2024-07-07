@@ -19,13 +19,13 @@ namespace NDE_Digital_Market.Services.SellerActiveAndInactiveService
         {
             try
             {
-                string decryptedcode = string.Empty;
-                if (CompanyCode != null)
-                {
-                     decryptedcode= CommonServices.DecryptPassword(CompanyCode);
-                }
+                //string decryptedcode = string.Empty;
+                //if (CompanyCode != null)
+                //{
+                //     decryptedcode= CommonServices.DecryptPassword(CompanyCode);
+                //}
 
-                DataTable dataTable = await _sellerActiveAndInactive_DAL.CompanySellerDetails(decryptedcode, IsSeller, IsActive);
+                DataTable dataTable = await _sellerActiveAndInactive_DAL.CompanySellerDetails(CompanyCode, IsSeller, IsActive);
 
                 List<GetCompanySellerDetailsDTO> list = new List<GetCompanySellerDetailsDTO>();
                 // Check if dataTable is null
@@ -47,7 +47,7 @@ namespace NDE_Digital_Market.Services.SellerActiveAndInactiveService
                     modelObj.IsActive = row["IsActive"] as bool? ?? IsActive;
                     modelObj.IsSeller = row["IsSeller"] as bool? ?? IsActive;
 
-                    modelObj.CompanyCode = CommonServices.EncryptPassword(row["CompanyCode"].ToString());
+                    modelObj.CompanyCode = row["CompanyCode"].ToString();
                     modelObj.CompanyAdminId = CommonServices.EncryptPassword(row["CompanyAdminId"].ToString());
 
                     modelObj.CompanyName = row["CompanyName"].ToString();
