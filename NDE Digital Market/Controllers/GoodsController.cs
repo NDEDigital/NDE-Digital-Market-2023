@@ -139,10 +139,7 @@ namespace NDE_Digital_Market.Controllers
             try
             {
 
-                if (ProductGroupCode == null)
-                {
-                    return NotFound(new { message = "Give Valid Data." });
-                }
+
                 object res = await _Goods_Service.GetProductList(CompanyCode, ProductGroupCode);
                 if (res == null)
                 {
