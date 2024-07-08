@@ -14,7 +14,7 @@ namespace NDE_Digital_Market.Services.GoodsService
 
         Task<List<GetCompanyListDTO>> GetProductCompany(string ProductGroupCode);
 
-        Task<List<GetCompanyWiseProductListDTO>> GetProductList(string? CompanyCode, string ProductGroupCode);
+        Task<List<GetCompanyWiseProductListDTO>> GetProductList(string? CompanyCode, string? ProductGroupCode);
 
         Task<List<GetRecommendedProductListDTO>> GetRecommendedProductList(string CompanyCode, string ProductId);
     }

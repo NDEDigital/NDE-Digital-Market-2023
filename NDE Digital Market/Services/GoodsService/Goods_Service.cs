@@ -212,7 +212,7 @@ namespace NDE_Digital_Market.Services.GoodsService
 
 
 
-        public async Task<List<GetCompanyWiseProductListDTO>> GetProductList(string? CompanyCode, string ProductGroupCode)
+        public async Task<List<GetCompanyWiseProductListDTO>> GetProductList(string? CompanyCode, string? ProductGroupCode)
         {
             //string decryptCompanyCode = null;
             //if (CompanyCode != null)

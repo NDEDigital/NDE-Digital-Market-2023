@@ -175,7 +175,7 @@ namespace NDE_Digital_Market.Data_Access_Layer
 
 
 
-        public async Task<DataTable> GetProductList(string? CompanyCode, string ProductGroupCode)
+        public async Task<DataTable> GetProductList(string? CompanyCode, string? ProductGroupCode)
         {
 
             try
