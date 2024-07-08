@@ -239,6 +239,7 @@ namespace NDE_Digital_Market.Services.GoodsService
                     ProductId = CommonServices.EncryptPassword(row["ProductId"].ToString()),
                     ProductName = row["ProductName"].ToString(),
                     ProductGroupID = CommonServices.EncryptPassword(row["ProductGroupID"].ToString()),
+                    ProductGroupCode = row["ProductGroupCode"].ToString(),
                     ProductGroupName = row["ProductGroupName"].ToString(),
                     Specification = row["Specification"].ToString(),
                     UnitId = CommonServices.EncryptPassword(row["UnitId"].ToString()),

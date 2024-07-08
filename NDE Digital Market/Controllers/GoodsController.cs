@@ -158,7 +158,7 @@ namespace NDE_Digital_Market.Controllers
 
 
         [HttpGet]
-        [Route("GetRecommendedProductList/{CompanyCode}/{ProductId}")]
+        [Route("GetRecommendedProductList")]
         public async Task<IActionResult> GetRecommendedProductList(string CompanyCode, string ProductId)
         {
             try
