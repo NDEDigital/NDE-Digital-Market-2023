@@ -5,7 +5,7 @@
 
         public string? BuyerName { get; set; }
 
-        public string? SellerName { get; set; }
+        public string? CompanyName { get; set; }
 
         public string? EmptyRatingArray { get; set; }
         public string? RatingArray { get; set; }
@@ -22,7 +22,7 @@
 
 
 
-        public string? SellerId { get; set; }
+        public string? CompanyCode { get; set; }
 
         public DateTime? ReviewDate { get; set; }
 

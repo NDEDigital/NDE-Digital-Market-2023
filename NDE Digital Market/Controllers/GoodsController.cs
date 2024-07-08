@@ -84,7 +84,7 @@ namespace NDE_Digital_Market.Controllers
         //====================== Product Details in url =================
 
         [HttpGet]
-        [Route("GetGoodsDetails/{CompanyCode}/{ProductId}")]
+        [Route("GetGoodsDetails")]
         public async Task<IActionResult> GetGoodsDetails(string CompanyCode,string ProductId)
         {
             try

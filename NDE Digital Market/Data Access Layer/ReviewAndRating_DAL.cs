@@ -74,8 +74,8 @@ namespace NDE_Digital_Market.Data_Access_Layer
                                     OrderDetailId = CommonServices.EncryptPassword(row["OrderDetailId"].ToString()),
                                     BuyerId = CommonServices.EncryptPassword(row["BuyerId"].ToString()),
                                     BuyerName = row["BuyerName"].ToString(),
-                                    SellerId = CommonServices.EncryptPassword(row["SellerId"].ToString()),
-                                    SellerName = row["SellerName"].ToString(),
+                                    CompanyCode = row["CompanyCode"].ToString(),
+                                    CompanyName = row["CompanyName"].ToString(),
 
 
                                     ReviewDate = Convert.ToDateTime(row["ReviewDate"]),
